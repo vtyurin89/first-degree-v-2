@@ -1,8 +1,8 @@
 extends Node3D
 
-const ROOM_W := 14.0
-const ROOM_D := 14.0
-const ROOM_H := 3.2
+const ROOM_W := 10.0
+const ROOM_D := 10.0
+const ROOM_H := 3.0
 
 const NOTE_LINES := [
 	{"speaker": "Доска дел", "text": "Дело №4417-С. Жертва: Грегори Мэйсон, 15 лет. Пасынок подозреваемого.", "internal": false},
@@ -54,10 +54,13 @@ var _mat_glass: StandardMaterial3D
 var _mat_paper: StandardMaterial3D
 var _mat_black: StandardMaterial3D
 
+const DeskLampHead := Vector3(-0.85, 1.28, -2.95)
+const DeskTop := Vector3(0, 0.78, -2.6)
+
 
 func _ready() -> void:
 	GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
-	player.position = Vector3(0, 0.1, 4.0)
+	player.position = Vector3(0, 0.1, 3.2)
 	_build_materials()
 	_build_environment()
 	_build_shell()
@@ -153,8 +156,8 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 
 
 func _build_materials() -> void:
-	_mat_floor = _make_material(Color(0.32, 0.2, 0.11), _make_wood_texture(), 6.0, 0.8, 0.0)
-	_mat_wall = _make_material(Color(0.42, 0.4, 0.39), _make_plaster_texture(), 3.0, 0.95, 0.0)
+	_mat_floor = _make_material(Color(0.32, 0.2, 0.11), _make_wood_texture(), 5.0, 0.8, 0.0)
+	_mat_wall = _make_material(Color(0.42, 0.4, 0.39), _make_plaster_texture(), 2.5, 0.95, 0.0)
 	_mat_ceiling = _make_material(Color(0.28, 0.28, 0.3), null, 1.0, 1.0, 0.0)
 	_mat_wood = _make_material(Color(0.24, 0.15, 0.09), _make_wood_texture(), 3.0, 0.6, 0.0)
 	_mat_dark = _make_material(Color(0.1, 0.09, 0.1), null, 1.0, 0.5, 0.1)
@@ -179,7 +182,7 @@ func _build_environment() -> void:
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.09, 0.09, 0.13)
 	env.fog_light_energy = 0.6
-	env.fog_density = 0.012
+	env.fog_density = 0.016
 
 
 func _build_shell() -> void:
@@ -191,9 +194,9 @@ func _build_shell() -> void:
 
 	var wx := ROOM_W * 0.5
 	_make_box(Vector3(0.2, 0.75, ROOM_D), Vector3(wx, 0.375, 0), _mat_wall)
-	_make_box(Vector3(0.2, 0.15, ROOM_D), Vector3(wx, 3.125, 0), _mat_wall)
-	_make_box(Vector3(0.2, 2.3, 4.9), Vector3(wx, 1.9, -4.55), _mat_wall)
-	_make_box(Vector3(0.2, 2.3, 4.9), Vector3(wx, 1.9, 4.55), _mat_wall)
+	_make_box(Vector3(0.2, 0.15, ROOM_D), Vector3(wx, 2.925, 0), _mat_wall)
+	_make_box(Vector3(0.2, 2.1, 2.9), Vector3(wx, 1.8, -3.55), _mat_wall)
+	_make_box(Vector3(0.2, 2.1, 2.9), Vector3(wx, 1.8, 3.55), _mat_wall)
 
 	var base := _make_material(Color(0.16, 0.14, 0.13), null, 1.0, 0.7, 0.0)
 	_make_box(Vector3(ROOM_W, 0.16, 0.06), Vector3(0, 0.08, -ROOM_D * 0.5 + 0.13), base, false)
@@ -202,12 +205,12 @@ func _build_shell() -> void:
 	_make_box(Vector3(0.06, 0.16, ROOM_D), Vector3(ROOM_W * 0.5 - 0.13, 0.08, 0), base, false)
 
 	var rug := _make_material(Color(0.28, 0.12, 0.12), null, 1.0, 1.0, 0.0)
-	_make_box(Vector3(3.6, 0.03, 2.6), Vector3(0, 0.015, -2.6), rug, false)
+	_make_box(Vector3(3.4, 0.03, 2.4), Vector3(0, 0.015, -2.2), rug, false)
 
 
 func _build_lights() -> void:
 	var sun := $Sun as DirectionalLight3D
-	sun.look_at_from_position(Vector3(11, 7.5, 5), Vector3(0, 0.5, -2), Vector3.UP)
+	sun.look_at_from_position(Vector3(9, 6.5, 4.5), Vector3(0, 0.5, -1.5), Vector3.UP)
 	sun.light_color = Color(1.0, 0.94, 0.82)
 	sun.light_energy = 1.1
 	sun.shadow_enabled = true
@@ -215,65 +218,61 @@ func _build_lights() -> void:
 	var window_beam := SpotLight3D.new()
 	window_beam.light_color = Color(0.85, 0.9, 1.0)
 	window_beam.light_energy = 1.7
-	window_beam.spot_range = 16.0
-	window_beam.spot_angle = 45.0
+	window_beam.spot_range = 14.0
+	window_beam.spot_angle = 48.0
 	window_beam.shadow_enabled = false
 	add_child(window_beam)
-	window_beam.look_at_from_position(Vector3(6.3, 1.9, 0), Vector3(-3, 0.6, -1), Vector3.UP)
+	window_beam.look_at_from_position(Vector3(4.3, 1.7, 0), Vector3(-2.5, 0.6, -1), Vector3.UP)
 
-	for z in [-3.4, 2.6]:
-		var panel := _make_box(Vector3(2.2, 0.06, 0.6), Vector3(0, ROOM_H - 0.02, z), _make_emissive(Color(0.9, 0.92, 1.0), 1.6), false)
+	for z in [-2.4, 2.0]:
+		var panel := _make_box(Vector3(2.0, 0.06, 0.6), Vector3(0, ROOM_H - 0.02, z), _make_emissive(Color(0.9, 0.92, 1.0), 1.6), false)
 		panel.name = "CeilingPanel"
 		var ceil_lamp := OmniLight3D.new()
 		ceil_lamp.light_color = Color(0.95, 0.95, 1.0)
-		ceil_lamp.light_energy = 1.1
-		ceil_lamp.omni_range = 9.0
+		ceil_lamp.light_energy = 1.0
+		ceil_lamp.omni_range = 7.5
 		ceil_lamp.position = Vector3(0, ROOM_H - 0.25, z)
 		add_child(ceil_lamp)
 
 	var lamp := OmniLight3D.new()
 	lamp.light_color = Color(1.0, 0.72, 0.42)
 	lamp.light_energy = 1.6
-	lamp.omni_range = 3.6
+	lamp.omni_range = 3.4
 	lamp.position = DeskLampHead
 	add_child(lamp)
 
 
-const DeskLampHead := Vector3(-0.85, 1.28, -3.35)
-const DeskTop := Vector3(0, 0.78, -3.0)
-
-
 func _build_furniture() -> void:
-	var desk_size := Vector3(2.8, 0.1, 1.3)
+	var desk_size := Vector3(2.6, 0.1, 1.2)
 	_make_box(desk_size, DeskTop, _mat_wood)
 	var leg_y := DeskTop.y - desk_size.y * 0.5 - 0.36
 	for sx in [-1.0, 1.0]:
 		for sz in [-1.0, 1.0]:
-			_make_box(Vector3(0.1, 0.72, 0.1), Vector3(sx * 1.25, leg_y, DeskTop.z + sz * 0.55), _mat_dark)
+			_make_box(Vector3(0.1, 0.72, 0.1), Vector3(sx * 1.15, leg_y, DeskTop.z + sz * 0.5), _mat_dark)
 
-	_make_chair(Vector3(0, 0, -3.9), PI)
-	_make_chair(Vector3(0.0, 0, -2.0), 0.0)
+	_make_chair(Vector3(0, 0, -3.4), PI)
+	_make_chair(Vector3(0.0, 0, -1.7), 0.0)
 
 	var cabinet := _make_material(Color(0.22, 0.23, 0.25), null, 1.0, 0.6, 0.3)
-	_make_box(Vector3(0.62, 1.1, 0.66), Vector3(-5.6, 0.55, -6.3), cabinet)
+	_make_box(Vector3(0.62, 1.1, 0.66), Vector3(-4.15, 0.55, -4.55), cabinet)
 	for i in 3:
-		_make_box(Vector3(0.56, 0.02, 0.03), Vector3(-5.6, 0.25 + i * 0.32, -5.96), _mat_metal, false)
-		_make_box(Vector3(0.24, 0.03, 0.05), Vector3(-5.6, 0.25 + i * 0.32, -5.97), _mat_metal, false)
+		_make_box(Vector3(0.56, 0.02, 0.03), Vector3(-4.15, 0.25 + i * 0.32, -4.21), _mat_metal, false)
+		_make_box(Vector3(0.24, 0.03, 0.05), Vector3(-4.15, 0.25 + i * 0.32, -4.2), _mat_metal, false)
 
-	_make_box(Vector3(0.5, 1.9, 2.6), Vector3(-6.6, 0.95, -1.4), _mat_wood)
+	_make_box(Vector3(0.5, 1.9, 2.4), Vector3(-4.65, 0.95, -1.4), _mat_wood)
 	var book_colors := [
 		Color(0.5, 0.15, 0.13), Color(0.16, 0.3, 0.5), Color(0.2, 0.4, 0.22),
 		Color(0.45, 0.4, 0.15), Color(0.3, 0.2, 0.4), Color(0.15, 0.15, 0.16),
 	]
 	for shelf_i in 3:
 		var shelf_y := 0.35 + shelf_i * 0.62
-		_make_box(Vector3(0.46, 0.04, 2.4), Vector3(-6.55, shelf_y, -1.4), _mat_dark, false)
-		var x := -1.4 - 1.05
+		_make_box(Vector3(0.46, 0.04, 2.2), Vector3(-4.6, shelf_y, -1.4), _mat_dark, false)
+		var z_pos := -1.4 - 0.95
 		for b in 6:
 			var col: Color = book_colors[(shelf_i * 6 + b) % book_colors.size()]
 			var bh := 0.3 + 0.08 * float(b % 3)
-			_make_box(Vector3(0.36, bh, 0.12), Vector3(-6.55, shelf_y + 0.02 + bh * 0.5, x + 0.14), _make_material(col, null, 1.0, 0.85, 0.0), false)
-			x += 0.15
+			_make_box(Vector3(0.36, bh, 0.12), Vector3(-4.6, shelf_y + 0.02 + bh * 0.5, z_pos + 0.14), _make_material(col, null, 1.0, 0.85, 0.0), false)
+			z_pos += 0.15
 
 
 func _make_chair(pos: Vector3, yaw: float) -> void:
@@ -305,94 +304,95 @@ func _build_desk_props() -> void:
 
 func _build_board() -> void:
 	var cork := _make_material(Color(0.33, 0.24, 0.15), null, 1.0, 0.95, 0.0)
-	_add_box_to(self, Vector3(3.8, 2.3, 0.08), Vector3(2.6, 1.8, -6.84), cork)
-	_add_box_to(self, Vector3(3.9, 0.08, 0.12), Vector3(2.6, 2.95, -6.82), _mat_wood, false)
-	_add_box_to(self, Vector3(0.08, 2.4, 0.12), Vector3(0.75, 1.8, -6.82), _mat_wood, false)
-	_add_box_to(self, Vector3(0.08, 2.4, 0.12), Vector3(4.45, 1.8, -6.82), _mat_wood, false)
+	_add_box_to(self, Vector3(3.4, 2.1, 0.08), Vector3(1.3, 1.55, -4.84), cork)
+	_add_box_to(self, Vector3(3.5, 0.08, 0.12), Vector3(1.3, 2.64, -4.82), _mat_wood, false)
+	_add_box_to(self, Vector3(0.08, 2.2, 0.12), Vector3(-0.45, 1.55, -4.82), _mat_wood, false)
+	_add_box_to(self, Vector3(0.08, 2.2, 0.12), Vector3(3.05, 1.55, -4.82), _mat_wood, false)
 
 	var photos := [
-		Vector3(1.5, 2.3, 0), Vector3(2.6, 2.5, 0), Vector3(3.6, 2.2, 0),
-		Vector3(1.9, 1.4, 0), Vector3(3.2, 1.5, 0), Vector3(2.5, 0.95, 0),
+		Vector3(0.3, 2.15, 0), Vector3(1.3, 2.3, 0), Vector3(2.3, 2.05, 0),
+		Vector3(0.6, 1.2, 0), Vector3(2.0, 1.25, 0), Vector3(1.3, 0.85, 0),
 	]
 	var photo_cols := [
 		Color(0.75, 0.72, 0.66), Color(0.7, 0.68, 0.62), Color(0.8, 0.76, 0.68),
 		Color(0.68, 0.66, 0.6), Color(0.78, 0.74, 0.66), Color(0.72, 0.7, 0.64),
 	]
 	for i in photos.size():
-		_add_box_to(self, Vector3(0.34, 0.42, 0.02), Vector3(photos[i].x, photos[i].y, -6.78), _make_material(photo_cols[i], null, 1.0, 0.9, 0.0), false)
+		_add_box_to(self, Vector3(0.34, 0.42, 0.02), Vector3(photos[i].x, photos[i].y, -4.78), _make_material(photo_cols[i], null, 1.0, 0.9, 0.0), false)
 
 	var strings := [
-		[1.5, 2.3, 2.6, 2.5], [2.6, 2.5, 3.6, 2.2], [1.5, 2.3, 1.9, 1.4],
-		[2.6, 2.5, 3.2, 1.5], [3.6, 2.2, 3.2, 1.5], [1.9, 1.4, 2.5, 0.95], [3.2, 1.5, 2.5, 0.95],
+		[0.3, 2.15, 1.3, 2.3], [1.3, 2.3, 2.3, 2.05], [0.3, 2.15, 0.6, 1.2],
+		[1.3, 2.3, 2.0, 1.25], [2.3, 2.05, 2.0, 1.25], [0.6, 1.2, 1.3, 0.85], [2.0, 1.25, 1.3, 0.85],
 	]
 	for s in strings:
-		_make_string(s[0], s[1], s[2], s[3], -6.76, Color(0.8, 0.15, 0.12))
+		_make_string(s[0], s[1], s[2], s[3], -4.76, Color(0.8, 0.15, 0.12))
 
 
 func _build_coffee_station() -> void:
-	_add_box_to(self, Vector3(1.9, 1.0, 0.72), Vector3(-3.2, 0.5, -6.5), _mat_wood)
-	_add_box_to(self, Vector3(1.95, 0.06, 0.78), Vector3(-3.2, 1.03, -6.5), _mat_dark, false)
-	_add_box_to(self, Vector3(0.68, 0.82, 0.56), Vector3(-3.2, 1.48, -6.5), _mat_black)
-	_add_box_to(self, Vector3(0.68, 0.06, 0.56), Vector3(-3.2, 1.92, -6.5), _mat_metal, false)
-	_add_box_to(self, Vector3(0.5, 0.1, 0.08), Vector3(-3.2, 1.35, -6.24), _mat_metal, false)
-	_add_box_to(self, Vector3(0.5, 0.03, 0.3), Vector3(-3.2, 1.08, -6.3), _mat_metal, false)
-	_add_cyl_to(self, 0.05, 0.14, Vector3(-3.2, 1.15, -6.34), _make_material(Color(0.85, 0.85, 0.85), null, 1.0, 0.3, 0.1))
-	_add_box_to(self, Vector3(0.24, 0.28, 0.08), Vector3(-2.4, 1.17, -6.5), _mat_dark, false)
+	_add_box_to(self, Vector3(1.8, 1.0, 0.7), Vector3(-2.6, 0.5, -4.55), _mat_wood)
+	_add_box_to(self, Vector3(1.85, 0.06, 0.76), Vector3(-2.6, 1.03, -4.55), _mat_dark, false)
+	_add_box_to(self, Vector3(0.66, 0.8, 0.54), Vector3(-2.6, 1.46, -4.55), _mat_black)
+	_add_box_to(self, Vector3(0.66, 0.06, 0.54), Vector3(-2.6, 1.89, -4.55), _mat_metal, false)
+	_add_box_to(self, Vector3(0.48, 0.1, 0.08), Vector3(-2.6, 1.33, -4.3), _mat_metal, false)
+	_add_box_to(self, Vector3(0.48, 0.03, 0.28), Vector3(-2.6, 1.08, -4.35), _mat_metal, false)
+	_add_cyl_to(self, 0.05, 0.14, Vector3(-2.6, 1.15, -4.38), _make_material(Color(0.85, 0.85, 0.85), null, 1.0, 0.3, 0.1))
+	_add_box_to(self, Vector3(0.24, 0.28, 0.08), Vector3(-1.85, 1.17, -4.55), _mat_dark, false)
 
 
 func _build_window() -> void:
 	var frame := _mat_wood
-	_add_box_to(self, Vector3(0.12, 0.12, 4.4), Vector3(ROOM_W * 0.5 - 0.1, 3.0, 0), frame, false)
-	_add_box_to(self, Vector3(0.12, 0.12, 4.4), Vector3(ROOM_W * 0.5 - 0.1, 0.7, 0), frame, false)
-	_add_box_to(self, Vector3(0.12, 2.4, 0.12), Vector3(ROOM_W * 0.5 - 0.1, 1.85, -2.1), frame, false)
-	_add_box_to(self, Vector3(0.12, 2.4, 0.12), Vector3(ROOM_W * 0.5 - 0.1, 1.85, 2.1), frame, false)
-	var glass_holder := _add_box_to(self, Vector3(0.04, 2.2, 4.0), Vector3(ROOM_W * 0.5 - 0.06, 1.85, 0), _mat_glass, false)
+	var wx := ROOM_W * 0.5 - 0.1
+	_add_box_to(self, Vector3(0.12, 0.12, 4.4), Vector3(wx, 2.8, 0), frame, false)
+	_add_box_to(self, Vector3(0.12, 0.12, 4.4), Vector3(wx, 0.7, 0), frame, false)
+	_add_box_to(self, Vector3(0.12, 2.2, 0.12), Vector3(wx, 1.75, -2.1), frame, false)
+	_add_box_to(self, Vector3(0.12, 2.2, 0.12), Vector3(wx, 1.75, 2.1), frame, false)
+	var glass_holder := _add_box_to(self, Vector3(0.04, 2.0, 4.0), Vector3(wx + 0.04, 1.75, 0), _mat_glass, false)
 	glass_holder.get_child(0).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_add_box_to(self, Vector3(0.1, 2.2, 0.06), Vector3(ROOM_W * 0.5 - 0.08, 1.85, 0), frame, false)
+	_add_box_to(self, Vector3(0.1, 2.0, 0.06), Vector3(wx + 0.02, 1.75, 0), frame, false)
 	for i in 6:
-		_add_box_to(self, Vector3(0.03, 0.05, 3.8), Vector3(ROOM_W * 0.5 - 0.14, 0.95 + i * 0.38, 0), _mat_dark, false)
+		_add_box_to(self, Vector3(0.03, 0.05, 3.8), Vector3(wx - 0.04, 0.95 + i * 0.34, 0), _mat_dark, false)
 
 
 func _build_door() -> void:
 	var frame := _mat_wood
 	var door_z := ROOM_D * 0.5 - 0.1
-	_add_box_to(self, Vector3(1.3, 0.12, 0.14), Vector3(-3.0, 2.22, door_z), frame, false)
-	_add_box_to(self, Vector3(0.12, 2.3, 0.14), Vector3(-3.6, 1.1, door_z), frame, false)
-	_add_box_to(self, Vector3(0.12, 2.3, 0.14), Vector3(-2.4, 1.1, door_z), frame, false)
-	_add_box_to(self, Vector3(1.06, 2.14, 0.08), Vector3(-3.0, 1.07, door_z - 0.02), _mat_wood, false)
-	_add_cyl_to(self, 0.05, 0.14, Vector3(-2.6, 1.05, door_z - 0.1), _mat_metal, false, Vector3(PI * 0.5, 0, 0))
+	_add_box_to(self, Vector3(1.3, 0.12, 0.14), Vector3(-2.6, 2.12, door_z), frame, false)
+	_add_box_to(self, Vector3(0.12, 2.1, 0.14), Vector3(-3.2, 1.0, door_z), frame, false)
+	_add_box_to(self, Vector3(0.12, 2.1, 0.14), Vector3(-2.0, 1.0, door_z), frame, false)
+	_add_box_to(self, Vector3(1.06, 1.96, 0.08), Vector3(-2.6, 1.02, door_z - 0.02), _mat_wood, false)
+	_add_cyl_to(self, 0.05, 0.14, Vector3(-2.2, 1.0, door_z - 0.1), _mat_metal, false, Vector3(PI * 0.5, 0, 0))
 
 
 func _build_extra_props() -> void:
-	_add_box_to(self, Vector3(0.42, 0.9, 0.42), Vector3(-6.4, 0.45, 2.2), _mat_metal)
-	_add_cyl_to(self, 0.2, 0.62, Vector3(-6.4, 1.2, 2.2), _make_material(Color(0.4, 0.62, 0.72, 0.5), null, 1.0, 0.2, 0.0, Color(0, 0, 0), 0.0, 0.5), false)
-	_add_cyl_to(self, 0.22, 0.6, Vector3(1.4, 0.3, 1.6), _mat_dark, false)
-	_add_cyl_to(self, 0.22, 0.5, Vector3(3.2, 0.25, -1.0), _mat_dark, false)
+	_add_box_to(self, Vector3(0.42, 0.9, 0.42), Vector3(-4.4, 0.45, 1.6), _mat_metal)
+	_add_cyl_to(self, 0.2, 0.62, Vector3(-4.4, 1.2, 1.6), _make_material(Color(0.4, 0.62, 0.72, 0.5), null, 1.0, 0.2, 0.0, Color(0, 0, 0), 0.0, 0.5), false)
+	_add_cyl_to(self, 0.22, 0.6, Vector3(1.0, 0.3, 1.3), _mat_dark, false)
+	_add_cyl_to(self, 0.22, 0.5, Vector3(2.4, 0.25, -0.8), _mat_dark, false)
 
 	var clock := _make_material(Color(0.9, 0.9, 0.88), null, 1.0, 0.5, 0.0)
-	_add_cyl_to(self, 0.28, 0.06, Vector3(-1.5, 2.4, -6.8), _mat_dark, false, Vector3(PI * 0.5, 0, 0))
-	_add_cyl_to(self, 0.24, 0.03, Vector3(-1.5, 2.4, -6.76), clock, false, Vector3(PI * 0.5, 0, 0))
-	_add_box_to(self, Vector3(0.02, 0.16, 0.02), Vector3(-1.5, 2.47, -6.74), _mat_black, false)
-	_add_box_to(self, Vector3(0.13, 0.02, 0.02), Vector3(-1.44, 2.4, -6.74), _mat_black, false)
+	_add_cyl_to(self, 0.28, 0.06, Vector3(-1.0, 2.35, -4.85), _mat_dark, false, Vector3(PI * 0.5, 0, 0))
+	_add_cyl_to(self, 0.24, 0.03, Vector3(-1.0, 2.35, -4.81), clock, false, Vector3(PI * 0.5, 0, 0))
+	_add_box_to(self, Vector3(0.02, 0.16, 0.02), Vector3(-1.0, 2.42, -4.79), _mat_black, false)
+	_add_box_to(self, Vector3(0.13, 0.02, 0.02), Vector3(-0.94, 2.35, -4.79), _mat_black, false)
 
 
 func _build_interactables() -> void:
-	_make_interactable("coffee", "Кофемашина — взять кофе", Vector3(-3.2, 0.9, -5.9), Vector3(1.4, 1.8, 1.0))
-	_make_interactable("board", "Доска дел — изучить материалы", Vector3(2.6, 1.7, -6.4), Vector3(3.6, 2.4, 1.0))
-	_make_interactable("cabinet", "Шкаф с делами — осмотреть", Vector3(-5.6, 0.9, -5.8), Vector3(0.9, 1.4, 0.9))
-	_make_interactable("shelf", "Стеллаж — осмотреть", Vector3(-5.9, 1.2, -1.4), Vector3(0.9, 2.0, 2.6))
-	_make_interactable("water", "Кулер — выпить воды", Vector3(-5.8, 0.9, 2.2), Vector3(0.9, 1.4, 0.9))
-	_make_interactable("window", "Окно — выглянуть", Vector3(6.4, 1.6, 0), Vector3(1.0, 1.6, 3.6))
-	_make_interactable("clock", "Часы — взглянуть на время", Vector3(-1.5, 2.2, -6.0), Vector3(0.9, 1.0, 0.9))
-	_make_interactable("desk", "Стол — осмотреть", Vector3(0, 1.0, -3.0), Vector3(2.6, 0.8, 2.0))
+	_make_interactable("coffee", "Кофемашина — взять кофе", Vector3(-2.6, 0.9, -4.0), Vector3(1.4, 1.8, 1.0))
+	_make_interactable("board", "Доска дел — изучить материалы", Vector3(1.3, 1.6, -4.4), Vector3(3.4, 2.2, 1.0))
+	_make_interactable("cabinet", "Шкаф с делами — осмотреть", Vector3(-4.15, 0.9, -4.0), Vector3(0.9, 1.4, 0.9))
+	_make_interactable("shelf", "Стеллаж — осмотреть", Vector3(-4.0, 1.2, -1.4), Vector3(0.9, 2.0, 2.4))
+	_make_interactable("water", "Кулер — выпить воды", Vector3(-4.4, 0.9, 1.6), Vector3(0.9, 1.4, 0.9))
+	_make_interactable("window", "Окно — выглянуть", Vector3(4.4, 1.6, 0), Vector3(1.0, 1.6, 3.6))
+	_make_interactable("clock", "Часы — взглянуть на время", Vector3(-1.0, 2.2, -4.4), Vector3(0.9, 1.0, 0.9))
+	_make_interactable("desk", "Стол — осмотреть", Vector3(0, 1.0, -2.4), Vector3(2.6, 0.8, 2.0))
 
 	var weller := Sprite3D.new()
 	weller.texture = _make_char_texture(Color(0.28, 0.38, 0.52))
 	weller.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	weller.pixel_size = 0.021
-	weller.position = Vector3(1.4, 0.0, -1.6)
+	weller.position = Vector3(1.7, 0.0, -0.7)
 	add_child(weller)
-	_make_interactable("weller", "Уэллер — начать брифинг", Vector3(1.4, 1.0, -1.6), Vector3(1.4, 2.0, 1.2))
+	_make_interactable("weller", "Уэллер — начать брифинг", Vector3(1.7, 1.0, -0.7), Vector3(1.4, 2.0, 1.2))
 
 
 func _make_material(color: Color, tex: Texture2D = null, uv_scale: float = 1.0, roughness: float = 0.9, metallic: float = 0.0, emission: Color = Color(0, 0, 0), emission_energy: float = 0.0, alpha: float = 1.0) -> StandardMaterial3D:
