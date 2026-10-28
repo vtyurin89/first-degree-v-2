@@ -552,7 +552,7 @@ func _build_hud() -> void:
 
 	var energy := Label.new()
 	energy.text = "Энергия: %d/%d" % [GameManager.player_energy, GameManager.MAX_ENERGY]
-	energy.add_theme_font_size_override("font_size", 18)
+	energy.theme_type_variation = UITheme.HUD
 	energy.position = Vector2(24, 20)
 	_ui_layer.add_child(energy)
 	_energy_label = energy
@@ -560,7 +560,7 @@ func _build_hud() -> void:
 
 	_prompt = Label.new()
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_prompt.add_theme_font_size_override("font_size", 20)
+	_prompt.theme_type_variation = UITheme.PROMPT
 	_prompt.anchor_left = 0.0
 	_prompt.anchor_right = 1.0
 	_prompt.anchor_top = 1.0
@@ -572,7 +572,7 @@ func _build_hud() -> void:
 
 	_toast = Label.new()
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.add_theme_font_size_override("font_size", 18)
+	_toast.theme_type_variation = UITheme.HUD
 	_toast.modulate = Color(0.95, 0.85, 0.5, 0.0)
 	_toast.anchor_left = 0.0
 	_toast.anchor_right = 1.0
@@ -584,7 +584,7 @@ func _build_hud() -> void:
 
 	var controls := Label.new()
 	controls.text = "WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — пауза"
-	controls.add_theme_font_size_override("font_size", 14)
+	controls.theme_type_variation = UITheme.SMALL
 	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
 	controls.anchor_left = 0.0
 	controls.anchor_right = 1.0

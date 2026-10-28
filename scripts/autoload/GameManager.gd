@@ -67,6 +67,71 @@ func reset_run() -> void:
 	completed_milestones.clear()
 	clicked_urls.clear()
 	flags.clear()
+	DialogueStateManager.reset_all()
+
+
+func capture_state() -> Dictionary:
+	return {
+		"current_state": current_state,
+		"player_energy": player_energy,
+		"coping_style": coping_style,
+		"weller_trust": weller_trust,
+		"alex_monologue_index": alex_monologue_index,
+		"admissibility_status": admissibility_status,
+		"attorney_resistance": attorney_resistance,
+		"pinned_slots_remaining": pinned_slots_remaining,
+		"unlocked_traits": unlocked_traits.duplicate(),
+		"unlocked_tactics": unlocked_tactics.duplicate(),
+		"registered_clues": registered_clues.duplicate(),
+		"completed_milestones": completed_milestones.duplicate(),
+		"clicked_urls": clicked_urls.duplicate(true),
+		"flags": flags.duplicate(true),
+	}
+
+
+func restore_state(data: Dictionary) -> void:
+	if data.is_empty():
+		return
+	player_energy = clampi(int(data.get("player_energy", DEFAULT_ENERGY)), 0, MAX_ENERGY)
+	coping_style = String(data.get("coping_style", ""))
+	weller_trust = clampi(int(data.get("weller_trust", 50)), 0, 100)
+	alex_monologue_index = int(data.get("alex_monologue_index", 0))
+	admissibility_status = String(data.get("admissibility_status", "CLEAN"))
+	attorney_resistance = clampi(int(data.get("attorney_resistance", 0)), 0, 100)
+	pinned_slots_remaining = int(data.get("pinned_slots_remaining", DEFAULT_SLOTS))
+	_fill_string_array(unlocked_traits, data.get("unlocked_traits", []))
+	_fill_string_array(unlocked_tactics, data.get("unlocked_tactics", []))
+	_fill_string_array(registered_clues, data.get("registered_clues", []))
+	completed_milestones.clear()
+	var milestones = data.get("completed_milestones", [])
+	if milestones is Array:
+		for value in milestones:
+			completed_milestones.append(int(value))
+	var clicked = data.get("clicked_urls", {})
+	if clicked is Dictionary:
+		clicked_urls = clicked.duplicate(true)
+	else:
+		clicked_urls = {}
+	var flags_data = data.get("flags", {})
+	if flags_data is Dictionary:
+		flags = flags_data.duplicate(true)
+	else:
+		flags = {}
+	var restored_state := int(data.get("current_state", GameState.EXPLORATION_3D))
+	if restored_state == GameState.PAUSED or restored_state == GameState.MAIN_MENU:
+		restored_state = GameState.EXPLORATION_3D
+	set_state(restored_state)
+	energy_changed.emit(player_energy)
+	trust_changed.emit(weller_trust)
+	resistance_changed.emit(attorney_resistance)
+	admissibility_changed.emit(admissibility_status)
+
+
+func _fill_string_array(target: Array[String], values) -> void:
+	target.clear()
+	if values is Array:
+		for value in values:
+			target.append(String(value))
 
 
 func set_state(new_state: int) -> void:

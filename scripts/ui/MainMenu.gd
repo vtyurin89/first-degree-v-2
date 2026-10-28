@@ -20,7 +20,7 @@ func _on_action(action_id: String) -> void:
 		"new_game":
 			GameManager.start_new_game()
 		"load_game":
-			MenuController.show_modal("ЗАГРУЗКА ИГРЫ", "Загрузка пока не реализована.", _ok_options())
+			MenuController.open_load_screen()
 		"settings":
 			MenuController.show_modal("НАСТРОЙКИ", "Настройки пока не реализованы.", _ok_options())
 		"exit":

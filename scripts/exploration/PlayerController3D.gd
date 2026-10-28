@@ -13,6 +13,7 @@ var _look_enabled := true
 
 
 func _ready() -> void:
+	add_to_group("player")
 	capture_mouse()
 
 

@@ -49,6 +49,8 @@ func _setup_manager() -> void:
 		return
 	_refresh_status()
 	_manager.start()
+	if not SaveManager.is_loading():
+		SaveManager.autosave_checkpoint()
 
 
 func _process(delta: float) -> void:
@@ -81,19 +83,20 @@ func _build_ui() -> void:
 
 	_status_label = Label.new()
 	_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_status_label.add_theme_font_size_override("font_size", 15)
+	_status_label.theme_type_variation = UITheme.STATUS
 	status_panel.add_child(_status_label)
 
 	_chapter_label = Label.new()
 	_chapter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_chapter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_chapter_label.add_theme_font_size_override("font_size", 16)
+	_chapter_label.theme_type_variation = UITheme.CHAPTER
 	_chapter_label.modulate = Color(0.85, 0.75, 0.5)
 	_set_rect(_chapter_label, 0.5, 0, 1, 0, 0, 64, -24, 92)
 	add_child(_chapter_label)
 
 	_back_button = Button.new()
 	_back_button.text = "← Назад"
+	_back_button.theme_type_variation = UITheme.BUTTON
 	_back_button.focus_mode = Control.FOCUS_NONE
 	_back_button.visible = false
 	_set_rect(_back_button, 0, 0, 0, 0, 24, 64, 140, 100)
@@ -102,7 +105,7 @@ func _build_ui() -> void:
 
 	_log_label = Label.new()
 	_log_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_log_label.add_theme_font_size_override("font_size", 17)
+	_log_label.theme_type_variation = UITheme.LOG
 	_log_label.modulate = Color(0.95, 0.85, 0.5, 0.0)
 	_log_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_set_rect(_log_label, 0, 0, 1, 0, 0, 112, 0, 142)
@@ -117,7 +120,7 @@ func _build_ui() -> void:
 	_portrait_initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_portrait_initial.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_portrait_initial.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_portrait_initial.add_theme_font_size_override("font_size", 72)
+	_portrait_initial.theme_type_variation = UITheme.PORTRAIT
 	_portrait_initial.modulate = Color(1, 1, 1, 0.85)
 	_portrait_panel.add_child(_portrait_initial)
 
@@ -140,7 +143,7 @@ func _build_ui() -> void:
 
 	_nameplate = Label.new()
 	_nameplate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_nameplate.add_theme_font_size_override("font_size", 22)
+	_nameplate.theme_type_variation = UITheme.NAME
 	vbox.add_child(_nameplate)
 
 	_text_label = RichTextLabel.new()
@@ -149,7 +152,7 @@ func _build_ui() -> void:
 	_text_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_text_label.custom_minimum_size = Vector2(0, 120)
 	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_text_label.add_theme_font_size_override("normal_font_size", 20)
+	_text_label.theme_type_variation = UITheme.BODY
 	_text_label.meta_clicked.connect(_on_meta_clicked)
 	_text_label.meta_hover_started.connect(_on_meta_hover_started)
 	_text_label.meta_hover_ended.connect(_on_meta_hover_ended)
@@ -163,7 +166,7 @@ func _build_ui() -> void:
 	_hint = Label.new()
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint.modulate = Color(0.7, 0.7, 0.7, 0.85)
-	_hint.add_theme_font_size_override("font_size", 14)
+	_hint.theme_type_variation = UITheme.HINT
 	vbox.add_child(_hint)
 
 	_flash = ColorRect.new()
@@ -240,6 +243,7 @@ func _on_choices_ready(available_choices: Array) -> void:
 	for choice in available_choices:
 		var button := Button.new()
 		button.text = String(choice.get("text", ""))
+		button.theme_type_variation = UITheme.BUTTON
 		button.focus_mode = Control.FOCUS_NONE
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.pressed.connect(_on_choice_pressed.bind(String(choice.get("id", ""))))

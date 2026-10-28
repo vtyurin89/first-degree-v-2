@@ -131,6 +131,7 @@ func _show_choices() -> void:
 	for choice in available:
 		var button := Button.new()
 		button.text = choice.label
+		button.theme_type_variation = UITheme.BUTTON
 		button.focus_mode = Control.FOCUS_NONE
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.pressed.connect(_select.bind(choice))
@@ -275,7 +276,7 @@ func _build_ui() -> void:
 
 	_nameplate = Label.new()
 	_nameplate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_nameplate.add_theme_font_size_override("font_size", 22)
+	_nameplate.theme_type_variation = UITheme.NAME
 	vbox.add_child(_nameplate)
 
 	_text_label = RichTextLabel.new()
@@ -284,7 +285,7 @@ func _build_ui() -> void:
 	_text_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_text_label.custom_minimum_size = Vector2(0, 120)
 	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_text_label.add_theme_font_size_override("normal_font_size", 20)
+	_text_label.theme_type_variation = UITheme.BODY
 	_text_label.meta_clicked.connect(_on_meta)
 	_text_label.meta_hover_started.connect(_on_hover_started)
 	_text_label.meta_hover_ended.connect(_on_hover_ended)
@@ -298,7 +299,7 @@ func _build_ui() -> void:
 	_hint = Label.new()
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint.modulate = Color(0.7, 0.7, 0.7, 0.85)
-	_hint.add_theme_font_size_override("font_size", 14)
+	_hint.theme_type_variation = UITheme.HINT
 	vbox.add_child(_hint)
 
 	_portrait_panel = Panel.new()
@@ -310,7 +311,7 @@ func _build_ui() -> void:
 	_portrait_initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_portrait_initial.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_portrait_initial.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_portrait_initial.add_theme_font_size_override("font_size", 72)
+	_portrait_initial.theme_type_variation = UITheme.PORTRAIT
 	_portrait_initial.modulate = Color(1, 1, 1, 0.85)
 	_portrait_panel.add_child(_portrait_initial)
 
@@ -334,7 +335,7 @@ func _build_ui() -> void:
 
 	_tactic_title = Label.new()
 	_tactic_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_tactic_title.add_theme_font_size_override("font_size", 18)
+	_tactic_title.theme_type_variation = UITheme.TACTIC_TITLE
 	_tactic_title.modulate = Color(0.9, 0.78, 0.45)
 	tactic_vbox.add_child(_tactic_title)
 

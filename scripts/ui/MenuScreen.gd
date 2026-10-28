@@ -51,7 +51,7 @@ func _build() -> void:
 	var version := Label.new()
 	version.text = "FD // v0.1.0"
 	version.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	version.add_theme_font_size_override("font_size", 12)
+	version.theme_type_variation = UITheme.VERSION
 	version.add_theme_color_override("font_color", UIPalette.TEXT_FAINT)
 	version.position = Vector2(26, 18)
 	add_child(version)
@@ -67,7 +67,7 @@ func _build() -> void:
 	title.scroll_active = false
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	title.custom_minimum_size = Vector2(0, 170)
-	title.add_theme_font_size_override("normal_font_size", 64)
+	title.theme_type_variation = UITheme.DISPLAY
 	title.add_theme_color_override("default_color", UIPalette.WHITE)
 	title.text = "F[color=%s]I[/color]RST\nDEGREE" % UIPalette.html(UIPalette.RED)
 	content.add_child(title)
@@ -77,7 +77,7 @@ func _build() -> void:
 	subtitle.scroll_active = false
 	subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	subtitle.custom_minimum_size = Vector2(0, 28)
-	subtitle.add_theme_font_size_override("normal_font_size", 17)
+	subtitle.theme_type_variation = UITheme.SUBTITLE
 	subtitle.add_theme_color_override("default_color", UIPalette.TEXT)
 	subtitle.text = "INTERROGATE.   UNCOVER.   [color=%s]CONVICT.[/color]" % UIPalette.html(UIPalette.RED)
 	content.add_child(subtitle)
@@ -102,7 +102,7 @@ func _build() -> void:
 	quote.scroll_active = false
 	quote.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	quote.custom_minimum_size = Vector2(0, 92)
-	quote.add_theme_font_size_override("normal_font_size", 14)
+	quote.theme_type_variation = UITheme.QUOTE
 	quote.add_theme_color_override("default_color", UIPalette.TEXT_DIM)
 	quote.text = "[i]«THE TRUTH DOESN'T COME OUT BECAUSE IT WANTS TO. IT COMES OUT BECAUSE [color=%s]YOU MAKE IT.[/color]»[/i]" % UIPalette.html(UIPalette.RED)
 	content.add_child(quote)
@@ -125,7 +125,7 @@ func _rebuild_items() -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.focus_mode = Control.FOCUS_ALL
 		button.custom_minimum_size = Vector2(0, 38)
-		button.add_theme_font_size_override("font_size", 20)
+		button.theme_type_variation = UITheme.MENU_ITEM
 		_style_item(button)
 		button.mouse_entered.connect(button.grab_focus)
 		button.pressed.connect(_on_item_pressed.bind(String(item.get("id", ""))))

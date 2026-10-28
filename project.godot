@@ -18,7 +18,10 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameManager="*res://scripts/autoload/GameManager.gd"
+DialogueStateManager="*res://scripts/autoload/DialogueStateManager.gd"
+SaveManager="*res://scripts/autoload/SaveManager.gd"
 MenuController="*res://scripts/autoload/MenuController.gd"
+ThemeManager="*res://scripts/autoload/ThemeManager.gd"
 
 [display]
 

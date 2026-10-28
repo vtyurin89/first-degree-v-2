@@ -31,12 +31,12 @@ func _ready() -> void:
 	_text.anchor_right = 0.88
 	_text.anchor_top = 0.3
 	_text.anchor_bottom = 0.7
-	_text.add_theme_font_size_override("normal_font_size", 24)
+	_text.theme_type_variation = UITheme.NARRATION
 	add_child(_text)
 
 	_hint = Label.new()
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hint.add_theme_font_size_override("font_size", 14)
+	_hint.theme_type_variation = UITheme.HINT
 	_hint.modulate = Color(0.6, 0.6, 0.6, 0.8)
 	_hint.anchor_left = 0.0
 	_hint.anchor_right = 1.0

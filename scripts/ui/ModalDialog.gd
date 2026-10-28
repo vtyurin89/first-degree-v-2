@@ -9,6 +9,7 @@ var _close_button: Button
 var _icon_container: CenterContainer
 var _message_label: Label
 var _sub_label: Label
+var _input: LineEdit
 var _buttons: HBoxContainer
 var _built := false
 
@@ -17,6 +18,9 @@ var _message_text := ""
 var _sub_text := ""
 var _options: Array = []
 var _show_icon := true
+var _input_enabled := false
+var _input_placeholder := ""
+var _input_text := ""
 
 
 func _ready() -> void:
@@ -28,14 +32,23 @@ func _ready() -> void:
 	_apply_config()
 
 
-func configure(title: String, message: String, options: Array, sub_message: String = "", show_icon: bool = true) -> void:
+func configure(title: String, message: String, options: Array, sub_message: String = "", show_icon: bool = true, input_enabled: bool = false, input_placeholder: String = "", input_text: String = "") -> void:
 	_title_text = title
 	_message_text = message
 	_sub_text = sub_message
 	_options = options
 	_show_icon = show_icon
+	_input_enabled = input_enabled
+	_input_placeholder = input_placeholder
+	_input_text = input_text
 	if _built:
 		_apply_config()
+
+
+func get_input_text() -> String:
+	if _input == null:
+		return ""
+	return _input.text.strip_edges()
 
 
 func dismiss() -> void:
@@ -67,7 +80,7 @@ func _build() -> void:
 	vbox.add_child(header)
 
 	_title_label = Label.new()
-	_title_label.add_theme_font_size_override("font_size", 18)
+	_title_label.theme_type_variation = UITheme.MODAL_TITLE
 	_title_label.add_theme_color_override("font_color", UIPalette.TEXT)
 	_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(_title_label)
@@ -77,7 +90,7 @@ func _build() -> void:
 	_close_button.flat = true
 	_close_button.focus_mode = Control.FOCUS_NONE
 	_close_button.custom_minimum_size = Vector2(28, 28)
-	_close_button.add_theme_font_size_override("font_size", 18)
+	_close_button.theme_type_variation = UITheme.BUTTON
 	_close_button.add_theme_color_override("font_color", UIPalette.TEXT_DIM)
 	_close_button.add_theme_color_override("font_hover_color", UIPalette.RED_BRIGHT)
 	_close_button.pressed.connect(func() -> void: closed.emit())
@@ -97,16 +110,28 @@ func _build() -> void:
 	_message_label = Label.new()
 	_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_message_label.add_theme_font_size_override("font_size", 22)
+	_message_label.theme_type_variation = UITheme.MODAL_MESSAGE
 	_message_label.add_theme_color_override("font_color", UIPalette.WHITE)
 	vbox.add_child(_message_label)
 
 	_sub_label = Label.new()
 	_sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_sub_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_sub_label.add_theme_font_size_override("font_size", 14)
+	_sub_label.theme_type_variation = UITheme.MODAL_SUB
 	_sub_label.add_theme_color_override("font_color", UIPalette.TEXT_DIM)
 	vbox.add_child(_sub_label)
+
+	_input = LineEdit.new()
+	_input.theme_type_variation = UITheme.INPUT
+	_input.custom_minimum_size = Vector2(0, 42)
+	_input.visible = false
+	_input.add_theme_stylebox_override("normal", UIPalette.make_style(UIPalette.BG_DEEP, UIPalette.GREY_LINE, 1, 2, 10))
+	_input.add_theme_stylebox_override("focus", UIPalette.make_style(UIPalette.BG_DEEP, UIPalette.GREY, 1, 2, 10))
+	_input.add_theme_color_override("font_color", UIPalette.TEXT)
+	_input.add_theme_color_override("font_placeholder_color", UIPalette.TEXT_FAINT)
+	_input.add_theme_color_override("caret_color", UIPalette.RED_BRIGHT)
+	_input.text_submitted.connect(_on_input_submitted)
+	vbox.add_child(_input)
 
 	var button_spacer := Control.new()
 	button_spacer.custom_minimum_size = Vector2(0, 4)
@@ -127,6 +152,10 @@ func _apply_config() -> void:
 	_sub_label.text = _sub_text
 	_sub_label.visible = _sub_text != ""
 	_icon_container.visible = _show_icon
+	_input.visible = _input_enabled
+	if _input_enabled:
+		_input.placeholder_text = _input_placeholder
+		_input.text = _input_text
 	for child in _buttons.get_children():
 		_buttons.remove_child(child)
 		child.queue_free()
@@ -136,19 +165,27 @@ func _apply_config() -> void:
 		button.text = String(option.get("text", "OK")).to_upper()
 		button.focus_mode = Control.FOCUS_ALL
 		button.custom_minimum_size = Vector2(200, 44)
-		button.add_theme_font_size_override("font_size", 18)
+		button.theme_type_variation = UITheme.BUTTON
 		_style_button(button, bool(option.get("primary", false)), bool(option.get("danger", false)))
 		button.mouse_entered.connect(button.grab_focus)
 		button.pressed.connect(_on_option.bind(String(option.get("value", "ok"))))
 		_buttons.add_child(button)
 		if first_button == null:
 			first_button = button
-	if first_button != null:
+	if _input_enabled:
+		_input.grab_focus()
+	elif first_button != null:
 		first_button.grab_focus()
 
 
 func _on_option(value: String) -> void:
 	option_selected.emit(value)
+
+
+func _on_input_submitted(_text: String) -> void:
+	if not _input_enabled or _options.is_empty():
+		return
+	option_selected.emit(String(_options[0].get("value", "ok")))
 
 
 func _style_button(button: Button, primary: bool, danger: bool) -> void:

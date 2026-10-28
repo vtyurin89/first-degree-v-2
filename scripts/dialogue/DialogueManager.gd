@@ -31,6 +31,8 @@ var initial_tactics: Array = []
 var _palette: Dictionary = {}
 var _ended := false
 var _loaded := false
+var _last_milestone := -1
+var started_from_resume := false
 
 
 func load_script(path: String) -> bool:
@@ -57,14 +59,49 @@ func start() -> void:
 		dialogue_ended.emit()
 		return
 	_ended = false
+	var resume_node := DialogueStateManager.consume_resume_node()
+	if resume_node != "":
+		started_from_resume = true
+		_restore_traversal_from(DialogueStateManager)
+		_enter_node(resume_node)
+		return
+	started_from_resume = false
+	DialogueStateManager.reset_traversal()
 	node_history.clear()
 	visited_nodes.clear()
 	used_once_choices.clear()
 	_reached_milestones.clear()
+	_last_milestone = -1
 	GameManager.set_energy(max_energy)
 	for tactic_id in initial_tactics:
 		GameManager.unlock_tactic(String(tactic_id))
 	_enter_node(start_node)
+
+
+func _restore_traversal_from(state) -> void:
+	node_history.clear()
+	for entry in state.node_history:
+		node_history.append(String(entry))
+	visited_nodes = state.visited_nodes.duplicate(true)
+	used_once_choices = state.used_once_choices.duplicate(true)
+	_reached_milestones = state.reached_milestones.duplicate(true)
+	_last_milestone = int(state.milestone_index)
+
+
+func _sync_state() -> void:
+	if current_node_id == "":
+		return
+	DialogueStateManager.current_node_id = current_node_id
+	DialogueStateManager.chapter_title = String(current_node.get("chapter", DialogueStateManager.chapter_title))
+	DialogueStateManager.milestone_index = _last_milestone
+	DialogueStateManager.dialogue_active = not _ended
+	var history: Array = []
+	for entry in node_history:
+		history.append(String(entry))
+	DialogueStateManager.node_history = history
+	DialogueStateManager.visited_nodes = visited_nodes.duplicate(true)
+	DialogueStateManager.used_once_choices = used_once_choices.duplicate(true)
+	DialogueStateManager.reached_milestones = _reached_milestones.duplicate(true)
 
 
 func advance() -> void:
@@ -247,6 +284,7 @@ func _enter_node(node_id: String) -> void:
 	current_node_id = node_id
 	current_node = nodes[node_id]
 	visited_nodes[node_id] = int(visited_nodes.get(node_id, 0)) + 1
+	_sync_state()
 	match String(current_node.get("type", "dialogue_line")):
 		"dialogue_line":
 			_emit_line(node_id, current_node)
@@ -306,9 +344,11 @@ func _reach_milestone(index: int) -> void:
 	if _reached_milestones.has(index):
 		return
 	_reached_milestones[index] = true
+	_last_milestone = index
 	GameManager.set_admissibility("CLEAN")
 	GameManager.mark_milestone(index, String(current_node.get("milestone_name", "")))
 	milestone_reached.emit(index)
+	_sync_state()
 
 
 func _filter_choices(node_id: String, node: Dictionary) -> Array:
@@ -408,6 +448,7 @@ func _end() -> void:
 	if _ended:
 		return
 	_ended = true
+	_sync_state()
 	dialogue_ended.emit()
 
 
