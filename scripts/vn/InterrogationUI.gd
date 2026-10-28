@@ -1,27 +1,62 @@
 extends Control
 
-var case_data: CaseData
-var _phase_index := 0
-var _vnbox: VNBox
+const CHARS_PER_SEC := 45.0
+const SCRIPT_PATH := "res://data/case1_scolfield.json"
 
+var _manager: DialogueManager
+var _mode := "idle"
+var _typing := false
+var _char_accum := 0.0
+var _hovered_meta = null
+var _last_meta_frame := -1
+
+var _nameplate: Label
+var _text_label: RichTextLabel
+var _choice_container: VBoxContainer
+var _hint: Label
+var _back_button: Button
 var _status_label: Label
+var _chapter_label: Label
 var _log_label: Label
-var _phase_label: Label
-var _flash: ColorRect
 var _log_tween: Tween
+var _portrait_panel: Panel
+var _portrait_initial: Label
+var _flash: ColorRect
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	GameManager.set_state(GameManager.GameState.INTERROGATION)
-	case_data = Case1Scolfield.build()
-	for tactic_id in case_data.initial_tactics:
-		GameManager.unlock_tactic(tactic_id)
 	_build_ui()
 	_connect_game()
+	_setup_manager()
+
+
+func _setup_manager() -> void:
+	_manager = DialogueManager.new()
+	_manager.line_ready.connect(_on_line_ready)
+	_manager.choices_ready.connect(_on_choices_ready)
+	_manager.clue_registered.connect(_on_clue_registered)
+	_manager.energy_depleted.connect(_on_energy_depleted)
+	_manager.milestone_reached.connect(_on_milestone_reached)
+	_manager.dialogue_ended.connect(_on_dialogue_ended)
+	if not _manager.load_script(SCRIPT_PATH):
+		_mode = "error"
+		_refresh_status()
+		_log("Сценарий не загрузился. Смотри консоль.")
+		return
 	_refresh_status()
-	_start_phase(0)
+	_manager.start()
+
+
+func _process(delta: float) -> void:
+	if _typing:
+		_char_accum += delta * CHARS_PER_SEC
+		var total := _text_label.get_total_character_count()
+		_text_label.visible_characters = int(_char_accum)
+		if total > 0 and int(_char_accum) >= total:
+			_complete_typing()
 
 
 func _build_ui() -> void:
@@ -33,14 +68,7 @@ func _build_ui() -> void:
 
 	var status_panel := PanelContainer.new()
 	status_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	status_panel.anchor_left = 0
-	status_panel.anchor_top = 0
-	status_panel.anchor_right = 1
-	status_panel.anchor_bottom = 0
-	status_panel.offset_left = 0
-	status_panel.offset_top = 0
-	status_panel.offset_right = 0
-	status_panel.offset_bottom = 54
+	_set_rect(status_panel, 0, 0, 1, 0, 0, 0, 0, 54)
 	var status_style := StyleBoxFlat.new()
 	status_style.bg_color = Color(0.08, 0.08, 0.1, 0.95)
 	status_style.content_margin_left = 24
@@ -52,40 +80,90 @@ func _build_ui() -> void:
 
 	_status_label = Label.new()
 	_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_status_label.add_theme_font_size_override("font_size", 16)
+	_status_label.add_theme_font_size_override("font_size", 15)
 	status_panel.add_child(_status_label)
 
-	_phase_label = Label.new()
-	_phase_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_phase_label.add_theme_font_size_override("font_size", 16)
-	_phase_label.modulate = Color(0.85, 0.75, 0.5)
-	_phase_label.anchor_left = 0.5
-	_phase_label.anchor_right = 1.0
-	_phase_label.anchor_bottom = 0.0
-	_phase_label.offset_top = 64
-	_phase_label.offset_right = -24
-	_phase_label.offset_bottom = 92
-	add_child(_phase_label)
+	_chapter_label = Label.new()
+	_chapter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_chapter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_chapter_label.add_theme_font_size_override("font_size", 16)
+	_chapter_label.modulate = Color(0.85, 0.75, 0.5)
+	_set_rect(_chapter_label, 0.5, 0, 1, 0, 0, 64, -24, 92)
+	add_child(_chapter_label)
+
+	_back_button = Button.new()
+	_back_button.text = "← Назад"
+	_back_button.focus_mode = Control.FOCUS_NONE
+	_back_button.visible = false
+	_set_rect(_back_button, 0, 0, 0, 0, 24, 64, 140, 100)
+	_back_button.pressed.connect(_on_back_pressed)
+	add_child(_back_button)
 
 	_log_label = Label.new()
 	_log_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_log_label.add_theme_font_size_override("font_size", 17)
 	_log_label.modulate = Color(0.95, 0.85, 0.5, 0.0)
 	_log_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_log_label.anchor_left = 0
-	_log_label.anchor_right = 1
-	_log_label.anchor_top = 0
-	_log_label.anchor_bottom = 0
-	_log_label.offset_top = 110
-	_log_label.offset_bottom = 140
+	_set_rect(_log_label, 0, 0, 1, 0, 0, 112, 0, 142)
 	add_child(_log_label)
 
-	_vnbox = VNBox.new()
-	add_child(_vnbox)
-	_vnbox.meta_clicked.connect(_on_meta_clicked)
-	_vnbox.choice_selected.connect(_on_choice_selected)
-	_vnbox.finished.connect(_on_vn_finished)
+	_portrait_panel = Panel.new()
+	_portrait_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_set_rect(_portrait_panel, 0, 1, 0, 1, 80, -520, 280, -300)
+	add_child(_portrait_panel)
+
+	_portrait_initial = Label.new()
+	_portrait_initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_portrait_initial.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_portrait_initial.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_portrait_initial.add_theme_font_size_override("font_size", 72)
+	_portrait_initial.modulate = Color(1, 1, 1, 0.85)
+	_portrait_panel.add_child(_portrait_initial)
+
+	var dialogue_panel := PanelContainer.new()
+	dialogue_panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	_set_rect(dialogue_panel, 0, 1, 1, 1, 60, -270, -60, -30)
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.05, 0.05, 0.07, 0.9)
+	panel_style.border_color = Color(0.3, 0.28, 0.25, 0.8)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(6)
+	panel_style.set_content_margin_all(18)
+	dialogue_panel.add_theme_stylebox_override("panel", panel_style)
+	add_child(dialogue_panel)
+
+	var vbox := VBoxContainer.new()
+	vbox.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_theme_constant_override("separation", 8)
+	dialogue_panel.add_child(vbox)
+
+	_nameplate = Label.new()
+	_nameplate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_nameplate.add_theme_font_size_override("font_size", 22)
+	vbox.add_child(_nameplate)
+
+	_text_label = RichTextLabel.new()
+	_text_label.bbcode_enabled = true
+	_text_label.scroll_active = false
+	_text_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	_text_label.custom_minimum_size = Vector2(0, 120)
+	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_text_label.add_theme_font_size_override("normal_font_size", 20)
+	_text_label.meta_clicked.connect(_on_meta_clicked)
+	_text_label.meta_hover_started.connect(_on_meta_hover_started)
+	_text_label.meta_hover_ended.connect(_on_meta_hover_ended)
+	vbox.add_child(_text_label)
+
+	_choice_container = VBoxContainer.new()
+	_choice_container.mouse_filter = Control.MOUSE_FILTER_PASS
+	_choice_container.add_theme_constant_override("separation", 6)
+	vbox.add_child(_choice_container)
+
+	_hint = Label.new()
+	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hint.modulate = Color(0.7, 0.7, 0.7, 0.85)
+	_hint.add_theme_font_size_override("font_size", 14)
+	vbox.add_child(_hint)
 
 	_flash = ColorRect.new()
 	_flash.color = Color(0.95, 0.78, 0.25, 0.0)
@@ -93,15 +171,18 @@ func _build_ui() -> void:
 	_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_flash)
 
+	gui_input.connect(_on_gui_input)
+
 
 func _connect_game() -> void:
-	GameManager.pinned_slots_changed.connect(_on_int_changed)
 	GameManager.energy_changed.connect(_on_int_changed)
+	GameManager.pinned_slots_changed.connect(_on_int_changed)
 	GameManager.resistance_changed.connect(_on_int_changed)
 	GameManager.admissibility_changed.connect(_on_string_changed)
 	GameManager.trait_unlocked.connect(_on_string_changed)
 	GameManager.tactic_unlocked.connect(_on_string_changed)
 	GameManager.clue_registered.connect(_on_string_changed)
+	GameManager.flags_changed.connect(_on_string_changed)
 
 
 func _on_int_changed(_value: int) -> void:
@@ -115,81 +196,192 @@ func _on_string_changed(_value: String) -> void:
 func _refresh_status() -> void:
 	if _status_label == null:
 		return
-	_status_label.text = "Энергия: %d/%d    |    Улики: %d    |    Допустимость: %s    |    Закрепы: %d    |    Доверие Уэллера: %d    |    Сопротивление адвоката: %d%%    |    Тактик: %d" % [
+	_status_label.text = "Энергия: %d/%d   |   Улики: %d   |   Черты: %d   |   Тактики: %d   |   Риск адвоката: %d%%   |   Флаги: %d   |   Допустимость: %s" % [
 		GameManager.player_energy,
 		GameManager.MAX_ENERGY,
 		GameManager.registered_clues.size(),
-		GameManager.admissibility_status,
-		GameManager.pinned_slots_remaining,
-		GameManager.weller_trust,
-		GameManager.attorney_resistance,
+		GameManager.unlocked_traits.size(),
 		GameManager.unlocked_tactics.size(),
+		GameManager.attorney_resistance,
+		GameManager.flags.size(),
+		GameManager.admissibility_status,
 	]
 
 
-func _start_phase(index: int) -> void:
-	_phase_index = index
-	GameManager.reset_phase_slots()
-	var phase: InterrogationPhase = case_data.phases[index]
-	_phase_label.text = "Фаза %d / %d — %s" % [index + 1, case_data.phases.size(), phase.milestone_name]
-	_vnbox.play(phase.dialogue_sequence)
+func _on_line_ready(speaker: String, text: String, metadata: Dictionary) -> void:
+	_mode = "line"
+	_clear_choices()
+	_hide_back()
+	_update_chapter(String(metadata.get("chapter", "")))
+	var internal := bool(metadata.get("internal", false))
+	_nameplate.text = speaker
+	if internal:
+		_nameplate.text = speaker + " · про себя"
+	_nameplate.modulate = _speaker_color(speaker)
+	_update_portrait(speaker, internal)
+	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if internal else Color(0.92, 0.9, 0.86))
+	_text_label.text = text
+	_text_label.visible_characters = 0
+	_char_accum = 0.0
+	_typing = true
+	_hint.text = ""
 
 
-func _on_vn_finished() -> void:
-	if _phase_index + 1 < case_data.phases.size():
-		_start_phase(_phase_index + 1)
-	else:
-		_finish_case()
+func _on_choices_ready(available_choices: Array) -> void:
+	_mode = "choice"
+	_typing = false
+	_text_label.text = ""
+	_nameplate.text = ""
+	_portrait_panel.visible = false
+	_clear_choices()
+	_hint.text = "Выберите, как действовать"
+	_update_chapter(String(_manager.get_current_node().get("chapter", "")))
+	for choice in available_choices:
+		var button := Button.new()
+		button.text = String(choice.get("text", ""))
+		button.focus_mode = Control.FOCUS_NONE
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.pressed.connect(_on_choice_pressed.bind(String(choice.get("id", ""))))
+		_choice_container.add_child(button)
+	_refresh_back_button()
 
 
-func _finish_case() -> void:
+func _on_choice_pressed(choice_id: String) -> void:
+	_manager.select_choice(choice_id)
+	_refresh_status()
+
+
+func _on_meta_clicked(meta_id: String) -> void:
+	_last_meta_frame = Engine.get_process_frames()
+	if _manager == null:
+		return
+	if _manager.is_meta_registered(meta_id):
+		_log("Уже зафиксировано.")
+		return
+	_manager.click_meta(meta_id)
+	_refresh_status()
+
+
+func _on_clue_registered(clue_id: String, remaining_energy: int) -> void:
+	_log("Зафиксировано: %s  ·  энергия %d" % [clue_id, remaining_energy])
+	_refresh_status()
+
+
+func _on_energy_depleted() -> void:
+	_log("Не хватает сил. Нужно отдышаться.")
+
+
+func _on_milestone_reached(milestone_index: int) -> void:
+	_log("РУБЕЖ ВЗЯТ: %d" % milestone_index)
+	_golden_pulse()
+	GameManager.play_cue(1046.5, 0.24, -4.0)
+	_refresh_status()
+
+
+func _on_dialogue_ended() -> void:
+	_mode = "ended"
+	_typing = false
+	_hint.text = ""
+	_clear_choices()
+	_hide_back()
 	set_process(false)
 	GameManager.change_scene(GameManager.SCENE_EPILOGUE, 1.0)
 
 
-func _on_choice_selected(choice: DialogueChoice) -> void:
-	if choice.kind == "TACTIC":
-		_log("Тактика: %s" % Case1Scolfield.TACTICS.get(choice.tactic_id, choice.label))
-	else:
-		_log("Вопрос: %s" % choice.label)
-	_refresh_status()
+func _on_back_pressed() -> void:
+	if _manager != null and _manager.go_back():
+		_refresh_status()
 
 
-func _on_meta_clicked(url: String) -> void:
-	if GameManager.clicked_urls.has(url):
-		_log("Это уже закреплено.")
+func _advance_or_complete() -> void:
+	if _mode != "line":
 		return
-	if not GameManager.consume_pinned_slot():
-		_log("Слоты закрепления закончились.")
+	if _typing:
+		_complete_typing()
 		return
-	GameManager.clicked_urls[url] = true
-	var entry: Dictionary = case_data.url_registry.get(url, {})
-	var kind: String = entry.get("type", "flavor")
-	match kind:
-		"trait":
-			GameManager.unlock_trait(entry.get("value", ""))
-			_log(entry.get("log", "Черта разблокирована."))
-		"clue":
-			GameManager.register_clue(entry.get("value", ""))
-			if entry.has("tactic"):
-				GameManager.unlock_tactic(entry["tactic"])
-			_log(entry.get("log", "Улика закреплена."))
-		"confession":
-			_trigger_confession(url, entry)
+	if _manager != null:
+		var node: Dictionary = _manager.get_current_node()
+		var target := String(node.get("target_confession", ""))
+		if target != "" and not _manager.is_meta_registered(target):
+			_log("Сначала закрепите признание кликом по подсвеченной фразе.")
+			return
+	_manager.advance()
+
+
+func _complete_typing() -> void:
+	_typing = false
+	_text_label.visible_characters = -1
+	_hint.text = "Пробел / клик — далее"
+
+
+func _on_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _hovered_meta != null:
+			return
+		if Engine.get_process_frames() == _last_meta_frame:
+			return
+		_advance_or_complete()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("advance"):
+		_advance_or_complete()
+		get_viewport().set_input_as_handled()
+
+
+func _on_meta_hover_started(meta) -> void:
+	_hovered_meta = meta
+
+
+func _on_meta_hover_ended(meta) -> void:
+	if _hovered_meta == meta:
+		_hovered_meta = null
+
+
+func _update_chapter(chapter: String) -> void:
+	if chapter != "":
+		_chapter_label.text = chapter
+
+
+func _refresh_back_button() -> void:
+	if _back_button == null or _manager == null:
+		return
+	_back_button.visible = _mode == "choice" and _manager.can_go_back()
+
+
+func _hide_back() -> void:
+	if _back_button != null:
+		_back_button.visible = false
+
+
+func _clear_choices() -> void:
+	for child in _choice_container.get_children():
+		_choice_container.remove_child(child)
+		child.queue_free()
+
+
+func _update_portrait(speaker: String, internal: bool) -> void:
+	_portrait_panel.visible = speaker != ""
+	var color := _speaker_color(speaker)
+	if internal:
+		color = color.darkened(0.25)
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(8)
+	_portrait_panel.add_theme_stylebox_override("panel", style)
+	_portrait_initial.text = speaker.substr(0, 1).to_upper()
+
+
+func _speaker_color(speaker: String) -> Color:
+	match speaker:
+		"Анна":
+			return Color(0.52, 0.32, 0.48)
+		"Уэллер":
+			return Color(0.3, 0.42, 0.58)
+		"Сколфилд":
+			return Color(0.45, 0.42, 0.38)
 		_:
-			_log(entry.get("log", ""))
-	_vnbox.refresh()
-	_refresh_status()
-
-
-func _trigger_confession(_url: String, entry: Dictionary) -> void:
-	var phase_index: int = entry.get("phase", _phase_index)
-	var milestone: String = entry.get("milestone", "")
-	GameManager.set_admissibility("CLEAN")
-	GameManager.mark_milestone(phase_index, milestone)
-	_log("МАЙЛСТОУН ВЗЯТ: %s" % milestone)
-	_golden_pulse()
-	GameManager.play_cue(1046.5, 0.24, -4.0)
+			return Color(0.3, 0.3, 0.32)
 
 
 func _golden_pulse() -> void:
@@ -210,3 +402,14 @@ func _log(text: String) -> void:
 	_log_tween = create_tween()
 	_log_tween.tween_interval(2.2)
 	_log_tween.tween_property(_log_label, "modulate:a", 0.0, 0.8)
+
+
+func _set_rect(control: Control, left: float, top: float, right: float, bottom: float, offset_left: float, offset_top: float, offset_right: float, offset_bottom: float) -> void:
+	control.anchor_left = left
+	control.anchor_top = top
+	control.anchor_right = right
+	control.anchor_bottom = bottom
+	control.offset_left = offset_left
+	control.offset_top = offset_top
+	control.offset_right = offset_right
+	control.offset_bottom = offset_bottom

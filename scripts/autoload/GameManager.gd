@@ -11,11 +11,12 @@ signal pinned_slots_changed(remaining: int)
 signal coping_style_changed(style: String)
 signal trust_changed(value: int)
 signal resistance_changed(value: int)
+signal flags_changed(flag: String)
 
 enum GameState { EXPLORATION_3D, DIALOGUE_VN, INTERROGATION }
 
-const MAX_ENERGY := 5
-const DEFAULT_ENERGY := 3
+const MAX_ENERGY := 10
+const DEFAULT_ENERGY := 10
 const DEFAULT_SLOTS := 6
 
 const SCENE_PROLOGUE := "res://scenes/Prologue.tscn"
@@ -38,6 +39,7 @@ var unlocked_tactics: Array[String] = []
 var registered_clues: Array[String] = []
 var completed_milestones: Array[int] = []
 var clicked_urls: Dictionary = {}
+var flags: Dictionary = {}
 
 var _fade: ColorRect
 var _transitioning := false
@@ -63,6 +65,7 @@ func reset_run() -> void:
 	registered_clues.clear()
 	completed_milestones.clear()
 	clicked_urls.clear()
+	flags.clear()
 
 
 func set_state(new_state: int) -> void:
@@ -84,6 +87,39 @@ func consume_energy(amount: int = 1) -> bool:
 	player_energy -= amount
 	energy_changed.emit(player_energy)
 	return true
+
+
+func set_energy(value: int) -> void:
+	player_energy = clampi(value, 0, MAX_ENERGY)
+	energy_changed.emit(player_energy)
+
+
+func modify_energy(delta: int) -> int:
+	player_energy = clampi(player_energy + delta, 0, MAX_ENERGY)
+	energy_changed.emit(player_energy)
+	return player_energy
+
+
+func modify_attorney_risk(delta: int) -> void:
+	adjust_resistance(delta)
+
+
+func register_clicked_meta(meta_id: String) -> bool:
+	if meta_id == "" or clicked_urls.has(meta_id):
+		return false
+	clicked_urls[meta_id] = true
+	return true
+
+
+func add_flag(flag: String) -> void:
+	if flag == "" or flags.has(flag):
+		return
+	flags[flag] = true
+	flags_changed.emit(flag)
+
+
+func has_flag(flag: String) -> bool:
+	return flags.has(flag)
 
 
 func set_coping_style(style: String) -> void:
