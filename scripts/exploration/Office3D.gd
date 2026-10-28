@@ -583,7 +583,7 @@ func _build_hud() -> void:
 	_ui_layer.add_child(_toast)
 
 	var controls := Label.new()
-	controls.text = "WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — курсор"
+	controls.text = "WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — пауза"
 	controls.add_theme_font_size_override("font_size", 14)
 	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
 	controls.anchor_left = 0.0

@@ -100,8 +100,7 @@ func _on_advance() -> void:
 	elif _waiting:
 		_next_line()
 	elif _done:
-		GameManager.reset_run()
-		GameManager.change_scene(GameManager.SCENE_PROLOGUE, 1.0)
+		GameManager.open_main_menu()
 
 
 func _unhandled_input(event: InputEvent) -> void:

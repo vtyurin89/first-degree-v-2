@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="first_degree_v2"
-run/main_scene="res://scenes/Main.tscn"
+run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameManager="*res://scripts/autoload/GameManager.gd"
+MenuController="*res://scripts/autoload/MenuController.gd"
 
 [display]
 

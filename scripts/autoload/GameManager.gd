@@ -13,7 +13,7 @@ signal trust_changed(value: int)
 signal resistance_changed(value: int)
 signal flags_changed(flag: String)
 
-enum GameState { EXPLORATION_3D, DIALOGUE_VN, INTERROGATION }
+enum GameState { MAIN_MENU, EXPLORATION_3D, DIALOGUE_VN, INTERROGATION, PAUSED }
 
 const MAX_ENERGY := 10
 const DEFAULT_ENERGY := 10
@@ -23,6 +23,7 @@ const SCENE_PROLOGUE := "res://scenes/Prologue.tscn"
 const SCENE_OFFICE := "res://scenes/Office3D.tscn"
 const SCENE_INTERROGATION := "res://scenes/Interrogation.tscn"
 const SCENE_EPILOGUE := "res://scenes/Epilogue.tscn"
+const SCENE_MAIN_MENU := "res://scenes/MainMenu.tscn"
 
 var current_state: int = GameState.EXPLORATION_3D
 var player_energy: int = DEFAULT_ENERGY
@@ -73,6 +74,23 @@ func set_state(new_state: int) -> void:
 		return
 	current_state = new_state
 	state_changed.emit(current_state)
+
+
+func is_gameplay_state() -> bool:
+	return current_state == GameState.EXPLORATION_3D or current_state == GameState.DIALOGUE_VN or current_state == GameState.INTERROGATION
+
+
+func start_new_game() -> void:
+	get_tree().paused = false
+	reset_run()
+	set_state(GameState.EXPLORATION_3D)
+	change_scene(SCENE_PROLOGUE, 1.0)
+
+
+func open_main_menu() -> void:
+	get_tree().paused = false
+	set_state(GameState.MAIN_MENU)
+	change_scene(SCENE_MAIN_MENU, 1.0)
 
 
 func add_energy(amount: int) -> int:

@@ -31,11 +31,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
 		head.rotation.x = clampf(head.rotation.x, -1.4, 1.4)
-	elif event.is_action_pressed("ui_cancel"):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			release_mouse()
-		else:
-			capture_mouse()
 
 
 func _physics_process(delta: float) -> void:

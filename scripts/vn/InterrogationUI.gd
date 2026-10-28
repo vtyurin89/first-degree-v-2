@@ -27,6 +27,7 @@ var _flash: ColorRect
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_PASS
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameManager.set_state(GameManager.GameState.INTERROGATION)
 	_build_ui()
 	_connect_game()
