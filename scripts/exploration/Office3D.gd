@@ -139,6 +139,7 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 	player.set_physics_process(false)
 	_prompt.visible = false
 	_vnbox = VNBox.new()
+	_vnbox.theme = ThemeManager.get_theme()
 	_ui_layer.add_child(_vnbox)
 	var box := _vnbox
 	box.finished.connect(func() -> void:
@@ -552,6 +553,7 @@ func _build_hud() -> void:
 
 	var energy := Label.new()
 	energy.text = "Энергия: %d/%d" % [GameManager.player_energy, GameManager.MAX_ENERGY]
+	energy.theme = ThemeManager.get_theme()
 	energy.theme_type_variation = UITheme.HUD
 	energy.position = Vector2(24, 20)
 	_ui_layer.add_child(energy)
@@ -560,6 +562,7 @@ func _build_hud() -> void:
 
 	_prompt = Label.new()
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_prompt.theme = ThemeManager.get_theme()
 	_prompt.theme_type_variation = UITheme.PROMPT
 	_prompt.anchor_left = 0.0
 	_prompt.anchor_right = 1.0
@@ -572,6 +575,7 @@ func _build_hud() -> void:
 
 	_toast = Label.new()
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.theme = ThemeManager.get_theme()
 	_toast.theme_type_variation = UITheme.HUD
 	_toast.modulate = Color(0.95, 0.85, 0.5, 0.0)
 	_toast.anchor_left = 0.0
@@ -584,6 +588,7 @@ func _build_hud() -> void:
 
 	var controls := Label.new()
 	controls.text = "WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — пауза"
+	controls.theme = ThemeManager.get_theme()
 	controls.theme_type_variation = UITheme.SMALL
 	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
 	controls.anchor_left = 0.0

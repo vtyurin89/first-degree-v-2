@@ -63,6 +63,7 @@ func pause_game() -> void:
 	add_child(_pause_layer)
 
 	_pause_menu = MenuScreen.new()
+	_pause_menu.theme = ThemeManager.get_theme()
 	_pause_layer.add_child(_pause_menu)
 	_pause_menu.configure(MenuScreen.Mode.PAUSE)
 	_pause_menu.action_selected.connect(_on_pause_action)
@@ -99,6 +100,7 @@ func _open_screen(mode: int) -> void:
 	_screen_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_screen_layer)
 	_screen = SaveLoadScreen.new()
+	_screen.theme = ThemeManager.get_theme()
 	_screen_layer.add_child(_screen)
 	_screen.configure(mode)
 	_screen.closed.connect(close_screen)
@@ -124,6 +126,7 @@ func has_modal() -> bool:
 func show_modal(title: String, message: String, options: Array, on_result: Callable = Callable(), sub_message: String = "", show_icon: bool = true) -> ModalDialog:
 	_dismiss_modal()
 	_modal = ModalDialog.new()
+	_modal.theme = ThemeManager.get_theme()
 	_modal_layer.add_child(_modal)
 	_modal.configure(title, message, options, sub_message, show_icon)
 	_modal.option_selected.connect(func(value: String) -> void:
@@ -139,6 +142,7 @@ func show_modal(title: String, message: String, options: Array, on_result: Calla
 func show_input_modal(title: String, message: String, placeholder: String, on_confirm: Callable, initial_text: String = "", sub_message: String = "") -> ModalDialog:
 	_dismiss_modal()
 	_modal = ModalDialog.new()
+	_modal.theme = ThemeManager.get_theme()
 	_modal_layer.add_child(_modal)
 	_modal.configure(
 		title,
@@ -230,6 +234,7 @@ func _create_indicator() -> void:
 	_indicator_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_indicator_layer)
 	_indicator = Label.new()
+	_indicator.theme = ThemeManager.get_theme()
 	_indicator.theme_type_variation = UITheme.SMALL
 	_indicator.add_theme_color_override("font_color", UIPalette.TEXT_DIM)
 	_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
