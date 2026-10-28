@@ -53,6 +53,29 @@ func load_script(path: String) -> bool:
 	return ok
 
 
+func reload_for_locale(path: String) -> bool:
+	if not FileAccess.file_exists(path):
+		return false
+	var saved_node := current_node_id
+	var saved_history: Array = node_history.duplicate()
+	var saved_visited: Dictionary = visited_nodes.duplicate(true)
+	var saved_once: Dictionary = used_once_choices.duplicate(true)
+	var saved_reached: Dictionary = _reached_milestones.duplicate(true)
+	var saved_milestone := _last_milestone
+	if not load_script(path):
+		return false
+	node_history.clear()
+	for entry in saved_history:
+		node_history.append(String(entry))
+	visited_nodes = saved_visited
+	used_once_choices = saved_once
+	_reached_milestones = saved_reached
+	_last_milestone = saved_milestone
+	if saved_node != "":
+		_enter_node(saved_node)
+	return true
+
+
 func start() -> void:
 	if not _loaded:
 		push_error("[DialogueManager] Попытка старта без загруженного сценария")

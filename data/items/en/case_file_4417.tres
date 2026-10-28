@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "case_file_4417"
+title = "Case File #4417-C"
+body = "Victim: Gregory Mason, 15. Stepson of the suspect.\n\nCause of death: asphyxiation. Strangulation marks on the neck. Toxicology clean.\n\nThe suspect's alibi is partially contradicted by footage from the garage camera.\n\nAnna's note: he is watching how I react. Don't rush. Keep a straight face."
+kind = "case_file"
+author = ""
+date = ""

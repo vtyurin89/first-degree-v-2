@@ -22,10 +22,6 @@ func _on_action(action_id: String) -> void:
 		"load_game":
 			MenuController.open_load_screen()
 		"settings":
-			MenuController.show_modal("НАСТРОЙКИ", "Настройки пока не реализованы.", _ok_options())
+			MenuController.open_settings()
 		"exit":
 			get_tree().quit()
-
-
-func _ok_options() -> Array:
-	return [{"text": "ЗАКРЫТЬ", "value": "ok", "primary": true}]

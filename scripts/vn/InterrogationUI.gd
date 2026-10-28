@@ -1,7 +1,6 @@
 extends Control
 
 const CHARS_PER_SEC := 45.0
-const SCRIPT_PATH := "res://data/case1_scolfield.json"
 
 var _manager: DialogueManager
 var _mode := "idle"
@@ -33,6 +32,7 @@ func _ready() -> void:
 	_build_ui()
 	_connect_game()
 	_setup_manager()
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
 func _setup_manager() -> void:
@@ -43,10 +43,10 @@ func _setup_manager() -> void:
 	_manager.energy_depleted.connect(_on_energy_depleted)
 	_manager.milestone_reached.connect(_on_milestone_reached)
 	_manager.dialogue_ended.connect(_on_dialogue_ended)
-	if not _manager.load_script(SCRIPT_PATH):
+	if not _manager.load_script(LocalizationManager.case_script_path()):
 		_mode = "error"
 		_refresh_status()
-		_log("Сценарий не загрузился. Смотри консоль.")
+		_log(tr("SCRIPT_ERROR"))
 		return
 	_refresh_status()
 	_manager.start()
@@ -96,7 +96,7 @@ func _build_ui() -> void:
 	add_child(_chapter_label)
 
 	_back_button = Button.new()
-	_back_button.text = "← Назад"
+	_back_button.text = tr("COMMON_BACK")
 	_back_button.theme_type_variation = UITheme.BUTTON
 	_back_button.focus_mode = Control.FOCUS_NONE
 	_back_button.visible = false
@@ -198,10 +198,18 @@ func _on_string_changed(_value: String) -> void:
 	_refresh_status()
 
 
+func _on_locale_changed(_locale: String) -> void:
+	if _manager != null and _mode != "ended" and _mode != "error":
+		_manager.reload_for_locale(LocalizationManager.case_script_path())
+	if _back_button != null:
+		_back_button.text = tr("COMMON_BACK")
+	_refresh_status()
+
+
 func _refresh_status() -> void:
 	if _status_label == null:
 		return
-	_status_label.text = "Энергия: %d/%d   |   Улики: %d   |   Черты: %d   |   Тактики: %d   |   Риск адвоката: %d%%   |   Флаги: %d   |   Допустимость: %s" % [
+	_status_label.text = tr("HUD_STATUS") % [
 		GameManager.player_energy,
 		GameManager.MAX_ENERGY,
 		GameManager.registered_clues.size(),
@@ -221,7 +229,7 @@ func _on_line_ready(speaker: String, text: String, metadata: Dictionary) -> void
 	var internal := bool(metadata.get("internal", false))
 	_nameplate.text = speaker
 	if internal:
-		_nameplate.text = speaker + " · про себя"
+		_nameplate.text = speaker + " " + tr("INTERNAL_SUFFIX")
 	_nameplate.modulate = _speaker_color(speaker)
 	_update_portrait(speaker, internal)
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if internal else Color(0.92, 0.9, 0.86))
@@ -239,7 +247,7 @@ func _on_choices_ready(available_choices: Array) -> void:
 	_nameplate.text = ""
 	_portrait_panel.visible = false
 	_clear_choices()
-	_hint.text = "Выберите, как действовать"
+	_hint.text = tr("CHOOSE_ACTION")
 	_update_chapter(String(_manager.get_current_node().get("chapter", "")))
 	for choice in available_choices:
 		var button := Button.new()
@@ -262,23 +270,23 @@ func _on_meta_clicked(meta_id: String) -> void:
 	if _manager == null:
 		return
 	if _manager.is_meta_registered(meta_id):
-		_log("Уже зафиксировано.")
+		_log(tr("META_ALREADY"))
 		return
 	_manager.click_meta(meta_id)
 	_refresh_status()
 
 
 func _on_clue_registered(clue_id: String, remaining_energy: int) -> void:
-	_log("Зафиксировано: %s  ·  энергия %d" % [clue_id, remaining_energy])
+	_log(tr("META_REGISTERED") % [clue_id, remaining_energy])
 	_refresh_status()
 
 
 func _on_energy_depleted() -> void:
-	_log("Не хватает сил. Нужно отдышаться.")
+	_log(tr("NO_ENERGY"))
 
 
 func _on_milestone_reached(milestone_index: int) -> void:
-	_log("РУБЕЖ ВЗЯТ: %d" % milestone_index)
+	_log(tr("MILESTONE_TAKEN") % milestone_index)
 	_golden_pulse()
 	GameManager.play_cue(1046.5, 0.24, -4.0)
 	_refresh_status()
@@ -309,7 +317,7 @@ func _advance_or_complete() -> void:
 		var node: Dictionary = _manager.get_current_node()
 		var target := String(node.get("target_confession", ""))
 		if target != "" and not _manager.is_meta_registered(target):
-			_log("Сначала закрепите признание кликом по подсвеченной фразе.")
+			_log(tr("PIN_CONFESSION"))
 			return
 	_manager.advance()
 
@@ -317,7 +325,7 @@ func _advance_or_complete() -> void:
 func _complete_typing() -> void:
 	_typing = false
 	_text_label.visible_characters = -1
-	_hint.text = "Пробел / клик — далее"
+	_hint.text = tr("ADVANCE_HINT")
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -380,11 +388,11 @@ func _update_portrait(speaker: String, internal: bool) -> void:
 
 func _speaker_color(speaker: String) -> Color:
 	match speaker:
-		"Анна":
+		"Анна", "Anna":
 			return Color(0.52, 0.32, 0.48)
-		"Уэллер":
+		"Уэллер", "Weller":
 			return Color(0.3, 0.42, 0.58)
-		"Сколфилд":
+		"Сколфилд", "Scolfield":
 			return Color(0.45, 0.42, 0.38)
 		_:
 			return Color(0.3, 0.3, 0.32)

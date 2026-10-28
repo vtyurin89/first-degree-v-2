@@ -1,0 +1,428 @@
+{
+  "case_id": "CASE_1_SCOLFIELD",
+  "title": "Edward Scolfield",
+  "start_node": "p1_intro",
+  "max_energy": 10,
+  "initial_tactics": ["good_guy_monster", "appeal_to_honor"],
+  "palette": {
+    "clue": "#ffd76a",
+    "trait": "#7ad0ff",
+    "confession": "#ffd23f",
+    "flavor": "#c8c8c8"
+  },
+  "nodes": {
+    "p1_intro": {
+      "id": "p1_intro",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "Finally. Listen, I've been sitting here for two hours already. Maybe some coffee? Or is that how you do things here — marinate people until they break?",
+      "next": "p1_hub"
+    },
+    "p1_hub": {
+      "id": "p1_hub",
+      "type": "choice_hub",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "next": "p2_intro",
+      "choices": [
+        {"id": "probe_army", "text": "Ask about his military service", "next": "p1_army_1", "once": true},
+        {"id": "probe_feelings", "text": "Ask how he's feeling", "next": "p1_feel_1", "once": true},
+        {"id": "continue_p1", "text": "Move on to the case", "next": "p2_intro"}
+      ]
+    },
+    "p1_army_1": {
+      "id": "p1_army_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "Twenty years in uniform. Impressive. Where did you serve?",
+      "next": "p1_army_2"
+    },
+    "p1_army_2": {
+      "id": "p1_army_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "Oh, now we're talking! [url=clue_army]Two tours in hot spots[/url], listen, I'll tell you — the people there, the kind of suspects you deal with, we didn't even call them people…",
+      "meta": {
+        "clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0}
+      },
+      "next": "p1_army_3"
+    },
+    "p1_army_3": {
+      "id": "p1_army_3",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "internal": true,
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "You see him? He likes this. He likes being looked at. Men like him aren't afraid of an interrogation — they're afraid of not being appreciated.",
+      "next": "@back"
+    },
+    "p1_feel_1": {
+      "id": "p1_feel_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "Yesterday must have been hard. How do you even…",
+      "next": "p1_feel_2"
+    },
+    "p1_feel_2": {
+      "id": "p1_feel_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 1 — Baseline Calibration",
+      "text": "Tamara is beside herself. I'm holding it together for her. Someone has to be strong.",
+      "next": "@back"
+    },
+
+    "p2_intro": {
+      "id": "p2_intro",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Tell me about the pool. Just describe it — what it looks like in the evening when you come home from work.",
+      "next": "p2_pool"
+    },
+    "p2_pool": {
+      "id": "p2_pool",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Good pool. [url=junk_concrete]I poured the concrete for it myself[/url], by the way. Tamara wanted to hire a crew, and I said — why pay, I built worse than this in the army. It's lit from below, looks nice at night, [url=clue_schedule]Greg was always out there late[/url], listening to his music, and I kept telling him — turn off the light, electricity isn't free.",
+      "meta": {
+        "junk_concrete": {"kind": "flavor", "energy_cost": 0},
+        "clue_schedule": {"kind": "clue", "clue_id": "victim_pool_habit", "energy_cost": 0}
+      },
+      "next": "p2_knew"
+    },
+    "p2_knew": {
+      "id": "p2_knew",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "So you knew that in the evening he would almost certainly be at the pool.",
+      "next": "p2_what"
+    },
+    "p2_what": {
+      "id": "p2_what",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Well… yes, usually. Why?",
+      "next": "p2_camera"
+    },
+    "p2_camera": {
+      "id": "p2_camera",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Nothing. Go on — you said you poured the concrete yourself. Tell me about the camera by the garage, by the way — is it aimed right at the driveway?",
+      "next": "p2_camreply"
+    },
+    "p2_camreply": {
+      "id": "p2_camreply",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Yes, I installed it myself. Good thing, cheap, but the picture is sharp. It records everything that happens by the garage and part of the yard at the edge.",
+      "next": "p2_observed"
+    },
+    "p2_observed": {
+      "id": "p2_observed",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Which means you knew exactly that your departure would be recorded to the minute.",
+      "next": "p2_why"
+    },
+    "p2_why": {
+      "id": "p2_why",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "What are you getting at?",
+      "next": "p2_hub"
+    },
+    "p2_hub": {
+      "id": "p2_hub",
+      "type": "choice_hub",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "next": "p2_tactic_1",
+      "choices": [
+        {"id": "good_guy_monster", "text": "Monster or mistake", "next": "p2_tactic_1", "requires": {"tactics": ["good_guy_monster"]}},
+        {"id": "flatter_service", "text": "Flatter his service record", "next": "p2_flatter_1", "once": true, "requires": {"traits": ["NARCISSISM"]}, "on_select": {"add_flags": ["flattered_scolfield"]}},
+        {"id": "threaten", "text": "Threaten him with consequences", "next": "p2_threat_1", "once": true, "requires": {"attorney_max": 30}, "on_select": {"modify_attorney_risk": 35, "add_flags": ["threatened_scolfield"]}}
+      ]
+    },
+    "p2_flatter_1": {
+      "id": "p2_flatter_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Twenty years in uniform isn't just a line in a personnel file. Men like that know how to take a hit. Not everyone in your position would have kept their composure.",
+      "next": "p2_flatter_2"
+    },
+    "p2_flatter_2": {
+      "id": "p2_flatter_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "You know how to listen. Rare. Most people here look at me like I'm meat.",
+      "next": "@back"
+    },
+    "p2_threat_1": {
+      "id": "p2_threat_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Edward, if you're going to play mute, I'll walk out of here and come back with a warrant. And then this won't be a conversation anymore — it'll be a record.",
+      "next": "p2_threat_2"
+    },
+    "p2_threat_2": {
+      "id": "p2_threat_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "Don't threaten me. I spent twenty years looking into the eyes of people who tried to scare me. It didn't work.",
+      "next": "@back"
+    },
+    "p2_tactic_1": {
+      "id": "p2_tactic_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "You know, Edward, I haven't been in this room for the first year. And you know what I've learned? Sometimes they bring real monsters in here — the ones who plan, who enjoy it, who feel not a shred of remorse. And sometimes they bring in people who at some point simply… panicked. Did something they would never do in a normal state, and then made mistakes trying to fix it. Those are very different people, Edward. And I don't yet know which category to put you in. Help me understand.",
+      "next": "p2_tactic_2"
+    },
+    "p2_tactic_2": {
+      "id": "p2_tactic_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 2 — Evidence Tampering",
+      "target_confession": "confession_tampering",
+      "milestone": 1,
+      "milestone_name": "Evidence Tampering",
+      "text": "I… I didn't put him there, if that's what you mean. I mean — not like put. [url=confession_tampering]I moved him. He was already dead, understand? He wasn't breathing when I touched him. I panicked and dragged him into the water so it would look like he fell in and drowned. It was stupid, I know. It was stupid.[/url]",
+      "meta": {
+        "confession_tampering": {"kind": "confession", "energy_cost": 0}
+      },
+      "next": "p2_internal"
+    },
+    "p2_internal": {
+      "id": "p2_internal",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "internal": true,
+      "chapter": "Phase 2 — Evidence Tampering",
+      "text": "There it is, the first brick. He thinks that's the worst thing he's just told me. He has no idea I've only just begun.",
+      "next": "p3_intro"
+    },
+
+    "p3_intro": {
+      "id": "p3_intro",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "Good. Thank you for telling me the truth about the pool — that matters, Edward, it really does. Now I need you to tell me just as honestly what happened before you touched him. You say he wasn't breathing. What happened before that?",
+      "next": "p3_slip"
+    },
+    "p3_slip": {
+      "id": "p3_slip",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "[url=clue_slip]An accident. He slipped, hit his head on the edge, and I found him like that.[/url]",
+      "meta": {
+        "clue_slip": {"kind": "clue", "clue_id": "medical_discrepancy", "tactic": "present_forensics", "energy_cost": 0}
+      },
+      "next": "p3_forensics_hub"
+    },
+    "p3_forensics_hub": {
+      "id": "p3_forensics_hub",
+      "type": "choice_hub",
+      "chapter": "Phase 3 — Manslaughter",
+      "next": "p3_honor_hub",
+      "choices": [
+        {"id": "present_forensics", "text": "Present the forensics", "next": "p3_forensics_1", "requires": {"tactics": ["present_forensics"], "clues": ["medical_discrepancy"]}}
+      ]
+    },
+    "p3_forensics_1": {
+      "id": "p3_forensics_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "Edward, I should be honest with you, since you're being honest with me. The medical examiner found no signs of a blow against the edge. No bruise, no laceration, nothing consistent with a fall. But there is something else. Strangulation marks on the neck. Do you understand what that means?",
+      "next": "p3_forensics_2"
+    },
+    "p3_forensics_2": {
+      "id": "p3_forensics_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "It's not what you think.",
+      "next": "p3_forensics_3"
+    },
+    "p3_forensics_3": {
+      "id": "p3_forensics_3",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "Then tell me what it is. Because right now it looks like you strangled a fifteen-year-old boy, Edward. And I don't know a single other version of events that explains those marks on his neck. Do you?",
+      "next": "p3_honor_hub"
+    },
+    "p3_honor_hub": {
+      "id": "p3_honor_hub",
+      "type": "choice_hub",
+      "chapter": "Phase 3 — Manslaughter",
+      "next": "p3_honor_1",
+      "choices": [
+        {"id": "appeal_to_honor", "text": "Appeal to his honor", "next": "p3_honor_1", "requires": {"tactics": ["appeal_to_honor"]}}
+      ]
+    },
+    "p3_honor_1": {
+      "id": "p3_honor_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "You've already done the hard part, Edward. You told me the truth about the pool, even though you could have lied. That said something about the kind of man you are. Don't stop halfway — that will look worse than if you'd said nothing at all.",
+      "next": "p3_honor_2"
+    },
+    "p3_honor_2": {
+      "id": "p3_honor_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 3 — Manslaughter",
+      "target_confession": "confession_manslaughter",
+      "milestone": 2,
+      "milestone_name": "Manslaughter",
+      "text": "He got to me, all right? Constantly, every day, that ungrateful little shit — sorry — he got to me. That day he started again, I walked over to… I don't know, shake him, snap him out of it. [url=confession_manslaughter]I grabbed him by the throat — not to kill him, just to shut him up, to make him stop for one second. And he started fighting, and I… I didn't know my own strength. I held on too long. He went limp, and I knew — too late. It wasn't murder. It was an accident that started because I just wanted to scare him.[/url]",
+      "meta": {
+        "confession_manslaughter": {"kind": "confession", "energy_cost": 0}
+      },
+      "next": "p3_internal"
+    },
+    "p3_internal": {
+      "id": "p3_internal",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "internal": true,
+      "chapter": "Phase 3 — Manslaughter",
+      "text": "The second brick. Now the hard part — proving it wasn't just 'he didn't know his own strength.' That he wanted this long before the pool.",
+      "next": "p4_intro"
+    },
+
+    "p4_intro": {
+      "id": "p4_intro",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "Edward, you said you 'wanted to scare him.' Tell me, was this really the first time you were angry with Greg?",
+      "next": "p4_history"
+    },
+    "p4_history": {
+      "id": "p4_history",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "He was a difficult kid. I raised my hand to him, yes, I admit it, I'm not proud of it. But that's a different thing — a smack on the head and what you're trying to pin on me now.",
+      "next": "p4_threat"
+    },
+    "p4_threat": {
+      "id": "p4_threat",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "Tamara told us that a week before it happened you said something to her — and I quote — 'one day I won't hold back, and then he can blame himself.' Were those your words?",
+      "next": "p4_defense"
+    },
+    "p4_defense": {
+      "id": "p4_defense",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "People say all sorts of things in anger. [url=clue_defense_trap]That doesn't mean I was planning to do anything.[/url] I said it, yes. So what? Every parent in a rage says things they don't mean.",
+      "meta": {
+        "clue_defense_trap": {"kind": "clue", "clue_id": "premature_defense", "tactic": "direct_confrontation", "energy_cost": 0}
+      },
+      "next": "p4_why"
+    },
+    "p4_why": {
+      "id": "p4_why",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "Edward, I didn't ask whether you were planning anything. You said it yourself. Why?",
+      "next": "p4_monster"
+    },
+    "p4_monster": {
+      "id": "p4_monster",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "…Because you're going to try to prove it anyway. You all want a monster, not a man who snapped. It's easier to lock up a monster.",
+      "next": "p4_hub"
+    },
+    "p4_hub": {
+      "id": "p4_hub",
+      "type": "choice_hub",
+      "chapter": "Phase 4 — Premeditation",
+      "next": "p4_force_1",
+      "choices": [
+        {"id": "direct_confrontation", "text": "Direct confrontation", "next": "p4_confront_1", "requires": {"tactics": ["direct_confrontation"], "clues": ["premature_defense"]}}
+      ]
+    },
+    "p4_confront_1": {
+      "id": "p4_confront_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "I don't need a monster, Edward. I need the truth. You told your wife that one day you wouldn't hold back. A week before Greg died. That doesn't sound like a flash of anger in the moment. It sounds like a man who already knew something serious was going to happen, and warned her in advance. So what happened that day at the pool? Did you really just 'want to scare him,' or somewhere deep down did you already know you wouldn't stop this time?",
+      "next": "p4_confront_2"
+    },
+    "p4_confront_2": {
+      "id": "p4_confront_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 4 — Premeditation",
+      "target_confession": "confession_premeditation",
+      "milestone": 3,
+      "milestone_name": "Premeditation",
+      "text": "[url=confession_premeditation]I thought about it in advance. That morning. When he mouthed off to me again at breakfast — I thought: 'today, if he starts again, I'll shut him up for good.' I didn't chase the thought away. Tamara had gone to her sister's, the house was empty, I knew that if it happened today no one would interfere. And then he started at the pool, and I… didn't snap. I just did what I'd been thinking about all morning.[/url]",
+      "meta": {
+        "confession_premeditation": {"kind": "confession", "energy_cost": 0}
+      },
+      "next": "p4_final"
+    },
+    "p4_force_1": {
+      "id": "p4_force_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "chapter": "Phase 4 — Premeditation",
+      "text": "You told your wife that one day you wouldn't hold back. A week before Greg died. I don't believe in coincidences, Edward. And neither do you. Tell me the truth — not for the record, for yourself.",
+      "next": "p4_force_2"
+    },
+    "p4_force_2": {
+      "id": "p4_force_2",
+      "type": "dialogue_line",
+      "speaker": "Scolfield",
+      "chapter": "Phase 4 — Premeditation",
+      "target_confession": "confession_premeditation",
+      "milestone": 3,
+      "milestone_name": "Premeditation",
+      "text": "[url=confession_premeditation]I thought about it. That morning, at breakfast. I knew that if he started again, I wouldn't stop. And when he did, at the pool, I didn't snap. I just did what I'd decided that morning.[/url]",
+      "meta": {
+        "confession_premeditation": {"kind": "confession", "energy_cost": 0}
+      },
+      "next": "p4_final"
+    },
+    "p4_final": {
+      "id": "p4_final",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "internal": true,
+      "chapter": "Phase 4 — Premeditation",
+      "text": "The third brick. Murder in the first degree. He'll go away for life. I should feel relieved. I feel nothing.",
+      "next": ""
+    }
+  }
+}

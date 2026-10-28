@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "case_file_4417"
+title = "Дело №4417-С"
+body = "Жертва: Грегори Мэйсон, 15 лет. Пасынок подозреваемого.\n\nПричина смерти: асфиксия. Странгуляционные борозды на шее. Токсикология чистая.\n\nАлиби подозреваемого частично опровергнуто записью с камеры у гаража.\n\nПримечание Анны: он следит за тем, как я реагирую. Не торопиться. Держать лицо."
+kind = "case_file"
+author = ""
+date = ""

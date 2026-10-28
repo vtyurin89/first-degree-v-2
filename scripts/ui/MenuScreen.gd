@@ -6,24 +6,26 @@ signal action_selected(action_id: String)
 enum Mode { MAIN, PAUSE }
 
 const ITEMS_MAIN := [
-	{"id": "new_game", "label": "НОВАЯ ИГРА"},
-	{"id": "load_game", "label": "ЗАГРУЗИТЬ ИГРУ"},
-	{"id": "settings", "label": "НАСТРОЙКИ"},
-	{"id": "exit", "label": "ВЫХОД"},
+	{"id": "new_game", "key": "MENU_NEW_GAME"},
+	{"id": "load_game", "key": "MENU_LOAD_GAME"},
+	{"id": "settings", "key": "MENU_SETTINGS"},
+	{"id": "exit", "key": "MENU_EXIT"},
 ]
 
 const ITEMS_PAUSE := [
-	{"id": "continue", "label": "ПРОДОЛЖИТЬ"},
-	{"id": "save_game", "label": "СОХРАНИТЬ ИГРУ"},
-	{"id": "load_game", "label": "ЗАГРУЗИТЬ ИГРУ"},
-	{"id": "settings", "label": "НАСТРОЙКИ"},
-	{"id": "exit", "label": "ВЫХОД"},
+	{"id": "continue", "key": "MENU_CONTINUE"},
+	{"id": "save_game", "key": "MENU_SAVE_GAME"},
+	{"id": "load_game", "key": "MENU_LOAD_GAME"},
+	{"id": "settings", "key": "MENU_SETTINGS"},
+	{"id": "exit", "key": "MENU_EXIT"},
 ]
 
 var _mode := Mode.MAIN
 var _built := false
 var _background: ColorRect
 var _items: VBoxContainer
+var _subtitle: RichTextLabel
+var _quote: RichTextLabel
 
 
 func _ready() -> void:
@@ -33,6 +35,7 @@ func _ready() -> void:
 	_build()
 	_built = true
 	_apply_mode()
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
 func configure(mode: int) -> void:
@@ -72,15 +75,14 @@ func _build() -> void:
 	title.text = "F[color=%s]I[/color]RST\nDEGREE" % UIPalette.html(UIPalette.RED)
 	content.add_child(title)
 
-	var subtitle := RichTextLabel.new()
-	subtitle.bbcode_enabled = true
-	subtitle.scroll_active = false
-	subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	subtitle.custom_minimum_size = Vector2(0, 28)
-	subtitle.theme_type_variation = UITheme.SUBTITLE
-	subtitle.add_theme_color_override("default_color", UIPalette.TEXT)
-	subtitle.text = "INTERROGATE.   UNCOVER.   [color=%s]CONVICT.[/color]" % UIPalette.html(UIPalette.RED)
-	content.add_child(subtitle)
+	_subtitle = RichTextLabel.new()
+	_subtitle.bbcode_enabled = true
+	_subtitle.scroll_active = false
+	_subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_subtitle.custom_minimum_size = Vector2(0, 28)
+	_subtitle.theme_type_variation = UITheme.SUBTITLE
+	_subtitle.add_theme_color_override("default_color", UIPalette.TEXT)
+	content.add_child(_subtitle)
 
 	var spacer_top := Control.new()
 	spacer_top.custom_minimum_size = Vector2(0, 42)
@@ -97,20 +99,47 @@ func _build() -> void:
 	spacer_expand.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(spacer_expand)
 
-	var quote := RichTextLabel.new()
-	quote.bbcode_enabled = true
-	quote.scroll_active = false
-	quote.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	quote.custom_minimum_size = Vector2(0, 92)
-	quote.theme_type_variation = UITheme.QUOTE
-	quote.add_theme_color_override("default_color", UIPalette.TEXT_DIM)
-	quote.text = "[i]«THE TRUTH DOESN'T COME OUT BECAUSE IT WANTS TO. IT COMES OUT BECAUSE [color=%s]YOU MAKE IT.[/color]»[/i]" % UIPalette.html(UIPalette.RED)
-	content.add_child(quote)
+	_quote = RichTextLabel.new()
+	_quote.bbcode_enabled = true
+	_quote.scroll_active = false
+	_quote.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quote.custom_minimum_size = Vector2(0, 92)
+	_quote.theme_type_variation = UITheme.QUOTE
+	_quote.add_theme_color_override("default_color", UIPalette.TEXT_DIM)
+	content.add_child(_quote)
 
 
 func _apply_mode() -> void:
 	_background.color = UIPalette.BG_DEEP if _mode == Mode.MAIN else UIPalette.OVERLAY
 	_rebuild_items()
+	_update_subtitle()
+	_update_quote()
+
+
+func _update_subtitle() -> void:
+	if _subtitle == null:
+		return
+	_subtitle.text = "%s[color=%s]%s[/color]" % [
+		tr("MENU_SUBTITLE_PREFIX"),
+		UIPalette.html(UIPalette.RED),
+		tr("MENU_SUBTITLE_ACCENT"),
+	]
+
+
+func _update_quote() -> void:
+	if _quote == null:
+		return
+	_quote.text = "[i]%s[color=%s]%s[/color][/i]" % [
+		tr("MENU_QUOTE_PREFIX"),
+		UIPalette.html(UIPalette.RED),
+		tr("MENU_QUOTE_ACCENT"),
+	]
+
+
+func _on_locale_changed(_locale: String) -> void:
+	_rebuild_items()
+	_update_subtitle()
+	_update_quote()
 
 
 func _rebuild_items() -> void:
@@ -121,7 +150,7 @@ func _rebuild_items() -> void:
 	var first: Button = null
 	for item in list:
 		var button := Button.new()
-		button.text = "—   " + String(item.get("label", ""))
+		button.text = "—   " + tr(String(item.get("key", "")))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.focus_mode = Control.FOCUS_ALL
 		button.custom_minimum_size = Vector2(0, 38)

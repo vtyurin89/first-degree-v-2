@@ -96,35 +96,38 @@ func _read_metadata(slot_id: String) -> Dictionary:
 	}
 	var res = ResourceLoader.load(slot_path(slot_id))
 	if res is SaveData:
-		meta["slot_name"] = res.slot_name if res.slot_name != "" else _default_name(slot_id)
+		var display_name := String(res.slot_name)
+		if display_name == "" or slot_id == CHECKPOINT_SLOT or slot_id == QUICKSAVE_SLOT:
+			display_name = _default_name(slot_id)
+		meta["slot_name"] = display_name
 		meta["timestamp"] = res.timestamp
 		meta["timestamp_text"] = res.timestamp_text
 		meta["chapter_title"] = res.chapter_title
 		meta["case_status"] = _status_label(res.case_status)
 	else:
 		meta["corrupted"] = true
-		meta["slot_name"] = "Повреждённое сохранение"
+		meta["slot_name"] = tr("CORRUPTED_SAVE_NAME")
 	return meta
 
 
 func _default_name(slot_id: String) -> String:
 	match slot_id:
 		CHECKPOINT_SLOT:
-			return "Контрольная точка"
+			return tr("SLOT_CHECKPOINT")
 		QUICKSAVE_SLOT:
-			return "Быстрое сохранение"
+			return tr("SLOT_QUICKSAVE")
 		_:
-			return "Сохранение"
+			return tr("SLOT_DEFAULT")
 
 
 func _status_label(status: String) -> String:
 	match status:
 		"CLEAN":
-			return "Clean"
+			return tr("STATUS_CLEAN")
 		"TAINTED":
-			return "Tainted"
+			return tr("STATUS_TAINTED")
 		"INADMISSIBLE":
-			return "Inadmissible"
+			return tr("STATUS_INADMISSIBLE")
 		_:
 			return status
 
@@ -148,7 +151,7 @@ func save_game(slot_id: String = "", display_name: String = "") -> bool:
 
 
 func autosave_checkpoint() -> bool:
-	return save_game(CHECKPOINT_SLOT, "Контрольная точка")
+	return save_game(CHECKPOINT_SLOT, "")
 
 
 func delete_slot(slot_id: String) -> bool:
@@ -226,14 +229,14 @@ func _chapter_title(scene_path: String) -> String:
 	if scene_path == GameManager.SCENE_INTERROGATION:
 		if DialogueStateManager.chapter_title != "":
 			return DialogueStateManager.chapter_title
-		return "Допрос"
+		return tr("CHAPTER_INTERROGATION")
 	if scene_path == GameManager.SCENE_OFFICE:
-		return "Кабинет"
+		return tr("CHAPTER_OFFICE")
 	if scene_path == GameManager.SCENE_PROLOGUE:
-		return "Пролог"
+		return tr("CHAPTER_PROLOGUE")
 	if scene_path == GameManager.SCENE_EPILOGUE:
-		return "Эпилог"
-	return "Игра"
+		return tr("CHAPTER_EPILOGUE")
+	return tr("CHAPTER_GAME")
 
 
 func _format_timestamp(unix_time: int) -> String:

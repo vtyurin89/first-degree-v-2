@@ -148,8 +148,8 @@ func show_input_modal(title: String, message: String, placeholder: String, on_co
 		title,
 		message,
 		[
-			{"text": "СОХРАНИТЬ", "value": "ok", "primary": true},
-			{"text": "ОТМЕНА", "value": "cancel"},
+			{"text": tr("COMMON_SAVE"), "value": "ok", "primary": true},
+			{"text": tr("COMMON_CANCEL"), "value": "cancel"},
 		],
 		sub_message,
 		false,
@@ -200,21 +200,21 @@ func _on_pause_action(action_id: String) -> void:
 		"load_game":
 			open_load_screen()
 		"settings":
-			show_modal("НАСТРОЙКИ", "Настройки пока не реализованы.", _ok_options())
+			open_settings()
 		"exit":
 			_confirm_exit()
 
 
 func _confirm_exit() -> void:
 	show_modal(
-		"ВЫХОД ИЗ ИГРЫ",
-		"Вы уверены, что хотите выйти?",
+		tr("EXIT_TITLE"),
+		tr("EXIT_MESSAGE"),
 		[
-			{"text": "ДА, ВЫЙТИ", "value": "exit", "primary": true, "danger": true},
-			{"text": "ОСТАТЬСЯ", "value": "stay"},
+			{"text": tr("YES_EXIT"), "value": "exit", "primary": true, "danger": true},
+			{"text": tr("STAY"), "value": "stay"},
 		],
 		_on_exit_choice,
-		"Несохранённый прогресс будет потерян.",
+		tr("EXIT_WARNING"),
 		true
 	)
 
@@ -224,8 +224,18 @@ func _on_exit_choice(value: String) -> void:
 		get_tree().quit()
 
 
-func _ok_options() -> Array:
-	return [{"text": "ЗАКРЫТЬ", "value": "ok", "primary": true}]
+func open_settings() -> void:
+	var options: Array = [
+		{"text": tr("LANGUAGE_RU"), "value": "ru", "primary": LocalizationManager.current_locale == "ru"},
+		{"text": tr("LANGUAGE_EN"), "value": "en", "primary": LocalizationManager.current_locale == "en"},
+		{"text": tr("COMMON_CANCEL"), "value": "cancel"},
+	]
+	show_modal(tr("SETTINGS_TITLE"), tr("SETTINGS_LANGUAGE"), options, _on_settings_choice, "", false)
+
+
+func _on_settings_choice(value: String) -> void:
+	if value == "ru" or value == "en":
+		LocalizationManager.set_locale(value)
 
 
 func _create_indicator() -> void:
@@ -265,22 +275,22 @@ func _show_indicator(text: String, color: Color = UIPalette.TEXT_DIM) -> void:
 
 
 func _on_save_started(_slot_id: String) -> void:
-	_show_indicator("СОХРАНЕНИЕ…")
+	_show_indicator(tr("INDICATOR_SAVING"))
 
 
 func _on_save_completed(_slot_id: String, success: bool) -> void:
 	if success:
-		_show_indicator("СОХРАНЕНО", UIPalette.TEXT)
+		_show_indicator(tr("INDICATOR_SAVED"), UIPalette.TEXT)
 	else:
-		_show_indicator("ОШИБКА СОХРАНЕНИЯ", UIPalette.RED_BRIGHT)
+		_show_indicator(tr("INDICATOR_SAVE_ERROR"), UIPalette.RED_BRIGHT)
 
 
 func _on_load_completed(success: bool) -> void:
 	if success:
-		_show_indicator("ЗАГРУЖЕНО", UIPalette.TEXT)
+		_show_indicator(tr("INDICATOR_LOADED"), UIPalette.TEXT)
 	else:
-		_show_indicator("ОШИБКА ЗАГРУЗКИ", UIPalette.RED_BRIGHT)
+		_show_indicator(tr("INDICATOR_LOAD_ERROR"), UIPalette.RED_BRIGHT)
 
 
 func _on_save_corrupted(_slot_id: String) -> void:
-	_show_indicator("СОХРАНЕНИЕ ПОВРЕЖДЕНО", UIPalette.RED_BRIGHT)
+	_show_indicator(tr("INDICATOR_CORRUPTED"), UIPalette.RED_BRIGHT)

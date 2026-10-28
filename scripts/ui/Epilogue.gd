@@ -49,6 +49,16 @@ func _ready() -> void:
 	_lines = Case1Scolfield.get_epilogue()
 	_next_line()
 	gui_input.connect(_on_gui_input)
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
+
+
+func _on_locale_changed(_locale: String) -> void:
+	if _done:
+		_end()
+		return
+	_lines = Case1Scolfield.get_epilogue()
+	if _index >= 0 and _index < _lines.size():
+		_display_current()
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -67,6 +77,10 @@ func _process(delta: float) -> void:
 
 func _next_line() -> void:
 	_index += 1
+	_display_current()
+
+
+func _display_current() -> void:
 	if _index >= _lines.size():
 		_end()
 		return
@@ -84,14 +98,14 @@ func _complete_line() -> void:
 	_typing = false
 	_waiting = true
 	_text.visible_characters = -1
-	_hint.text = "Пробел / клик — далее"
+	_hint.text = tr("ADVANCE_HINT")
 
 
 func _end() -> void:
 	_done = true
-	_text.text = "[center]ПЕРВАЯ СТЕПЕНЬ\n\nКонец вертикального среза.[/center]"
+	_text.text = "[center]%s\n\n%s[/center]" % [tr("EPILOGUE_TITLE"), tr("EPILOGUE_SUBTITLE")]
 	_text.visible_characters = -1
-	_hint.text = "Пробел / клик — начать заново"
+	_hint.text = tr("RESTART_HINT")
 
 
 func _on_advance() -> void:

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "book_interrogation"
+title = "Interrogation: A Field Manual"
+body = "'Silence is not a confession. Silence is a strategy.\n\nYour job is not to make the suspect talk, but to make silence unprofitable. Every detail he denies is one more place to catch him.\n\nNever ask 'why'. Ask 'how'.'"
+kind = "book"
+author = ""
+date = ""

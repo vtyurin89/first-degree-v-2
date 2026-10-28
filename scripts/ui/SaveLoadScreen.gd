@@ -27,6 +27,7 @@ func _ready() -> void:
 	_build()
 	_built = true
 	_apply_mode()
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
 func configure(mode: int) -> void:
@@ -95,7 +96,7 @@ func _build() -> void:
 	footer.add_child(_status)
 
 	_load_button = Button.new()
-	_load_button.text = "ЗАГРУЗИТЬ"
+	_load_button.text = tr("COMMON_LOAD")
 	_load_button.theme_type_variation = UITheme.BUTTON
 	_load_button.custom_minimum_size = Vector2(170, 44)
 	_load_button.visible = false
@@ -104,7 +105,7 @@ func _build() -> void:
 	footer.add_child(_load_button)
 
 	_delete_button = Button.new()
-	_delete_button.text = "УДАЛИТЬ"
+	_delete_button.text = tr("COMMON_DELETE")
 	_delete_button.theme_type_variation = UITheme.BUTTON
 	_delete_button.custom_minimum_size = Vector2(150, 44)
 	_delete_button.visible = false
@@ -114,7 +115,7 @@ func _build() -> void:
 
 
 func _apply_mode() -> void:
-	_title.text = "СОХРАНЕНИЕ ИГРЫ" if _mode == Mode.SAVE else "ЗАГРУЗКА ИГРЫ"
+	_title.text = tr("SAVE_TITLE") if _mode == Mode.SAVE else tr("LOAD_TITLE")
 	_status.text = ""
 	_refresh()
 
@@ -127,13 +128,13 @@ func _refresh() -> void:
 	_selected_name = ""
 	_selected_corrupted = false
 	if _mode == Mode.SAVE:
-		_list.add_child(_make_row("__new__", "Новое сохранение", "Создать новый слот сохранения", true, false))
+		_list.add_child(_make_row("__new__", tr("NEW_SAVE"), tr("NEW_SAVE_HINT"), true, false))
 	var slots := SaveManager.list_slots()
 	for meta in slots:
 		var slot_id := String(meta.get("slot_id", ""))
 		var display_name := String(meta.get("slot_name", slot_id))
 		var corrupted := bool(meta.get("corrupted", false))
-		var meta_text := "Файл повреждён"
+		var meta_text := tr("CORRUPTED_FILE")
 		if not corrupted:
 			meta_text = "%s   ·   %s   ·   %s" % [
 				String(meta.get("timestamp_text", "—")),
@@ -145,13 +146,19 @@ func _refresh() -> void:
 		var empty := Label.new()
 		empty.theme_type_variation = UITheme.SMALL
 		empty.add_theme_color_override("font_color", UIPalette.TEXT_FAINT)
-		empty.text = "Сохранений пока нет."
+		empty.text = tr("NO_SAVES")
 		empty.custom_minimum_size = Vector2(0, 60)
 		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_list.add_child(empty)
 	_update_actions()
 	_focus_initial()
+
+
+func _on_locale_changed(_locale: String) -> void:
+	_load_button.text = tr("COMMON_LOAD")
+	_delete_button.text = tr("COMMON_DELETE")
+	_apply_mode()
 
 
 func _focus_initial() -> void:
@@ -306,17 +313,17 @@ func _on_row_pressed(slot_id: String, display_name: String, corrupted: bool, is_
 
 func _open_save_modal() -> void:
 	MenuController.show_input_modal(
-		"СОХРАНЕНИЕ ИГРЫ",
-		"Введите название сохранения",
-		"Название сохранения",
+		tr("SAVE_TITLE"),
+		tr("SAVE_INPUT_MESSAGE"),
+		tr("SAVE_INPUT_PLACEHOLDER"),
 		_perform_save,
-		"Сохранение"
+		tr("DEFAULT_SAVE_NAME")
 	)
 
 
 func _perform_save(display_name: String) -> void:
 	var ok := SaveManager.save_game("", display_name)
-	_status.text = "Сохранено." if ok else "Не удалось сохранить."
+	_status.text = tr("SAVED_OK") if ok else tr("SAVE_FAILED")
 	_refresh()
 
 
@@ -324,11 +331,11 @@ func _on_delete_pressed() -> void:
 	if _selected_id == "":
 		return
 	MenuController.show_modal(
-		"УДАЛЕНИЕ СОХРАНЕНИЯ",
-		"Удалить это сохранение?",
+		tr("DELETE_TITLE"),
+		tr("DELETE_MESSAGE"),
 		[
-			{"text": "УДАЛИТЬ", "value": "delete", "primary": true, "danger": true},
-			{"text": "ОТМЕНА", "value": "cancel"},
+			{"text": tr("COMMON_DELETE"), "value": "delete", "primary": true, "danger": true},
+			{"text": tr("COMMON_CANCEL"), "value": "cancel"},
 		],
 		_on_delete_result,
 		_selected_name,
@@ -340,7 +347,7 @@ func _on_delete_result(value: String) -> void:
 	if value == "delete":
 		SaveManager.delete_slot(_selected_id)
 		_selected_id = ""
-		_status.text = "Сохранение удалено."
+		_status.text = tr("DELETED_OK")
 		_refresh()
 
 

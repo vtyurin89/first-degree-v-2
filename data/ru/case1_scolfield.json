@@ -15,14 +15,14 @@
       "id": "p1_intro",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "Наконец-то. Слушайте, я тут уже два часа торчу. Может, кофе? Или у вас тут так заведено — мариновать людей, пока не сломаются?",
       "next": "p1_hub"
     },
     "p1_hub": {
       "id": "p1_hub",
       "type": "choice_hub",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "next": "p2_intro",
       "choices": [
         {"id": "probe_army", "text": "Спросить о службе в армии", "next": "p1_army_1", "once": true},
@@ -34,7 +34,7 @@
       "id": "p1_army_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "Двадцать лет в форме. Впечатляет. Где служили?",
       "next": "p1_army_2"
     },
@@ -42,7 +42,7 @@
       "id": "p1_army_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "О, вот это разговор! [url=clue_army]Два тура в горячих точках[/url], слушайте, я вам расскажу — там таких, как ваши подозреваемые, только людьми не называли…",
       "meta": {
         "clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0}
@@ -54,7 +54,7 @@
       "type": "dialogue_line",
       "speaker": "Анна",
       "internal": true,
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "Видишь его? Ему нравится это. Ему нравится, что на него смотрят. Такие, как он, не боятся допроса — они боятся, что их не оценят по достоинству.",
       "next": "@back"
     },
@@ -62,7 +62,7 @@
       "id": "p1_feel_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "Тяжёлый, наверное, был вчерашний день. Как вы вообще…",
       "next": "p1_feel_2"
     },
@@ -70,7 +70,7 @@
       "id": "p1_feel_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 1 — Baseline Calibration",
+      "chapter": "Фаза 1 — Калибровка базовой линии",
       "text": "Тамара сама не своя. Я держусь ради неё. Кто-то же должен быть сильным.",
       "next": "@back"
     },
@@ -79,7 +79,7 @@
       "id": "p2_intro",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Расскажите мне о бассейне. Просто опишите его — как он выглядит вечером, когда вы приходите с работы.",
       "next": "p2_pool"
     },
@@ -87,7 +87,7 @@
       "id": "p2_pool",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Хороший бассейн. [url=junk_concrete]Я сам заливал бетон под него[/url], между прочим. Тамара хотела нанять бригаду, а я сказал — зачем платить, я в армии и не такое строил. Подсветка снизу, ночью красиво светится, [url=clue_schedule]Грег там вечно торчал допоздна[/url], музыку свою слушал, я ему говорил — выключай свет, электричество не бесплатное.",
       "meta": {
         "junk_concrete": {"kind": "flavor", "energy_cost": 0},
@@ -99,7 +99,7 @@
       "id": "p2_knew",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Значит, вы знали, что вечером он почти наверняка будет у бассейна.",
       "next": "p2_what"
     },
@@ -107,7 +107,7 @@
       "id": "p2_what",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Ну… да, обычно да. А что?",
       "next": "p2_camera"
     },
@@ -115,7 +115,7 @@
       "id": "p2_camera",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Ничего. Продолжайте — вы сказали, залили бетон сами. Расскажите про камеру у гаража, кстати — она направлена прямо на подъездную дорожку?",
       "next": "p2_camreply"
     },
@@ -123,7 +123,7 @@
       "id": "p2_camreply",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Да, я сам её ставил. Хорошая штука, недорогая, но картинку даёт чёткую. Записывает всё, что происходит у гаража и краем — часть двора.",
       "next": "p2_observed"
     },
@@ -131,7 +131,7 @@
       "id": "p2_observed",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "То есть вы знали точно, что ваш отъезд будет зафиксирован с точностью до минуты.",
       "next": "p2_why"
     },
@@ -139,14 +139,14 @@
       "id": "p2_why",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "К чему вы клоните?",
       "next": "p2_hub"
     },
     "p2_hub": {
       "id": "p2_hub",
       "type": "choice_hub",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "next": "p2_tactic_1",
       "choices": [
         {"id": "good_guy_monster", "text": "Злодей или ошибка", "next": "p2_tactic_1", "requires": {"tactics": ["good_guy_monster"]}},
@@ -158,7 +158,7 @@
       "id": "p2_flatter_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Двадцать лет в форме — это не строчка в личном деле. Такие люди умеют держать удар. Не каждый на вашем месте сохранил бы самообладание.",
       "next": "p2_flatter_2"
     },
@@ -166,7 +166,7 @@
       "id": "p2_flatter_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Вы умеете слушать. Редкость. Большинство здесь смотрят на меня как на мясо.",
       "next": "@back"
     },
@@ -174,7 +174,7 @@
       "id": "p2_threat_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Эдвард, если вы будете играть в молчанку, я выйду отсюда и вернусь с ордером. И тогда у вас будет уже не беседа, а протокол.",
       "next": "p2_threat_2"
     },
@@ -182,7 +182,7 @@
       "id": "p2_threat_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Не пугайте меня. Я двадцать лет смотрел в глаза людям, которые пытались меня запугать. Это не сработало.",
       "next": "@back"
     },
@@ -190,7 +190,7 @@
       "id": "p2_tactic_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Знаете, Эдвард, я сижу в этой комнате не первый год. И знаете, что я поняла? Иногда сюда приводят настоящих чудовищ — тех, кто планирует, наслаждается, не испытывает ни капли раскаяния. А иногда сюда приводят людей, которые в какой-то момент просто… запаниковали. Сделали то, что в нормальном состоянии никогда бы не сделали, а потом наделали ошибок, пытаясь всё исправить. Это очень разные люди, Эдвард. И я пока не понимаю, к какой категории отнести вас. Помогите мне понять.",
       "next": "p2_tactic_2"
     },
@@ -198,7 +198,7 @@
       "id": "p2_tactic_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "target_confession": "confession_tampering",
       "milestone": 1,
       "milestone_name": "Evidence Tampering",
@@ -213,7 +213,7 @@
       "type": "dialogue_line",
       "speaker": "Анна",
       "internal": true,
-      "chapter": "Фаза 2 — Evidence Tampering",
+      "chapter": "Фаза 2 — Фальсификация улик",
       "text": "Вот он, первый кирпичик. Он думает, что это самое страшное, что он мне только что сказал. Он понятия не имеет, что я только начала.",
       "next": "p3_intro"
     },
@@ -222,7 +222,7 @@
       "id": "p3_intro",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Хорошо. Спасибо, что сказали правду про бассейн — это важно, Эдвард, правда важно. Теперь мне нужно, чтобы вы так же честно рассказали, что произошло до того, как вы к нему прикоснулись. Вы говорите, он уже не дышал. Что случилось перед этим?",
       "next": "p3_slip"
     },
@@ -230,7 +230,7 @@
       "id": "p3_slip",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "[url=clue_slip]Несчастный случай. Он поскользнулся, ударился головой о бортик, я нашёл его уже такого.[/url]",
       "meta": {
         "clue_slip": {"kind": "clue", "clue_id": "medical_discrepancy", "tactic": "present_forensics", "energy_cost": 0}
@@ -240,7 +240,7 @@
     "p3_forensics_hub": {
       "id": "p3_forensics_hub",
       "type": "choice_hub",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "next": "p3_honor_hub",
       "choices": [
         {"id": "present_forensics", "text": "Предъявить экспертизу", "next": "p3_forensics_1", "requires": {"tactics": ["present_forensics"], "clues": ["medical_discrepancy"]}}
@@ -250,7 +250,7 @@
       "id": "p3_forensics_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Эдвард, я должна быть с вами честна, раз уж вы честны со мной. Судмедэксперт не нашёл следов удара о бортик. Ни синяка, ни рассечения, ничего, что совпадало бы с падением. Зато есть кое-что другое. Странгуляционные борозды на шее. Понимаете, что это значит?",
       "next": "p3_forensics_2"
     },
@@ -258,7 +258,7 @@
       "id": "p3_forensics_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Это не то, что вы думаете.",
       "next": "p3_forensics_3"
     },
@@ -266,14 +266,14 @@
       "id": "p3_forensics_3",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Тогда расскажите мне, что это. Потому что пока что выглядит так, будто вы душили пятнадцатилетнего мальчика, Эдвард. И я не знаю больше ни одной версии событий, которая объясняет эти борозды на шее. Может, вы знаете?",
       "next": "p3_honor_hub"
     },
     "p3_honor_hub": {
       "id": "p3_honor_hub",
       "type": "choice_hub",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "next": "p3_honor_1",
       "choices": [
         {"id": "appeal_to_honor", "text": "Апелляция к чести", "next": "p3_honor_1", "requires": {"tactics": ["appeal_to_honor"]}}
@@ -283,7 +283,7 @@
       "id": "p3_honor_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Вы ведь уже сделали трудную часть, Эдвард. Вы сказали мне правду про бассейн, хотя могли соврать. Это говорило о том, что вы за человек. Не останавливайтесь на середине пути — это будет выглядеть хуже, чем если бы вы вообще ничего не сказали.",
       "next": "p3_honor_2"
     },
@@ -291,7 +291,7 @@
       "id": "p3_honor_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "target_confession": "confession_manslaughter",
       "milestone": 2,
       "milestone_name": "Manslaughter",
@@ -306,7 +306,7 @@
       "type": "dialogue_line",
       "speaker": "Анна",
       "internal": true,
-      "chapter": "Фаза 3 — Manslaughter",
+      "chapter": "Фаза 3 — Непредумышленное убийство",
       "text": "Второй кирпичик. Осталось самое сложное — доказать, что он не просто «не рассчитал». Что он хотел этого задолго до бассейна.",
       "next": "p4_intro"
     },
@@ -315,7 +315,7 @@
       "id": "p4_intro",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Эдвард, вы сказали — «хотел его напугать». Скажите, вы ведь не в первый раз были в гневе из-за Грега?",
       "next": "p4_history"
     },
@@ -323,7 +323,7 @@
       "id": "p4_history",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Он трудный был парень. Я поднимал на него руку, да, признаю, не горжусь этим. Но это разные вещи — подзатыльник и то, что вы мне сейчас пытаетесь пришить.",
       "next": "p4_threat"
     },
@@ -331,7 +331,7 @@
       "id": "p4_threat",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Тамара рассказала нам, что за неделю до случившегося вы сказали ей нечто вроде — цитирую — «однажды я не сдержусь, и тогда пусть пеняет на себя». Это ваши слова?",
       "next": "p4_defense"
     },
@@ -339,7 +339,7 @@
       "id": "p4_defense",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Люди говорят разное сгоряча. [url=clue_defense_trap]Это не значит, что я планировал что-то сделать.[/url] Я говорил это, да. И что? Каждый родитель в бешенстве говорит то, чего не думает.",
       "meta": {
         "clue_defense_trap": {"kind": "clue", "clue_id": "premature_defense", "tactic": "direct_confrontation", "energy_cost": 0}
@@ -350,7 +350,7 @@
       "id": "p4_why",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Эдвард, я не спрашивала, планировали ли вы. Вы сами это сказали. Почему?",
       "next": "p4_monster"
     },
@@ -358,14 +358,14 @@
       "id": "p4_monster",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "…Потому что вы всё равно попытаетесь это доказать. Вам всем нужен монстр, а не человек, который сорвался. Проще посадить монстра.",
       "next": "p4_hub"
     },
     "p4_hub": {
       "id": "p4_hub",
       "type": "choice_hub",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "next": "p4_force_1",
       "choices": [
         {"id": "direct_confrontation", "text": "Прямая конфронтация", "next": "p4_confront_1", "requires": {"tactics": ["direct_confrontation"], "clues": ["premature_defense"]}}
@@ -375,7 +375,7 @@
       "id": "p4_confront_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Мне не нужен монстр, Эдвард. Мне нужна правда. Вы сказали жене, что однажды не сдержитесь. За неделю до смерти Грега. Это звучит не как вспышка гнева в моменте. Это звучит как человек, который уже тогда знал, что произойдёт что-то серьёзное, и предупреждал об этом заранее. Так что случилось в тот день у бассейна? Вы правда просто «хотели напугать», или в глубине души вы уже знали, что на этот раз не остановитесь?",
       "next": "p4_confront_2"
     },
@@ -383,7 +383,7 @@
       "id": "p4_confront_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "target_confession": "confession_premeditation",
       "milestone": 3,
       "milestone_name": "Premeditation",
@@ -397,7 +397,7 @@
       "id": "p4_force_1",
       "type": "dialogue_line",
       "speaker": "Анна",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Вы сказали жене, что однажды не сдержитесь. За неделю до смерти Грега. Я не верю в совпадения, Эдвард. И вы не верите. Скажите мне правду — не для протокола, для себя.",
       "next": "p4_force_2"
     },
@@ -405,7 +405,7 @@
       "id": "p4_force_2",
       "type": "dialogue_line",
       "speaker": "Сколфилд",
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "target_confession": "confession_premeditation",
       "milestone": 3,
       "milestone_name": "Premeditation",
@@ -420,7 +420,7 @@
       "type": "dialogue_line",
       "speaker": "Анна",
       "internal": true,
-      "chapter": "Фаза 4 — Premeditation",
+      "chapter": "Фаза 4 — Умысел",
       "text": "Третий кирпичик. Убийство первой степени. Он сядет до конца жизни. Я должна чувствовать облегчение. Я не чувствую ничего.",
       "next": ""
     }

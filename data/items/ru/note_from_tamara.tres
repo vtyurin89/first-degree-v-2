@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "note_from_tamara"
+title = "Записка — Тамара"
+body = "«Он никогда не бил Грега при мне. Но Грег боялся оставаться с ним наедине. Я думала, это пройдёт. Я думала, я смогу это исправить. Простите меня.»"
+kind = "note"
+author = "Тамара"
+date = ""

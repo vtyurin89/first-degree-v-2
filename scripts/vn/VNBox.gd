@@ -74,7 +74,7 @@ func _next() -> void:
 func _display_line(line: DialogueLine) -> void:
 	_nameplate.text = line.speaker
 	if line.internal_thought:
-		_nameplate.text = line.speaker + " · про себя"
+		_nameplate.text = line.speaker + " " + tr("INTERNAL_SUFFIX")
 	_nameplate.modulate = _speaker_color(line.speaker)
 	_update_portrait(line)
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if line.internal_thought else Color(0.92, 0.9, 0.86))
@@ -144,7 +144,7 @@ func _show_choices() -> void:
 		if choice.kind == "TACTIC":
 			has_tactic = true
 	_tactic_panel.visible = has_tactic
-	_tactic_title.text = "Тактики" if has_tactic else ""
+	_tactic_title.text = tr("TACTICS") if has_tactic else ""
 	_update_hint()
 
 
@@ -187,7 +187,7 @@ func _clear_container(container: Node) -> void:
 
 func _update_hint() -> void:
 	if _waiting_choice:
-		_hint.text = "Выберите, как действовать"
+		_hint.text = tr("CHOOSE_ACTION")
 		return
 	if _typing:
 		_hint.text = ""
@@ -196,9 +196,9 @@ func _update_hint() -> void:
 		_hint.text = ""
 		return
 	if _current.required_url != "" and not GameManager.clicked_urls.has(_current.required_url):
-		_hint.text = "Закрепите ключевую фразу в тексте, чтобы продолжить"
+		_hint.text = tr("PIN_HINT")
 	else:
-		_hint.text = "Пробел / клик — далее"
+		_hint.text = tr("ADVANCE_HINT")
 
 
 func _update_portrait(line: DialogueLine) -> void:
@@ -218,11 +218,11 @@ func _update_portrait(line: DialogueLine) -> void:
 
 func _speaker_color(speaker: String) -> Color:
 	match speaker:
-		"Анна":
+		"Анна", "Anna":
 			return Color(0.52, 0.32, 0.48)
-		"Уэллер":
+		"Уэллер", "Weller":
 			return Color(0.3, 0.42, 0.58)
-		"Сколфилд":
+		"Сколфилд", "Scolfield":
 			return Color(0.45, 0.42, 0.38)
 		_:
 			return Color(0.3, 0.3, 0.32)

@@ -4,40 +4,13 @@ const ROOM_W := 10.0
 const ROOM_D := 10.0
 const ROOM_H := 3.0
 
-const NOTE_LINES := [
-	{"speaker": "Доска дел", "text": "Дело №4417-С. Жертва: Грегори Мэйсон, 15 лет. Пасынок подозреваемого.", "internal": false},
-	{"speaker": "Доска дел", "text": "Причина смерти: асфиксия. Странгуляционные борозды на шее. Токсикология чистая.", "internal": false},
-	{"speaker": "Доска дел", "text": "Алиби подозреваемого частично опровергнуто записью с камеры у гаража.", "internal": false},
-	{"speaker": "Доска дел", "text": "Примечание Анны: он следит за тем, как я реагирую. Не торопиться. Держать лицо.", "internal": true},
-]
-
-const FLAVOR := {
-	"cabinet": [
-		{"speaker": "Анна", "text": "Шкаф забит старыми делами. У половины подозреваемых в графе «исход» стоит «прекращено». Система.", "internal": true},
-	],
-	"window": [
-		{"speaker": "Анна", "text": "Утро. Люди идут на работу, кому-то наливают кофе, кто-то целует детей в макушку. Где-то там сейчас идёт человек, который вчера мечтал только об одном — не оказаться в этой комнате.", "internal": true},
-	],
-	"water": [
-		{"speaker": "Анна", "text": "Вода. Отёк, головная боль, язык как наждак. Я знаю этот вкус. Я знаю его слишком хорошо.", "internal": true},
-	],
-	"shelf": [
-		{"speaker": "Анна", "text": "Юридические справочники, методички по допросу, чей-то забытый термос. На полке — папка с делом Грега. Я её знаю наизусть.", "internal": true},
-	],
-	"clock": [
-		{"speaker": "Анна", "text": "Двадцать четыре часа. У нас всегда двадцать четыре часа, пока не приедет адвокат.", "internal": true},
-	],
-	"desk": [
-		{"speaker": "Анна", "text": "Мой стол, если это можно так назвать. Мятная жвачка Мартина, остывший кофе и фотография, которую я переворачиваю лицом вниз.", "internal": true},
-	],
-}
-
 @onready var player: PlayerController3D = $Player3D
 
 var _ui_layer: CanvasLayer
 var _prompt: Label
 var _toast: Label
 var _energy_label: Label
+var _controls_label: Label
 var _toast_tween: Tween
 var _overlay_rect: ColorRect
 var _vnbox: VNBox
@@ -75,6 +48,7 @@ func _ready() -> void:
 	_build_interactables()
 	_build_hud()
 	_build_hangover()
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
 func _process(_delta: float) -> void:
@@ -82,7 +56,7 @@ func _process(_delta: float) -> void:
 		return
 	_current = player.get_interactable()
 	if _current != null:
-		_prompt.text = "[E] " + _current.prompt
+		_prompt.text = "[E] " + tr(_current.prompt)
 		_prompt.visible = true
 		if Input.is_action_just_pressed("interact"):
 			_trigger(_current)
@@ -94,33 +68,56 @@ func _trigger(target: Interactable) -> void:
 	match target.interact_id:
 		"coffee":
 			if GameManager.player_energy >= GameManager.MAX_ENERGY:
-				_show_toast("Больше кофе не влезет. И так трясёт.")
+				_show_toast(tr("COFFEE_FULL"))
 			else:
 				GameManager.add_energy(1)
 				GameManager.play_cue(660.0, 0.14, -8.0)
-				_show_toast("Кофе. Минус один шаг к трезвости. Энергия +1.")
+				_show_toast(tr("COFFEE_DRANK"))
 		"board":
-			_start_dialogue(_note_sequence(), Callable())
+			_start_dialogue(_document_sequence("case_file_4417"), Callable())
+		"cabinet":
+			_start_dialogue(_document_sequence("email_weller"), Callable())
+		"shelf":
+			_start_dialogue(_document_sequence("book_interrogation"), Callable())
+		"desk":
+			_start_dialogue(_document_sequence("note_from_tamara"), Callable())
 		"weller":
 			_start_dialogue(Case1Scolfield.get_briefing(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
 		_:
-			if FLAVOR.has(target.interact_id):
-				_start_dialogue(_flavor_sequence(target.interact_id), Callable())
+			var lines := _flavor_sequence(target.interact_id)
+			if not lines.is_empty():
+				_start_dialogue(lines, Callable())
 			else:
-				_show_toast(target.prompt)
+				_show_toast(tr(target.prompt))
 
 
-func _note_sequence() -> Array:
+func _on_locale_changed(_locale: String) -> void:
+	if _energy_label != null:
+		_energy_label.text = tr("OFFICE_ENERGY") % [GameManager.player_energy, GameManager.MAX_ENERGY]
+	if _controls_label != null:
+		_controls_label.text = tr("OFFICE_CONTROLS")
+
+
+func _document_sequence(id: String) -> Array:
 	var lines: Array[DialogueLine] = []
-	for entry in NOTE_LINES:
-		lines.append(_flavor_line(entry))
+	var document := DocumentLibrary.load_document(id)
+	if document == null:
+		lines.append(_flavor_line({"speaker": "", "text": tr("DOCUMENT_MISSING"), "internal": false}))
+		return lines
+	var paragraphs := document.body.split("\n\n", false)
+	if paragraphs.is_empty():
+		lines.append(_flavor_line({"speaker": document.title, "text": document.body}))
+	else:
+		for paragraph in paragraphs:
+			lines.append(_flavor_line({"speaker": document.title, "text": String(paragraph)}))
 	return lines
 
 
 func _flavor_sequence(interact_id: String) -> Array:
 	var lines: Array[DialogueLine] = []
-	for entry in FLAVOR.get(interact_id, []):
-		lines.append(_flavor_line(entry))
+	for entry in LocalizationManager.get_office_flavor(interact_id):
+		if entry is Dictionary:
+			lines.append(_flavor_line(entry))
 	return lines
 
 
@@ -378,14 +375,14 @@ func _build_extra_props() -> void:
 
 
 func _build_interactables() -> void:
-	_make_interactable("coffee", "Кофемашина — взять кофе", Vector3(-2.6, 0.9, -4.0), Vector3(1.4, 1.8, 1.0))
-	_make_interactable("board", "Доска дел — изучить материалы", Vector3(1.3, 1.6, -4.4), Vector3(3.4, 2.2, 1.0))
-	_make_interactable("cabinet", "Шкаф с делами — осмотреть", Vector3(-4.15, 0.9, -4.0), Vector3(0.9, 1.4, 0.9))
-	_make_interactable("shelf", "Стеллаж — осмотреть", Vector3(-4.0, 1.2, -1.4), Vector3(0.9, 2.0, 2.4))
-	_make_interactable("water", "Кулер — выпить воды", Vector3(-4.4, 0.9, 1.6), Vector3(0.9, 1.4, 0.9))
-	_make_interactable("window", "Окно — выглянуть", Vector3(4.4, 1.6, 0), Vector3(1.0, 1.6, 3.6))
-	_make_interactable("clock", "Часы — взглянуть на время", Vector3(-1.0, 2.2, -4.4), Vector3(0.9, 1.0, 0.9))
-	_make_interactable("desk", "Стол — осмотреть", Vector3(0, 1.0, -2.4), Vector3(2.6, 0.8, 2.0))
+	_make_interactable("coffee", "PROMPT_COFFEE", Vector3(-2.6, 0.9, -4.0), Vector3(1.4, 1.8, 1.0))
+	_make_interactable("board", "PROMPT_BOARD", Vector3(1.3, 1.6, -4.4), Vector3(3.4, 2.2, 1.0))
+	_make_interactable("cabinet", "PROMPT_CABINET", Vector3(-4.15, 0.9, -4.0), Vector3(0.9, 1.4, 0.9))
+	_make_interactable("shelf", "PROMPT_SHELF", Vector3(-4.0, 1.2, -1.4), Vector3(0.9, 2.0, 2.4))
+	_make_interactable("water", "PROMPT_WATER", Vector3(-4.4, 0.9, 1.6), Vector3(0.9, 1.4, 0.9))
+	_make_interactable("window", "PROMPT_WINDOW", Vector3(4.4, 1.6, 0), Vector3(1.0, 1.6, 3.6))
+	_make_interactable("clock", "PROMPT_CLOCK", Vector3(-1.0, 2.2, -4.4), Vector3(0.9, 1.0, 0.9))
+	_make_interactable("desk", "PROMPT_DESK", Vector3(0, 1.0, -2.4), Vector3(2.6, 0.8, 2.0))
 
 	var weller := Sprite3D.new()
 	weller.texture = _make_char_texture(Color(0.28, 0.38, 0.52))
@@ -393,7 +390,7 @@ func _build_interactables() -> void:
 	weller.pixel_size = 0.021
 	weller.position = Vector3(1.7, 0.0, -0.7)
 	add_child(weller)
-	_make_interactable("weller", "Уэллер — начать брифинг", Vector3(1.7, 1.0, -0.7), Vector3(1.4, 2.0, 1.2))
+	_make_interactable("weller", "PROMPT_WELLER", Vector3(1.7, 1.0, -0.7), Vector3(1.4, 2.0, 1.2))
 
 
 func _make_material(color: Color, tex: Texture2D = null, uv_scale: float = 1.0, roughness: float = 0.9, metallic: float = 0.0, emission: Color = Color(0, 0, 0), emission_energy: float = 0.0, alpha: float = 1.0) -> StandardMaterial3D:
@@ -552,7 +549,7 @@ func _build_hud() -> void:
 	add_child(_ui_layer)
 
 	var energy := Label.new()
-	energy.text = "Энергия: %d/%d" % [GameManager.player_energy, GameManager.MAX_ENERGY]
+	energy.text = tr("OFFICE_ENERGY") % [GameManager.player_energy, GameManager.MAX_ENERGY]
 	energy.theme = ThemeManager.get_theme()
 	energy.theme_type_variation = UITheme.HUD
 	energy.position = Vector2(24, 20)
@@ -587,7 +584,7 @@ func _build_hud() -> void:
 	_ui_layer.add_child(_toast)
 
 	var controls := Label.new()
-	controls.text = "WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — пауза"
+	controls.text = tr("OFFICE_CONTROLS")
 	controls.theme = ThemeManager.get_theme()
 	controls.theme_type_variation = UITheme.SMALL
 	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
@@ -599,11 +596,12 @@ func _build_hud() -> void:
 	controls.offset_bottom = -8
 	controls.offset_left = 24
 	_ui_layer.add_child(controls)
+	_controls_label = controls
 
 
 func _on_energy_changed(value: int) -> void:
 	if _energy_label != null:
-		_energy_label.text = "Энергия: %d/%d" % [value, GameManager.MAX_ENERGY]
+		_energy_label.text = tr("OFFICE_ENERGY") % [value, GameManager.MAX_ENERGY]
 
 
 func _show_toast(text: String) -> void:

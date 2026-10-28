@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "email_weller"
+title = "Email — M. Weller"
+body = "Crawford,\n\nThe garage camera came out clean. His departure time doesn't match his story by about seven minutes. If he says he left before the death — he's lying.\n\nAlso: Tamara doesn't want to talk in front of him. I left her number on your desk.\n\n— Martin"
+kind = "email"
+author = "Martin Weller"
+date = ""

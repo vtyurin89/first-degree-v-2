@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "email_weller"
+title = "Письмо — М. Уэллер"
+body = "Кроуфорд,\n\nкамера у гаража отработала чисто. Время отъезда не совпадает с его версией примерно на семь минут. Если он скажет, что уезжал до смерти — он врёт.\n\nЕщё: Тамара не хочет говорить при нём. Я оставил её номер у тебя на столе.\n\n— Мартин"
+kind = "email"
+author = "Мартин Уэллер"
+date = ""

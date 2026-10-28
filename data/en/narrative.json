@@ -1,0 +1,53 @@
+{
+  "prologue": [
+    {"speaker": "Anna", "text": "Are you here?", "internal": true, "pause": 1.4},
+    {"speaker": "", "text": "", "internal": false, "pause": 1.6},
+    {"speaker": "Anna", "text": "I know, I know. Stupid question. You're always here.", "internal": true, "pause": 1.0},
+    {"speaker": "", "text": "", "internal": false, "pause": 1.2},
+    {"speaker": "Anna", "text": "Forgive me for making you… watch all of this through my eyes. Especially today. Everything's a little off-kilter here, in case you haven't noticed. Literally — right now I feel like I'm looking at the world through two lenses at once, and neither one is in focus.", "internal": true, "pause": 0.8},
+    {"speaker": "Anna", "text": "Do you know how many people are walking the streets of this country right now who shouldn't be? Not because of a miscarriage of justice — not the case where an innocent man goes down, they at least make movies about that. I mean the opposite. The ones who are guilty, a hundred percent, and still sleep in their own bed tonight instead of a cell. Because there wasn't enough evidence. Because the lawyer was smarter than the prosecutor. Because someone in the interrogation room couldn't find the right words in the twenty-four hours they had — and then they send him in, polite, in a suit, and he says: 'my client declines to answer questions.'", "internal": true, "pause": 0.8},
+    {"speaker": "Anna", "text": "The system loves to pretend that's a bug. The cost of due process, you know. I think it's a feature. It's designed exactly so that scum can slip between your fingers if it knows the right words — or stays quiet long enough. And the worst part is you don't have to be a genius to do it. You just have to hold out. Not crack. The system will give up before he does.", "internal": true, "pause": 0.8},
+    {"speaker": "Anna", "text": "Well, I don't give up. Maybe that's the one thing I'm truly good at — not letting go. While everyone else is looking for a balance between the rights of the suspect and justice, I find the words. I always find them. Because somewhere behind the door of every interrogation room there isn't an abstraction, not 'the defense' — there's some Edward who drowned a child in a pool and has already rehearsed how he'll spread his hands in court. And the only thing standing between him and the next pool is me, and whatever I can pull out of him in a few hours, while there's no lawyer around to teach him how to keep quiet.", "internal": true, "pause": 0.8},
+    {"speaker": "", "text": "", "internal": false, "pause": 1.4},
+    {"speaker": "Anna", "text": "All right. Enough philosophy. I've got a new case, and my head is splitting like there's someone in there conducting an interrogation too — not a very polite one, I have to say. Help me pull myself together. You always did.", "internal": true, "pause": 0.6}
+  ],
+  "epilogue": [
+    {"speaker": "Weller", "text": "First degree. He'll get the maximum. You did it, Crawford.", "internal": false, "pause": 0.6},
+    {"speaker": "Anna", "text": "It worked. He'll go away for life. So why don't I feel better? Used to be I'd feel better at this point. At least for a couple of hours.", "internal": true, "pause": 0.6}
+  ],
+  "briefing": {
+    "before": [
+      {"speaker": "Weller", "text": "Finally. A little longer and I'd have come to pick you up myself for the second time tonight. You look… almost human. Progress, I'd say."},
+      {"speaker": "Anna", "text": "Thanks, Martin. I'm touched."},
+      {"speaker": "Weller", "text": "Crawford, I found you in a bar last night looking so bad the bartender was thinking ambulance, not taxi. Do you even remember how you got home?"},
+      {"speaker": "Anna", "text": "Vaguely. I remember the shower. I remember the coffee was terrible."},
+      {"speaker": "Weller", "text": "The coffee was fine. You were terrible. I spent two hours bringing you back. Shower, coffee, more coffee, then you went out for a smoke and came back looking a little more like a living person. You know what would happen to any other detective in this department after the third time in a month?"},
+      {"speaker": "Anna", "text": "Let me guess. A talk with the mentor, then HR, then a farewell party with a badge-shaped cake."},
+      {"speaker": "Weller", "text": "They wouldn't be here anymore, Anna. At all. They keep you because you're… Never mind. Just. This can't go on forever. I'm not going to lecture you every morning for the rest of my career. Just… one day I might not be around to pull you out of a bar before someone sees it who won't care that you're the best detective in the department."}
+    ],
+    "choices": [
+      {"id": "sarcasm", "coping": "SARCASM", "trust": 0, "label": "Then try to be around more often, Weller. You're clearly good at it.", "reply": {"speaker": "Anna", "text": "Then try to be around more often, Weller. You're clearly good at it."}},
+      {"id": "denial", "coping": "DENIAL", "trust": -5, "label": "I'm fine. Really. Just a rough week.", "reply": {"speaker": "Anna", "text": "I'm fine. Really. Just a rough week."}},
+      {"id": "vulnerable", "coping": "VULNERABLE", "trust": 10, "label": "I know. I'm sorry. Really sorry — for last night, and for the fact that this clearly won't be the last time.", "reply": {"speaker": "Anna", "text": "I know. I'm sorry. Really sorry — for last night, and for the fact that this clearly won't be the last time."}}
+    ],
+    "after": [
+      {"speaker": "Anna", "text": "By the way. Do I at least not smell? Be honest, because if someone with a dog's nose walks into the interrogation room right now…"},
+      {"speaker": "Weller", "text": "A little. But luckily most of our suspects come in smelling so bad they'd cover anything. Mint gum on the desk, by the way — I left it for you. Don't thank me."},
+      {"speaker": "Anna", "text": "I won't. All right — tell me what we've got."},
+      {"speaker": "Weller", "text": "Edward Scolfield. Former military, forty-three. Twenty years of service, retired three years ago. Wife — Tamara, stepson — Greg, fifteen. The relationship between them was… let's say not a relationship but a cold war. Neighbors heard shouting regularly. Tamara never called the police — the classic picture. Alibi — full of holes. The camera by the garage caught him leaving a few minutes after the estimated time of death. Apparently he thought the time gap would be written off as forensic error. It won't be."}
+    ]
+  },
+  "office": {
+    "flavor": {
+      "window": [
+        {"speaker": "Anna", "text": "Morning. People are going to work, someone is pouring coffee, someone is kissing their kids on the top of the head. Somewhere out there a man is walking around who last night wanted only one thing — not to end up in this room.", "internal": true}
+      ],
+      "water": [
+        {"speaker": "Anna", "text": "Water. Swelling, headache, a tongue like sandpaper. I know this taste. I know it too well.", "internal": true}
+      ],
+      "clock": [
+        {"speaker": "Anna", "text": "Twenty-four hours. We always have twenty-four hours until the lawyer arrives.", "internal": true}
+      ]
+    }
+  }
+}
