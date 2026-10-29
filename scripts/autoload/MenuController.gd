@@ -9,6 +9,7 @@ var _pause_layer: CanvasLayer
 var _pause_menu: MenuScreen
 var _modal_layer: CanvasLayer
 var _modal: ModalDialog
+var _settings_dialog: SettingsDialog
 var _screen_layer: CanvasLayer
 var _screen: SaveLoadScreen
 var _indicator_layer: CanvasLayer
@@ -37,6 +38,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _modal != null:
 		_dismiss_modal()
+		get_viewport().set_input_as_handled()
+	elif _settings_dialog != null:
+		_close_settings()
 		get_viewport().set_input_as_handled()
 	elif _screen != null:
 		close_screen()
@@ -94,6 +98,7 @@ func open_load_screen() -> void:
 
 func _open_screen(mode: int) -> void:
 	_dismiss_modal()
+	_close_settings()
 	_close_screen_internal()
 	_screen_layer = CanvasLayer.new()
 	_screen_layer.layer = SCREEN_LAYER
@@ -120,7 +125,7 @@ func _close_screen_internal() -> void:
 
 
 func has_modal() -> bool:
-	return _modal != null
+	return _modal != null or _settings_dialog != null
 
 
 func show_modal(title: String, message: String, options: Array, on_result: Callable = Callable(), sub_message: String = "", show_icon: bool = true) -> ModalDialog:
@@ -172,6 +177,7 @@ func show_input_modal(title: String, message: String, placeholder: String, on_co
 
 func _on_load_started() -> void:
 	_dismiss_modal()
+	_close_settings()
 	_close_screen_internal()
 	if _pause_menu != null:
 		_pause_menu.queue_free()
@@ -225,17 +231,20 @@ func _on_exit_choice(value: String) -> void:
 
 
 func open_settings() -> void:
-	var options: Array = [
-		{"text": tr("LANGUAGE_RU"), "value": "ru", "primary": LocalizationManager.current_locale == "ru"},
-		{"text": tr("LANGUAGE_EN"), "value": "en", "primary": LocalizationManager.current_locale == "en"},
-		{"text": tr("COMMON_CANCEL"), "value": "cancel"},
-	]
-	show_modal(tr("SETTINGS_TITLE"), tr("SETTINGS_LANGUAGE"), options, _on_settings_choice, "", false)
+	_dismiss_modal()
+	_close_settings()
+	_settings_dialog = SettingsDialog.new()
+	_settings_dialog.theme = ThemeManager.get_theme()
+	_modal_layer.add_child(_settings_dialog)
+	_settings_dialog.closed.connect(_close_settings)
 
 
-func _on_settings_choice(value: String) -> void:
-	if value == "ru" or value == "en":
-		LocalizationManager.set_locale(value)
+func _close_settings() -> void:
+	if _settings_dialog == null:
+		return
+	var dialog := _settings_dialog
+	_settings_dialog = null
+	dialog.queue_free()
 
 
 func _create_indicator() -> void:

@@ -150,7 +150,10 @@ func start_new_game() -> void:
 	get_tree().paused = false
 	reset_run()
 	set_state(GameState.EXPLORATION_3D)
-	change_scene(SCENE_PROLOGUE, 1.0)
+	if GameSettings.skip_prologue:
+		change_scene(SCENE_STATION, 1.0)
+	else:
+		change_scene(SCENE_PROLOGUE, 1.0)
 
 
 func open_main_menu() -> void:

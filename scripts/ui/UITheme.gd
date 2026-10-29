@@ -24,6 +24,7 @@ const PROMPT := "FDPrompt"
 const SMALL := "FDSmall"
 const SCREEN_TITLE := "FDScreenTitle"
 const INPUT := "FDInput"
+const CHECK := "FDCheck"
 
 
 static func build_theme() -> Theme:
@@ -57,6 +58,7 @@ static func build_theme() -> Theme:
 	_register_button(theme, BUTTON, 18)
 
 	_register_line(theme, INPUT, 18)
+	_register_check(theme, CHECK, 18)
 
 	return theme
 
@@ -86,4 +88,9 @@ static func _register_button(theme: Theme, variation: String, font_size: int) ->
 
 static func _register_line(theme: Theme, variation: String, font_size: int) -> void:
 	theme.set_type_variation(variation, "LineEdit")
+	theme.set_font_size("font_size", variation, font_size)
+
+
+static func _register_check(theme: Theme, variation: String, font_size: int) -> void:
+	theme.set_type_variation(variation, "CheckBox")
 	theme.set_font_size("font_size", variation, font_size)

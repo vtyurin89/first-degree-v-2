@@ -52,7 +52,7 @@ func _build() -> void:
 	add_child(_background)
 
 	var version := Label.new()
-	version.text = "FD // v0.1.0"
+	version.text = "Anime alpha // v0.1.0"
 	version.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	version.theme_type_variation = UITheme.VERSION
 	version.add_theme_color_override("font_color", UIPalette.TEXT_FAINT)

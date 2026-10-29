@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scripts/autoload/GameManager.gd"
 LocalizationManager="*res://scripts/autoload/LocalizationManager.gd"
+GameSettings="*res://scripts/autoload/GameSettings.gd"
 DialogueStateManager="*res://scripts/autoload/DialogueStateManager.gd"
 SaveManager="*res://scripts/autoload/SaveManager.gd"
 ThemeManager="*res://scripts/autoload/ThemeManager.gd"
