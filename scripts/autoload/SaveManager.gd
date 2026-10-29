@@ -230,6 +230,8 @@ func _chapter_title(scene_path: String) -> String:
 		if DialogueStateManager.chapter_title != "":
 			return DialogueStateManager.chapter_title
 		return tr("CHAPTER_INTERROGATION")
+	if scene_path == GameManager.SCENE_STATION:
+		return tr("CHAPTER_STATION")
 	if scene_path == GameManager.SCENE_OFFICE:
 		return tr("CHAPTER_OFFICE")
 	if scene_path == GameManager.SCENE_PROLOGUE:

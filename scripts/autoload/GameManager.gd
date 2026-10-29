@@ -21,6 +21,7 @@ const DEFAULT_SLOTS := 6
 
 const SCENE_PROLOGUE := "res://scenes/Prologue.tscn"
 const SCENE_OFFICE := "res://scenes/Office3D.tscn"
+const SCENE_STATION := "res://scenes/world/PoliceStationFloor.tscn"
 const SCENE_INTERROGATION := "res://scenes/Interrogation.tscn"
 const SCENE_EPILOGUE := "res://scenes/Epilogue.tscn"
 const SCENE_MAIN_MENU := "res://scenes/MainMenu.tscn"

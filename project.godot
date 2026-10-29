@@ -22,6 +22,7 @@ LocalizationManager="*res://scripts/autoload/LocalizationManager.gd"
 DialogueStateManager="*res://scripts/autoload/DialogueStateManager.gd"
 SaveManager="*res://scripts/autoload/SaveManager.gd"
 ThemeManager="*res://scripts/autoload/ThemeManager.gd"
+AudioManager="*res://scripts/autoload/AudioManager.gd"
 MenuController="*res://scripts/autoload/MenuController.gd"
 
 [display]

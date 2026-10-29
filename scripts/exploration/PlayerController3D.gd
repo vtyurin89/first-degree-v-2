@@ -54,6 +54,7 @@ func get_interactable() -> Interactable:
 	var query := PhysicsRayQueryParameters3D.create(from, to)
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
+	query.collision_mask = 1
 	var exclude: Array[RID] = [get_rid()]
 	query.exclude = exclude
 	var result := space.intersect_ray(query)

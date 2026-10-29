@@ -122,7 +122,7 @@ func _end() -> void:
 		return
 	_done = true
 	_hint.text = ""
-	GameManager.change_scene(GameManager.SCENE_OFFICE, 1.0)
+	GameManager.change_scene(GameManager.SCENE_STATION, 1.0)
 
 
 func _on_advance() -> void:

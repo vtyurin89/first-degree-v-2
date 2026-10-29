@@ -47,6 +47,33 @@
       ],
       "clock": [
         {"speaker": "Anna", "text": "Twenty-four hours. We always have twenty-four hours until the lawyer arrives.", "internal": true}
+      ],
+      "lockers": [
+        {"speaker": "Anna", "text": "Metal lockers. Other people's coats, other people's lives. Mine is third from the left, and there's a bottle in it I never threw out last winter.", "internal": true}
+      ],
+      "notice": [
+        {"speaker": "Anna", "text": "The notice board. Shift schedules, a bonus order, someone's photo in a black frame. Nobody takes it down.", "internal": true}
+      ],
+      "duty": [
+        {"speaker": "Anna", "text": "The duty post. A visitor log, cold tea, a radio tuned to three stations at once. He pretends not to notice how I look.", "internal": true}
+      ],
+      "vending": [
+        {"speaker": "Anna", "text": "The snack machine. Everything in here is sugar and salt in plastic. My usual breakfast.", "internal": true}
+      ],
+      "sink": [
+        {"speaker": "Anna", "text": "The sink and the mirror. In the mirror there's a woman I don't trust. She looks tired. She looks like she's about to break.", "internal": true}
+      ],
+      "sofa": [
+        {"speaker": "Anna", "text": "The sofa. Sagging, like everything else in this department. You can sit here a minute and pretend you're in control.", "internal": true}
+      ],
+      "int1_table": [
+        {"speaker": "Anna", "text": "The strict interrogation room. Everything here is bolted to the floor — except the truth.", "internal": true}
+      ],
+      "int2_table": [
+        {"speaker": "Anna", "text": "The soft interrogation room. Armchairs, a floor lamp, a water jug. Cozy — just enough for a man to forget where he is.", "internal": true}
+      ],
+      "fire_escape": [
+        {"speaker": "Anna", "text": "The fire escape. It smells of wet concrete and cigarette butts. From here you can see the yard, where nobody ever walks.", "internal": true}
       ]
     }
   }

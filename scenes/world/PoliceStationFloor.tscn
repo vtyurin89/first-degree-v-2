@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/PoliceStationFloor.gd" id="1_station"]
+[ext_resource type="PackedScene" path="res://scenes/Player3D.tscn" id="2_player"]
+
+[sub_resource type="Environment" id="Environment_station"]
+background_mode = 1
+background_color = Color(0.008, 0.008, 0.012, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.24, 0.26, 0.31, 1)
+ambient_light_energy = 0.32
+
+[node name="PoliceStationFloor" type="Node3D"]
+script = ExtResource("1_station")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_station")
+
+[node name="Player3D" parent="." instance=ExtResource("2_player")]
