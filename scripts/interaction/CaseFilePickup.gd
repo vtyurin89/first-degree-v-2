@@ -8,6 +8,7 @@ func _init() -> void:
 	interaction_type = InteractionType.PICKUP
 	interaction_size = Vector3(0.62, 0.36, 0.52)
 	interaction_offset = Vector3(0, 0.15, 0)
+	highlight_enabled = true
 
 
 func _ready() -> void:

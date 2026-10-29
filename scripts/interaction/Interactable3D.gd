@@ -10,6 +10,7 @@ enum InteractionType { PICKUP, INSPECT, TRIGGER }
 @export var interaction_size := Vector3(1, 1, 1)
 @export var interaction_offset := Vector3.ZERO
 @export var highlight_root: Node3D
+@export var highlight_enabled := false
 
 var is_focused := false
 
@@ -52,13 +53,8 @@ func get_prompt_text() -> String:
 
 func set_highlight(enabled: bool) -> void:
 	is_focused = enabled
-	if not enabled:
-		for mesh in _highlighted_meshes:
-			if is_instance_valid(mesh):
-				mesh.material_overlay = null
-		_highlighted_meshes.clear()
-		if _proxy != null:
-			_proxy.visible = false
+	if not highlight_enabled or not enabled:
+		_clear_highlight()
 		return
 	var meshes := _find_highlight_meshes()
 	if meshes.is_empty():
@@ -71,6 +67,15 @@ func set_highlight(enabled: bool) -> void:
 	_highlighted_meshes = meshes
 	for mesh in _highlighted_meshes:
 		mesh.material_overlay = _outline_material
+
+
+func _clear_highlight() -> void:
+	for mesh in _highlighted_meshes:
+		if is_instance_valid(mesh):
+			mesh.material_overlay = null
+	_highlighted_meshes.clear()
+	if _proxy != null:
+		_proxy.visible = false
 
 
 func _find_highlight_meshes() -> Array[MeshInstance3D]:
