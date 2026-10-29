@@ -6,13 +6,14 @@ var _visual: MeshInstance3D
 
 func _init() -> void:
 	interaction_type = InteractionType.PICKUP
+	interaction_size = Vector3(0.62, 0.36, 0.52)
+	interaction_offset = Vector3(0, 0.15, 0)
 
 
 func _ready() -> void:
 	super._ready()
 	prompt_key = "PROMPT_TAKE_CASE_FILE"
 	_build_visual()
-	_build_shape()
 
 
 func _build_visual() -> void:
@@ -48,26 +49,14 @@ func _build_visual() -> void:
 	add_child(label)
 
 
-func _build_shape() -> void:
-	var shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(0.62, 0.36, 0.52)
-	shape.shape = box
-	shape.position = Vector3(0, 0.15, 0)
-	add_child(shape)
-
-
 func execute_interaction(_player) -> void:
 	if not is_active:
 		return
 	is_active = false
+	set_highlight(false)
 	GameManager.has_case_file = true
 	ObjectiveManager.complete_objective("take_case")
 	GameManager.play_paper_sound()
 	if _visual != null:
 		_visual.visible = false
-	for child in get_children():
-		if child is CollisionShape3D:
-			child.set_deferred("disabled", true)
-	monitorable = false
 	queue_free()

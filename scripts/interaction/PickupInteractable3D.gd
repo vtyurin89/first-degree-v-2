@@ -22,9 +22,12 @@ func execute_interaction(player) -> void:
 
 func _consume() -> void:
 	is_active = false
+	set_highlight(false)
 	visible = false
-	for child in get_children():
-		if child is CollisionShape3D:
-			child.set_deferred("disabled", true)
-	monitorable = false
+	for node in find_children("*", "CollisionShape3D", true, false):
+		var shape := node as CollisionShape3D
+		if shape != null:
+			shape.set_deferred("disabled", true)
+	if _volume != null:
+		_volume.monitorable = false
 	queue_free()

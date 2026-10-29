@@ -19,6 +19,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 
-[node name="Interactor" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -1.5)
+[node name="Interactor" type="Node" parent="."]
 script = ExtResource("2_interactor")

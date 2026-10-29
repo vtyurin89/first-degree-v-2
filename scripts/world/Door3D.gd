@@ -106,11 +106,8 @@ func _build_interactable() -> void:
 	area.prompt_key = "PROMPT_DOOR"
 	area.is_active = not locked
 	area.on_trigger = _on_triggered
-	var shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(maxf(width, 1.0), 2.2, 0.9)
-	shape.shape = box
-	area.add_child(shape)
+	area.interaction_size = Vector3(maxf(width, 1.0), 2.2, 0.9)
+	area.highlight_root = self
 	area.position = Vector3(0, 1.1, 0)
 	add_child(area)
 

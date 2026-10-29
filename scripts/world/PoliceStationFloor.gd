@@ -421,7 +421,8 @@ func _build_interactables() -> void:
 	_make_interactable3d("sink", "PROMPT_SINK", Interactable3D.InteractionType.TRIGGER, Vector3(-3.6, 1.0, 7.0), Vector3(1.2, 1.4, 0.8))
 	_make_interactable3d("sofa", "PROMPT_SOFA", Interactable3D.InteractionType.TRIGGER, Vector3(-5.5, 0.8, 4.2), Vector3(0.9, 1.2, 2.6))
 	_make_interactable3d("equipment", "PROMPT_EQUIPMENT", Interactable3D.InteractionType.INSPECT, Vector3(2.5, 0.9, 4.1), Vector3(3.0, 1.0, 0.8))
-	_make_interactable3d("weller", "PROMPT_WELLER", Interactable3D.InteractionType.INSPECT, Vector3(4.6, 1.0, 2.8), Vector3(1.2, 2.0, 1.2))
+	var weller := _make_interactable3d("weller", "PROMPT_WELLER", Interactable3D.InteractionType.INSPECT, Vector3(4.6, 1.0, 2.8), Vector3(1.2, 2.0, 1.2))
+	weller.highlight_root = null
 	_make_interactable3d("int1_table", "PROMPT_INT1_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(2.0, 0.9, 6.5), Vector3(1.8, 1.0, 0.9))
 	_make_interactable3d("int2_table", "PROMPT_INT2_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(6.9, 0.8, 3.0), Vector3(1.3, 1.0, 0.8))
 	_make_interactable3d("water", "PROMPT_WATER", Interactable3D.InteractionType.TRIGGER, Vector3(-3.4, 0.8, -1.05), Vector3(0.8, 1.4, 0.8))
@@ -799,7 +800,7 @@ func _add_cyl_to(parent: Node3D, radius: float, height: float, pos: Vector3, mat
 	return holder
 
 
-func _make_interactable3d(id: String, prompt_key: String, kind: int, pos: Vector3, size: Vector3) -> void:
+func _make_interactable3d(id: String, prompt_key: String, kind: int, pos: Vector3, size: Vector3) -> Interactable3D:
 	var area: Interactable3D
 	if kind == Interactable3D.InteractionType.INSPECT:
 		var inspect := InspectInteractable3D.new()
@@ -812,12 +813,10 @@ func _make_interactable3d(id: String, prompt_key: String, kind: int, pos: Vector
 	area.name = "Interact_" + id
 	area.prompt_key = prompt_key
 	area.position = pos
-	var shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = size
-	shape.shape = box
-	area.add_child(shape)
+	area.interaction_size = size
+	area.highlight_root = self
 	add_child(area)
+	return area
 
 
 func _make_material(color: Color, tex: Texture2D = null, uv_scale: float = 1.0, roughness: float = 0.9, metallic: float = 0.0, emission: Color = Color(0, 0, 0), emission_energy: float = 0.0, alpha: float = 1.0) -> StandardMaterial3D:

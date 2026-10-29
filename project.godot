@@ -32,6 +32,10 @@ MenuController="*res://scripts/autoload/MenuController.gd"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[layer_names]
+
+3d_physics/layer_4="interactables"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
