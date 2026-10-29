@@ -36,6 +36,7 @@ var weller_trust: int = 50
 var alex_monologue_index: int = 0
 var cigarettes: int = DEFAULT_CIGARETTES
 var cigarettes_smoked_today: int = 0
+var has_case_file := false
 
 var admissibility_status: String = "CLEAN"
 var attorney_resistance: int = 0
@@ -66,6 +67,7 @@ func reset_run() -> void:
 	alex_monologue_index = 0
 	cigarettes = DEFAULT_CIGARETTES
 	cigarettes_smoked_today = 0
+	has_case_file = false
 	admissibility_status = "CLEAN"
 	attorney_resistance = 0
 	pinned_slots_remaining = DEFAULT_SLOTS
@@ -89,6 +91,7 @@ func capture_state() -> Dictionary:
 		"alex_monologue_index": alex_monologue_index,
 		"cigarettes": cigarettes,
 		"cigarettes_smoked_today": cigarettes_smoked_today,
+		"has_case_file": has_case_file,
 		"admissibility_status": admissibility_status,
 		"attorney_resistance": attorney_resistance,
 		"pinned_slots_remaining": pinned_slots_remaining,
@@ -110,6 +113,7 @@ func restore_state(data: Dictionary) -> void:
 	alex_monologue_index = int(data.get("alex_monologue_index", 0))
 	cigarettes = clampi(int(data.get("cigarettes", DEFAULT_CIGARETTES)), 0, MAX_CIGARETTES)
 	cigarettes_smoked_today = maxi(int(data.get("cigarettes_smoked_today", 0)), 0)
+	has_case_file = bool(data.get("has_case_file", false))
 	admissibility_status = String(data.get("admissibility_status", "CLEAN"))
 	attorney_resistance = clampi(int(data.get("attorney_resistance", 0)), 0, 100)
 	pinned_slots_remaining = int(data.get("pinned_slots_remaining", DEFAULT_SLOTS))
@@ -347,6 +351,37 @@ func make_tone(freq: float, duration: float, sample_rate: int = 44100) -> AudioS
 	return wav
 
 
+func play_paper_sound() -> void:
+	var player := AudioStreamPlayer.new()
+	player.stream = make_paper_sound()
+	player.volume_db = -7.0
+	add_child(player)
+	player.finished.connect(player.queue_free)
+	player.play()
+
+
+func make_paper_sound(sample_rate: int = 22050) -> AudioStreamWAV:
+	var duration := 0.3
+	var count := int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(count * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4417
+	for i in count:
+		var t := float(i) / float(sample_rate)
+		var envelope := exp(-t * 16.0)
+		var rustle := rng.randf_range(-1.0, 1.0)
+		var flap := sin(TAU * 95.0 * t) * exp(-t * 12.0)
+		var sample := (rustle * 0.55 + flap * 0.45) * envelope
+		data.encode_s16(i * 2, int(clampf(sample, -1.0, 1.0) * 32767.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = sample_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+
 func _register_actions() -> void:
 	_add_action("move_forward", [KEY_W, KEY_UP])
 	_add_action("move_back", [KEY_S, KEY_DOWN])
@@ -355,6 +390,7 @@ func _register_actions() -> void:
 	_add_action("interact", [KEY_E])
 	_add_action("advance", [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER])
 	_add_action("inventory", [KEY_TAB])
+	_add_action("read", [KEY_F])
 
 
 func _add_action(action: String, keys: Array) -> void:

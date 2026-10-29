@@ -18,6 +18,10 @@ var _tasks_box: VBoxContainer
 var _items_area: Control
 var _task_rows: Array = []
 var _item_slots: Dictionary = {}
+var _reading_overlay: Control
+var _reading_title: Label
+var _reading_body: RichTextLabel
+var _reading_hint: Label
 
 
 func _ready() -> void:
@@ -53,6 +57,7 @@ func _build() -> void:
 
 	_build_notebook()
 	_build_bag()
+	_build_reading_overlay()
 
 
 func _build_notebook() -> void:
@@ -149,6 +154,111 @@ func _build_bag() -> void:
 	_refresh_item_visibility()
 
 
+func _build_reading_overlay() -> void:
+	_reading_overlay = Control.new()
+	_reading_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_reading_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_reading_overlay.visible = false
+	add_child(_reading_overlay)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.0, 0.0, 0.82)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_reading_overlay.add_child(dim)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_PASS
+	_reading_overlay.add_child(center)
+
+	var paper := PanelContainer.new()
+	paper.custom_minimum_size = Vector2(760, 540)
+	paper.mouse_filter = Control.MOUSE_FILTER_STOP
+	var paper_style := UIPalette.make_style(PAPER, Color(0.42, 0.35, 0.26), 1, 4, 24)
+	paper_style.shadow_color = Color(0.0, 0.0, 0.0, 0.6)
+	paper_style.shadow_size = 14
+	paper_style.shadow_offset = Vector2(8, 10)
+	paper.add_theme_stylebox_override("panel", paper_style)
+	center.add_child(paper)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	paper.add_child(vbox)
+
+	_reading_title = Label.new()
+	_reading_title.theme_type_variation = UITheme.MODAL_TITLE
+	_reading_title.add_theme_color_override("font_color", INK)
+	_reading_title.text = tr("ITEM_CASE_FILE")
+	vbox.add_child(_reading_title)
+
+	var line := ColorRect.new()
+	line.color = Color(0.5, 0.42, 0.32, 0.6)
+	line.custom_minimum_size = Vector2(0, 1)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(line)
+
+	_reading_body = RichTextLabel.new()
+	_reading_body.bbcode_enabled = false
+	_reading_body.scroll_active = true
+	_reading_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_reading_body.add_theme_color_override("default_color", INK)
+	_reading_body.add_theme_font_size_override("normal_font_size", 18)
+	vbox.add_child(_reading_body)
+
+	_reading_hint = Label.new()
+	_reading_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_reading_hint.theme_type_variation = UITheme.SMALL
+	_reading_hint.add_theme_color_override("font_color", INK)
+	_reading_hint.text = tr("READ_CLOSE_HINT")
+	vbox.add_child(_reading_hint)
+
+	var close := Button.new()
+	close.text = tr("COMMON_CLOSE")
+	close.custom_minimum_size = Vector2(180, 42)
+	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	close.pressed.connect(_close_reading)
+	vbox.add_child(close)
+
+
+func _open_reading() -> void:
+	if not GameManager.has_case_file:
+		return
+	var document := DocumentLibrary.load_document("case_file_4417")
+	if document == null:
+		_reading_title.text = tr("ITEM_CASE_FILE")
+		_reading_body.text = tr("DOCUMENT_MISSING")
+	else:
+		_reading_title.text = document.title
+		_reading_body.text = document.body
+	_reading_hint.text = tr("READ_CLOSE_HINT")
+	_reading_overlay.visible = true
+
+
+func _close_reading() -> void:
+	_reading_overlay.visible = false
+
+
+func _on_item_gui_input(event: InputEvent, entry: Dictionary) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if String(entry["id"]) == "case_file" and GameManager.has_case_file:
+			_open_reading()
+			get_viewport().set_input_as_handled()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _reading_overlay == null:
+		return
+	if not event.is_action_pressed("read"):
+		return
+	if _reading_overlay.visible:
+		_close_reading()
+		get_viewport().set_input_as_handled()
+	elif GameManager.has_case_file:
+		_open_reading()
+		get_viewport().set_input_as_handled()
+
+
 func _make_item_slot(item: Dictionary) -> void:
 	var slot := Control.new()
 	slot.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -196,7 +306,7 @@ func _make_item_slot(item: Dictionary) -> void:
 	name_panel.anchor_top = 1.0
 	name_panel.anchor_bottom = 1.0
 	name_panel.offset_top = 4
-	name_panel.offset_bottom = 30
+	name_panel.offset_bottom = 46
 	name_panel.visible = false
 	var name_style := UIPalette.make_style(Color(0.02, 0.02, 0.03, 0.85), UIPalette.GREY_LINE, 1, 3, 4)
 	name_panel.add_theme_stylebox_override("panel", name_style)
@@ -204,6 +314,7 @@ func _make_item_slot(item: Dictionary) -> void:
 
 	var name_label := Label.new()
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_label.theme_type_variation = UITheme.SMALL
 	name_label.add_theme_color_override("font_color", UIPalette.WHITE)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -221,6 +332,7 @@ func _make_item_slot(item: Dictionary) -> void:
 	_item_slots[entry["id"]] = entry
 	slot.mouse_entered.connect(_on_item_hover.bind(entry, true))
 	slot.mouse_exited.connect(_on_item_hover.bind(entry, false))
+	slot.gui_input.connect(_on_item_gui_input.bind(entry))
 
 
 func _on_item_hover(entry: Dictionary, hovered: bool) -> void:
@@ -241,6 +353,8 @@ func _on_item_hover(entry: Dictionary, hovered: bool) -> void:
 func _item_display_name(id: String, name_key: String) -> String:
 	if id == "cigarettes":
 		return tr("ITEM_CIGARETTES") % [GameManager.cigarettes, GameManager.MAX_CIGARETTES]
+	if id == "case_file" and GameManager.has_case_file:
+		return tr(name_key) + "\n" + tr("ITEM_READ_HINT")
 	return tr(name_key)
 
 
@@ -249,7 +363,7 @@ func _refresh_item_visibility() -> void:
 	if case_file is Dictionary:
 		var slot: Control = case_file["slot"]
 		if is_instance_valid(slot):
-			slot.visible = ObjectiveManager.is_completed("take_case_file")
+			slot.visible = GameManager.has_case_file
 
 
 func _refresh_tasks() -> void:
@@ -347,7 +461,9 @@ func _animate_strikes() -> void:
 			strike.scale.x = 0.0
 			var tween := create_tween()
 			tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-			tween.tween_property(strike, "scale.x", 1.0, 0.2).set_delay(0.1)
+			var tweener := tween.tween_property(strike, "scale:x", 1.0, 0.2)
+			if tweener != null:
+				tweener.set_delay(0.1)
 		else:
 			strike.scale.x = 1.0
 
@@ -365,6 +481,8 @@ func _on_objectives_reset() -> void:
 func _on_locale_changed(_locale: String) -> void:
 	_title.text = tr("INVENTORY_TITLE")
 	_close_hint.text = tr("INVENTORY_CLOSE_HINT")
+	if _reading_hint != null:
+		_reading_hint.text = tr("READ_CLOSE_HINT")
 	_refresh_tasks()
 
 

@@ -14,11 +14,10 @@ var _toast: Label
 var _energy_label: Label
 var _controls_label: Label
 var _toast_tween: Tween
+var _prompt_tween: Tween
 var _overlay_rect: ColorRect
 var _vnbox: VNBox
-var _dialogue_active := false
-var _current: Interactable = null
-var _doors: Dictionary = {}
+var _interactor: PlayerInteractor
 
 var _mat_floor: StandardMaterial3D
 var _mat_wall: StandardMaterial3D
@@ -48,31 +47,15 @@ func _ready() -> void:
 	_build_hud()
 	_build_hangover()
 	LocalizationManager.locale_changed.connect(_on_locale_changed)
+	var interactor := player.get_node_or_null("Interactor")
+	if interactor is PlayerInteractor:
+		_interactor = interactor as PlayerInteractor
+		_interactor.interaction_target_focused.connect(_on_interact_focused)
+		_interactor.interaction_target_lost.connect(_on_interact_lost)
 
 
-func _process(_delta: float) -> void:
-	if _dialogue_active or _vnbox != null:
-		return
-	_current = player.get_interactable()
-	if _current != null:
-		_prompt.text = "[E] " + tr(_current.prompt)
-		_prompt.visible = true
-		if Input.is_action_just_pressed("interact"):
-			_trigger(_current)
-	else:
-		_prompt.visible = false
-
-
-func _trigger(target: Interactable) -> void:
-	if target.interact_id.begins_with("door:"):
-		if target.interact_id == "door:entrance":
-			_show_toast(tr("LOCKED_DOOR"))
-			return
-		var door = _doors.get(target.interact_id)
-		if door is Door3D:
-			door.toggle()
-		return
-	match target.interact_id:
+func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
+	match id:
 		"coffee":
 			if GameManager.player_energy >= GameManager.MAX_ENERGY:
 				_show_toast(tr("COFFEE_FULL"))
@@ -81,11 +64,8 @@ func _trigger(target: Interactable) -> void:
 				GameManager.play_cue(660.0, 0.14, -8.0)
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
-			ObjectiveManager.complete_objective("take_case_file")
 			ObjectiveManager.activate_objective("study_911_transcript")
 			_start_dialogue(_document_sequence("case_file_4417"), Callable())
-		"office_desk":
-			_start_dialogue(_document_sequence("note_from_tamara"), Callable())
 		"office_cabinet":
 			ObjectiveManager.complete_objective("study_evidence")
 			ObjectiveManager.complete_objective("study_911_transcript")
@@ -106,11 +86,29 @@ func _trigger(target: Interactable) -> void:
 		"weller":
 			_start_dialogue(Case1Scolfield.get_briefing(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
 		_:
-			var lines := _flavor_sequence(target.interact_id)
+			var lines := _flavor_sequence(id)
 			if not lines.is_empty():
 				_start_dialogue(lines, Callable())
 			else:
-				_show_toast(tr(target.prompt))
+				_show_toast(tr(prompt_key))
+
+
+func _on_interact_focused(prompt_text: String, _screen_position: Vector2) -> void:
+	_prompt.text = "[E] " + prompt_text
+	_prompt.visible = true
+	if _prompt_tween != null and _prompt_tween.is_valid():
+		_prompt_tween.kill()
+	_prompt.modulate.a = 0.0
+	_prompt_tween = create_tween()
+	_prompt_tween.tween_property(_prompt, "modulate:a", 1.0, 0.12)
+
+
+func _on_interact_lost() -> void:
+	if _prompt_tween != null and _prompt_tween.is_valid():
+		_prompt_tween.kill()
+	_prompt_tween = create_tween()
+	_prompt_tween.tween_property(_prompt, "modulate:a", 0.0, 0.12)
+	_prompt_tween.tween_callback(func() -> void: _prompt.visible = false)
 
 
 func _on_locale_changed(_locale: String) -> void:
@@ -118,6 +116,8 @@ func _on_locale_changed(_locale: String) -> void:
 		_energy_label.text = tr("OFFICE_ENERGY") % [GameManager.player_energy, GameManager.MAX_ENERGY]
 	if _controls_label != null:
 		_controls_label.text = tr("OFFICE_CONTROLS")
+	if _interactor != null:
+		_interactor.refresh_focus()
 
 
 func _build_materials() -> void:
@@ -414,22 +414,26 @@ func _build_audio_zones() -> void:
 
 
 func _build_interactables() -> void:
-	_make_interactable("board", "PROMPT_BOARD", Vector3(-9.0, 1.6, 7.4), Vector3(3.6, 2.0, 1.0))
-	_make_interactable("office_desk", "PROMPT_DESK", Vector3(-9.0, 0.9, 5.0), Vector3(2.4, 1.0, 1.2))
-	_make_interactable("office_cabinet", "PROMPT_CABINET", Vector3(-11.4, 0.9, 3.25), Vector3(0.8, 1.4, 1.4))
-	_make_interactable("coffee", "PROMPT_COFFEE", Vector3(-1.5, 1.0, 4.0), Vector3(0.9, 1.6, 1.2))
-	_make_interactable("vending", "PROMPT_VENDING", Vector3(-4.6, 1.0, 7.0), Vector3(1.0, 1.8, 0.8))
-	_make_interactable("sink", "PROMPT_SINK", Vector3(-3.6, 1.0, 7.0), Vector3(1.2, 1.4, 0.8))
-	_make_interactable("sofa", "PROMPT_SOFA", Vector3(-5.5, 0.8, 4.2), Vector3(0.9, 1.2, 2.6))
-	_make_interactable("equipment", "PROMPT_EQUIPMENT", Vector3(2.5, 0.9, 4.1), Vector3(3.0, 1.0, 0.8))
-	_make_interactable("weller", "PROMPT_WELLER", Vector3(4.6, 1.0, 2.8), Vector3(1.2, 2.0, 1.2))
-	_make_interactable("int1_table", "PROMPT_INT1_TABLE", Vector3(2.0, 0.9, 6.5), Vector3(1.8, 1.0, 0.9))
-	_make_interactable("int2_table", "PROMPT_INT2_TABLE", Vector3(6.9, 0.8, 3.0), Vector3(1.3, 1.0, 0.8))
-	_make_interactable("water", "PROMPT_WATER", Vector3(-3.4, 0.8, -1.05), Vector3(0.8, 1.4, 0.8))
-	_make_interactable("lockers", "PROMPT_LOCKERS", Vector3(-7.5, 1.0, -1.1), Vector3(7.0, 1.8, 0.7))
-	_make_interactable("notice", "PROMPT_NOTICE", Vector3(-8.0, 1.8, -1.2), Vector3(2.4, 1.4, 0.6))
-	_make_interactable("duty", "PROMPT_DUTY", Vector3(0.0, 1.0, -5.4), Vector3(2.4, 1.2, 0.8))
-	_make_interactable("fire_escape", "PROMPT_FIRE", Vector3(12.6, 1.2, 2.0), Vector3(2.0, 1.8, 3.0))
+	_make_interactable3d("board", "PROMPT_BOARD", Interactable3D.InteractionType.INSPECT, Vector3(-9.0, 1.6, 7.4), Vector3(3.6, 2.0, 1.0))
+	_make_interactable3d("office_cabinet", "PROMPT_CABINET", Interactable3D.InteractionType.INSPECT, Vector3(-11.4, 0.9, 3.25), Vector3(0.8, 1.4, 1.4))
+	_make_interactable3d("coffee", "PROMPT_COFFEE", Interactable3D.InteractionType.TRIGGER, Vector3(-1.5, 1.0, 4.0), Vector3(0.9, 1.6, 1.2))
+	_make_interactable3d("vending", "PROMPT_VENDING", Interactable3D.InteractionType.TRIGGER, Vector3(-4.6, 1.0, 7.0), Vector3(1.0, 1.8, 0.8))
+	_make_interactable3d("sink", "PROMPT_SINK", Interactable3D.InteractionType.TRIGGER, Vector3(-3.6, 1.0, 7.0), Vector3(1.2, 1.4, 0.8))
+	_make_interactable3d("sofa", "PROMPT_SOFA", Interactable3D.InteractionType.TRIGGER, Vector3(-5.5, 0.8, 4.2), Vector3(0.9, 1.2, 2.6))
+	_make_interactable3d("equipment", "PROMPT_EQUIPMENT", Interactable3D.InteractionType.INSPECT, Vector3(2.5, 0.9, 4.1), Vector3(3.0, 1.0, 0.8))
+	_make_interactable3d("weller", "PROMPT_WELLER", Interactable3D.InteractionType.INSPECT, Vector3(4.6, 1.0, 2.8), Vector3(1.2, 2.0, 1.2))
+	_make_interactable3d("int1_table", "PROMPT_INT1_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(2.0, 0.9, 6.5), Vector3(1.8, 1.0, 0.9))
+	_make_interactable3d("int2_table", "PROMPT_INT2_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(6.9, 0.8, 3.0), Vector3(1.3, 1.0, 0.8))
+	_make_interactable3d("water", "PROMPT_WATER", Interactable3D.InteractionType.TRIGGER, Vector3(-3.4, 0.8, -1.05), Vector3(0.8, 1.4, 0.8))
+	_make_interactable3d("lockers", "PROMPT_LOCKERS", Interactable3D.InteractionType.TRIGGER, Vector3(-7.5, 1.0, -1.1), Vector3(7.0, 1.8, 0.7))
+	_make_interactable3d("notice", "PROMPT_NOTICE", Interactable3D.InteractionType.TRIGGER, Vector3(-8.0, 1.8, -1.2), Vector3(2.4, 1.4, 0.6))
+	_make_interactable3d("duty", "PROMPT_DUTY", Interactable3D.InteractionType.TRIGGER, Vector3(0.0, 1.0, -5.4), Vector3(2.4, 1.2, 0.8))
+	_make_interactable3d("fire_escape", "PROMPT_FIRE", Interactable3D.InteractionType.TRIGGER, Vector3(12.6, 1.2, 2.0), Vector3(2.0, 1.8, 3.0))
+	if not GameManager.has_case_file:
+		var pickup := CaseFilePickup.new()
+		pickup.name = "CaseFilePickup"
+		pickup.position = Vector3(-8.4, 0.82, 4.95)
+		add_child(pickup)
 
 
 func _document_sequence(id: String) -> Array:
@@ -464,10 +468,11 @@ func _flavor_line(entry: Dictionary) -> DialogueLine:
 
 
 func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true) -> void:
-	_dialogue_active = true
 	GameManager.set_state(GameManager.GameState.DIALOGUE_VN)
 	player.release_mouse()
 	player.set_physics_process(false)
+	if _prompt_tween != null and _prompt_tween.is_valid():
+		_prompt_tween.kill()
 	_prompt.visible = false
 	_vnbox = VNBox.new()
 	_vnbox.theme = ThemeManager.get_theme()
@@ -476,7 +481,6 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 	box.finished.connect(func() -> void:
 		box.queue_free()
 		_vnbox = null
-		_dialogue_active = false
 		GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
 		if restore_control:
 			player.set_physics_process(true)
@@ -626,12 +630,12 @@ func _wall_box(size: Vector3, pos: Vector3, material: Material) -> void:
 func _add_door(interact_id: String, pos: Vector3, rotation_y: float) -> void:
 	var door := Door3D.new()
 	door.interact_id = interact_id
+	door.locked = interact_id == "door:entrance"
 	door.width = DOOR_W
 	door.height = 2.15
 	door.position = pos
 	door.rotation.y = rotation_y
 	add_child(door)
-	_doors[interact_id] = door
 
 
 func _add_one_way_glass(pos: Vector3, size: Vector2, rotation_y: float) -> void:
@@ -795,10 +799,18 @@ func _add_cyl_to(parent: Node3D, radius: float, height: float, pos: Vector3, mat
 	return holder
 
 
-func _make_interactable(id: String, prompt: String, pos: Vector3, size: Vector3) -> Interactable:
-	var area := Interactable.new()
-	area.interact_id = id
-	area.prompt = prompt
+func _make_interactable3d(id: String, prompt_key: String, kind: int, pos: Vector3, size: Vector3) -> void:
+	var area: Interactable3D
+	if kind == Interactable3D.InteractionType.INSPECT:
+		var inspect := InspectInteractable3D.new()
+		inspect.on_inspect = Callable(self, "_handle_interact").bind(id, prompt_key)
+		area = inspect
+	else:
+		var trigger := TriggerInteractable3D.new()
+		trigger.on_trigger = Callable(self, "_handle_interact").bind(id, prompt_key)
+		area = trigger
+	area.name = "Interact_" + id
+	area.prompt_key = prompt_key
 	area.position = pos
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -806,7 +818,6 @@ func _make_interactable(id: String, prompt: String, pos: Vector3, size: Vector3)
 	shape.shape = box
 	area.add_child(shape)
 	add_child(area)
-	return area
 
 
 func _make_material(color: Color, tex: Texture2D = null, uv_scale: float = 1.0, roughness: float = 0.9, metallic: float = 0.0, emission: Color = Color(0, 0, 0), emission_energy: float = 0.0, alpha: float = 1.0) -> StandardMaterial3D:

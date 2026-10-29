@@ -10,7 +10,7 @@ enum Status { HIDDEN, ACTIVE, COMPLETED, FAILED }
 enum Category { MAIN, INVESTIGATION, CHARACTER }
 
 const DEFINITIONS := {
-	"take_case_file": {
+	"take_case": {
 		"text_key": "OBJ_TAKE_CASE_FILE",
 		"category": Category.MAIN,
 		"weight": 10,

@@ -5,6 +5,7 @@ class_name Door3D
 @export var height := 2.15
 @export var thickness := 0.06
 @export var interact_id := "door:unnamed"
+@export var locked := false
 
 var _hinge: Node3D
 var _anim: AnimationPlayer
@@ -100,10 +101,11 @@ func _build_animation() -> void:
 
 
 func _build_interactable() -> void:
-	var area := Interactable.new()
+	var area := TriggerInteractable3D.new()
 	area.name = "DoorInteractable"
-	area.interact_id = interact_id
-	area.prompt = "PROMPT_DOOR"
+	area.prompt_key = "PROMPT_DOOR"
+	area.is_active = not locked
+	area.on_trigger = _on_triggered
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = Vector3(maxf(width, 1.0), 2.2, 0.9)
@@ -111,3 +113,9 @@ func _build_interactable() -> void:
 	area.add_child(shape)
 	area.position = Vector3(0, 1.1, 0)
 	add_child(area)
+
+
+func _on_triggered(_player) -> void:
+	if locked:
+		return
+	toggle()
