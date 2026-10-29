@@ -81,13 +81,28 @@ func _trigger(target: Interactable) -> void:
 				GameManager.play_cue(660.0, 0.14, -8.0)
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
+			ObjectiveManager.complete_objective("take_case_file")
+			ObjectiveManager.activate_objective("study_911_transcript")
 			_start_dialogue(_document_sequence("case_file_4417"), Callable())
 		"office_desk":
 			_start_dialogue(_document_sequence("note_from_tamara"), Callable())
 		"office_cabinet":
+			ObjectiveManager.complete_objective("study_evidence")
+			ObjectiveManager.complete_objective("study_911_transcript")
 			_start_dialogue(_document_sequence("email_weller"), Callable())
 		"equipment":
 			_start_dialogue(_document_sequence("book_interrogation"), Callable())
+		"int1_table":
+			ObjectiveManager.complete_objective("interrogate_box_1")
+			_start_dialogue(_flavor_sequence("int1_table"), Callable())
+		"int2_table":
+			ObjectiveManager.complete_objective("interrogate_box_2")
+			_start_dialogue(_flavor_sequence("int2_table"), Callable())
+		"fire_escape":
+			if GameManager.smoke_cigarette():
+				_start_dialogue(_flavor_sequence("fire_escape"), Callable())
+			else:
+				_show_toast(tr("NO_CIGARETTES"))
 		"weller":
 			_start_dialogue(Case1Scolfield.get_briefing(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
 		_:

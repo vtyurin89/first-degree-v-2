@@ -163,6 +163,7 @@ func _build() -> void:
 	_add_control_row("LMB / SPACE / ENTER", "CONTROLS_ADVANCE")
 	_add_control_row("LMB", "CONTROLS_PIN")
 	_add_control_row("ESC", "CONTROLS_PAUSE")
+	_add_control_row("TAB", "CONTROLS_INVENTORY")
 
 	var controls_spacer := Control.new()
 	controls_spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL

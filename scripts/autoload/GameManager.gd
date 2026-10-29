@@ -12,12 +12,15 @@ signal coping_style_changed(style: String)
 signal trust_changed(value: int)
 signal resistance_changed(value: int)
 signal flags_changed(flag: String)
+signal cigarettes_changed(value: int)
 
-enum GameState { MAIN_MENU, EXPLORATION_3D, DIALOGUE_VN, INTERROGATION, PAUSED }
+enum GameState { MAIN_MENU, EXPLORATION_3D, DIALOGUE_VN, INTERROGATION, INVENTORY, PAUSED }
 
 const MAX_ENERGY := 10
 const DEFAULT_ENERGY := 10
 const DEFAULT_SLOTS := 6
+const MAX_CIGARETTES := 20
+const DEFAULT_CIGARETTES := 3
 
 const SCENE_PROLOGUE := "res://scenes/Prologue.tscn"
 const SCENE_OFFICE := "res://scenes/Office3D.tscn"
@@ -31,6 +34,8 @@ var player_energy: int = DEFAULT_ENERGY
 var coping_style: String = ""
 var weller_trust: int = 50
 var alex_monologue_index: int = 0
+var cigarettes: int = DEFAULT_CIGARETTES
+var cigarettes_smoked_today: int = 0
 
 var admissibility_status: String = "CLEAN"
 var attorney_resistance: int = 0
@@ -59,6 +64,8 @@ func reset_run() -> void:
 	coping_style = ""
 	weller_trust = 50
 	alex_monologue_index = 0
+	cigarettes = DEFAULT_CIGARETTES
+	cigarettes_smoked_today = 0
 	admissibility_status = "CLEAN"
 	attorney_resistance = 0
 	pinned_slots_remaining = DEFAULT_SLOTS
@@ -69,6 +76,8 @@ func reset_run() -> void:
 	clicked_urls.clear()
 	flags.clear()
 	DialogueStateManager.reset_all()
+	ObjectiveManager.reset_to_defaults()
+	cigarettes_changed.emit(cigarettes)
 
 
 func capture_state() -> Dictionary:
@@ -78,6 +87,8 @@ func capture_state() -> Dictionary:
 		"coping_style": coping_style,
 		"weller_trust": weller_trust,
 		"alex_monologue_index": alex_monologue_index,
+		"cigarettes": cigarettes,
+		"cigarettes_smoked_today": cigarettes_smoked_today,
 		"admissibility_status": admissibility_status,
 		"attorney_resistance": attorney_resistance,
 		"pinned_slots_remaining": pinned_slots_remaining,
@@ -97,6 +108,8 @@ func restore_state(data: Dictionary) -> void:
 	coping_style = String(data.get("coping_style", ""))
 	weller_trust = clampi(int(data.get("weller_trust", 50)), 0, 100)
 	alex_monologue_index = int(data.get("alex_monologue_index", 0))
+	cigarettes = clampi(int(data.get("cigarettes", DEFAULT_CIGARETTES)), 0, MAX_CIGARETTES)
+	cigarettes_smoked_today = maxi(int(data.get("cigarettes_smoked_today", 0)), 0)
 	admissibility_status = String(data.get("admissibility_status", "CLEAN"))
 	attorney_resistance = clampi(int(data.get("attorney_resistance", 0)), 0, 100)
 	pinned_slots_remaining = int(data.get("pinned_slots_remaining", DEFAULT_SLOTS))
@@ -119,13 +132,14 @@ func restore_state(data: Dictionary) -> void:
 	else:
 		flags = {}
 	var restored_state := int(data.get("current_state", GameState.EXPLORATION_3D))
-	if restored_state == GameState.PAUSED or restored_state == GameState.MAIN_MENU:
+	if restored_state == GameState.PAUSED or restored_state == GameState.MAIN_MENU or restored_state == GameState.INVENTORY:
 		restored_state = GameState.EXPLORATION_3D
 	set_state(restored_state)
 	energy_changed.emit(player_energy)
 	trust_changed.emit(weller_trust)
 	resistance_changed.emit(attorney_resistance)
 	admissibility_changed.emit(admissibility_status)
+	cigarettes_changed.emit(cigarettes)
 
 
 func _fill_string_array(target: Array[String], values) -> void:
@@ -179,6 +193,15 @@ func consume_energy(amount: int = 1) -> bool:
 func set_energy(value: int) -> void:
 	player_energy = clampi(value, 0, MAX_ENERGY)
 	energy_changed.emit(player_energy)
+
+
+func smoke_cigarette() -> bool:
+	if cigarettes <= 0:
+		return false
+	cigarettes -= 1
+	cigarettes_smoked_today += 1
+	cigarettes_changed.emit(cigarettes)
+	return true
 
 
 func modify_energy(delta: int) -> int:
@@ -331,6 +354,7 @@ func _register_actions() -> void:
 	_add_action("move_right", [KEY_D, KEY_RIGHT])
 	_add_action("interact", [KEY_E])
 	_add_action("advance", [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER])
+	_add_action("inventory", [KEY_TAB])
 
 
 func _add_action(action: String, keys: Array) -> void:

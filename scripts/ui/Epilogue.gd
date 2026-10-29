@@ -13,6 +13,7 @@ var _accum := 0.0
 
 
 func _ready() -> void:
+	ObjectiveManager.complete_objective("dont_die")
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 

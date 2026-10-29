@@ -177,6 +177,7 @@ func load_game(slot_id: String) -> bool:
 	_loading = true
 	get_tree().paused = false
 	GameManager.restore_state(res.game_state)
+	ObjectiveManager.restore_statuses(res.objective_statuses)
 	var scene_path: String = String(res.last_scene_path)
 	if scene_path == "" or not ResourceLoader.exists(scene_path):
 		scene_path = GameManager.SCENE_OFFICE
@@ -211,6 +212,7 @@ func _build_save_data(slot_id: String, display_name: String) -> SaveData:
 	data.case_status = GameManager.admissibility_status
 	data.game_state = GameManager.capture_state()
 	data.dialogue_state = DialogueStateManager.snapshot()
+	data.objective_statuses = ObjectiveManager.snapshot_statuses()
 	var player = get_tree().get_first_node_in_group("player")
 	if player is Node3D:
 		data.has_player_position = true

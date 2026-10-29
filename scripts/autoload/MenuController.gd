@@ -10,6 +10,10 @@ var _pause_menu: MenuScreen
 var _modal_layer: CanvasLayer
 var _modal: ModalDialog
 var _settings_dialog: SettingsDialog
+var _inventory_layer: CanvasLayer
+var _inventory: InventoryUI
+var _inventory_state: int = -1
+var _inventory_mouse_mode: int = Input.MOUSE_MODE_VISIBLE
 var _screen_layer: CanvasLayer
 var _screen: SaveLoadScreen
 var _indicator_layer: CanvasLayer
@@ -34,7 +38,16 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("inventory"):
+		if _can_toggle_inventory():
+			_toggle_inventory()
+			get_viewport().set_input_as_handled()
+		return
 	if not event.is_action_pressed("ui_cancel"):
+		return
+	if _inventory != null:
+		close_inventory()
+		get_viewport().set_input_as_handled()
 		return
 	if _modal != null:
 		_dismiss_modal()
@@ -88,6 +101,71 @@ func resume_game() -> void:
 	Input.mouse_mode = _prev_mouse_mode
 
 
+func _can_toggle_inventory() -> bool:
+	if _inventory != null:
+		return true
+	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null:
+		return false
+	if get_tree().paused:
+		return false
+	return GameManager.is_gameplay_state()
+
+
+func _toggle_inventory() -> void:
+	if _inventory != null:
+		close_inventory()
+	else:
+		open_inventory()
+
+
+func open_inventory() -> void:
+	if _inventory != null:
+		return
+	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null:
+		return
+	if get_tree().paused or not GameManager.is_gameplay_state():
+		return
+	_inventory_state = GameManager.current_state
+	_inventory_mouse_mode = Input.mouse_mode
+	GameManager.set_state(GameManager.GameState.INVENTORY)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+	_inventory_layer = CanvasLayer.new()
+	_inventory_layer.layer = 92
+	_inventory_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_inventory_layer)
+
+	_inventory = InventoryUI.new()
+	_inventory.theme = ThemeManager.get_theme()
+	_inventory_layer.add_child(_inventory)
+	get_tree().paused = true
+
+
+func close_inventory() -> void:
+	if _inventory == null:
+		return
+	get_tree().paused = false
+	_inventory.queue_free()
+	_inventory = null
+	_inventory_layer.queue_free()
+	_inventory_layer = null
+	if _inventory_state >= 0:
+		GameManager.set_state(_inventory_state)
+	_inventory_state = -1
+	Input.mouse_mode = _inventory_mouse_mode
+
+
+func _close_inventory_internal() -> void:
+	if _inventory == null:
+		return
+	get_tree().paused = false
+	_inventory.queue_free()
+	_inventory = null
+	_inventory_layer.queue_free()
+	_inventory_layer = null
+	_inventory_state = -1
+
+
 func open_save_screen() -> void:
 	_open_screen(SaveLoadScreen.Mode.SAVE)
 
@@ -99,6 +177,7 @@ func open_load_screen() -> void:
 func _open_screen(mode: int) -> void:
 	_dismiss_modal()
 	_close_settings()
+	_close_inventory_internal()
 	_close_screen_internal()
 	_screen_layer = CanvasLayer.new()
 	_screen_layer.layer = SCREEN_LAYER
@@ -125,7 +204,7 @@ func _close_screen_internal() -> void:
 
 
 func has_modal() -> bool:
-	return _modal != null or _settings_dialog != null
+	return _modal != null or _settings_dialog != null or _inventory != null
 
 
 func show_modal(title: String, message: String, options: Array, on_result: Callable = Callable(), sub_message: String = "", show_icon: bool = true) -> ModalDialog:
@@ -178,6 +257,7 @@ func show_input_modal(title: String, message: String, placeholder: String, on_co
 func _on_load_started() -> void:
 	_dismiss_modal()
 	_close_settings()
+	_close_inventory_internal()
 	_close_screen_internal()
 	if _pause_menu != null:
 		_pause_menu.queue_free()

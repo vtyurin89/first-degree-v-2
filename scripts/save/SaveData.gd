@@ -14,3 +14,4 @@ const CURRENT_VERSION := 1
 @export var has_player_position: bool = false
 @export var game_state: Dictionary = {}
 @export var dialogue_state: Dictionary = {}
+@export var objective_statuses: Dictionary = {}
