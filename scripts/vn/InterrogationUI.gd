@@ -223,6 +223,7 @@ func _refresh_status() -> void:
 
 func _on_line_ready(speaker: String, text: String, metadata: Dictionary) -> void:
 	_mode = "line"
+	_text_label.visible = true
 	_clear_choices()
 	_hide_back()
 	_update_chapter(String(metadata.get("chapter", "")))
@@ -244,10 +245,11 @@ func _on_choices_ready(available_choices: Array) -> void:
 	_mode = "choice"
 	_typing = false
 	_text_label.text = ""
+	_text_label.visible = false
 	_nameplate.text = ""
 	_portrait_panel.visible = false
 	_clear_choices()
-	_hint.text = tr("CHOOSE_ACTION")
+	_hint.text = ""
 	_update_chapter(String(_manager.get_current_node().get("chapter", "")))
 	for choice in available_choices:
 		var button := Button.new()

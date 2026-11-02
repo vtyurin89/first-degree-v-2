@@ -80,7 +80,7 @@ PROMPT_WATER,"Water cooler — drink some water","Кулер — выпить в
 PROMPT_WINDOW,"Window — look outside","Окно — выглянуть"
 PROMPT_CLOCK,"Clock — check the time","Часы — взглянуть на время"
 PROMPT_DESK,"Desk — take a look","Стол — осмотреть"
-PROMPT_WELLER,"Weller — start the briefing","Уэллер — начать брифинг"
+PROMPT_WELLER,"Weller","Уэллер"
 PROMPT_DEFAULT,"Inspect","Осмотреть"
 DOCUMENT_MISSING,"Document unavailable.","Документ недоступен."
 CORRUPTED_SAVE_NAME,"Corrupted save","Повреждённое сохранение"

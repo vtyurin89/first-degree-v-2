@@ -85,7 +85,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 			else:
 				_show_toast(tr("NO_CIGARETTES"))
 		"weller":
-			_start_node_dialogue(LocalizationManager.dialogues_path(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
+			_start_node_dialogue(LocalizationManager.dialogues_path(), Callable(self, "_on_weller_finished"))
 		_:
 			var lines := _flavor_sequence(id)
 			if not lines.is_empty():
@@ -110,6 +110,12 @@ func _on_interact_lost() -> void:
 	_prompt_tween = create_tween()
 	_prompt_tween.tween_property(_prompt, "modulate:a", 0.0, 0.12)
 	_prompt_tween.tween_callback(func() -> void: _prompt.visible = false)
+
+
+func _on_weller_finished() -> void:
+	GameManager.add_flag("weller_briefing_done")
+	if GameManager.has_case_file:
+		GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0)
 
 
 func _on_locale_changed(_locale: String) -> void:

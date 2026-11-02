@@ -17,7 +17,7 @@ signal cigarettes_changed(value: int)
 enum GameState { MAIN_MENU, EXPLORATION_3D, DIALOGUE_VN, INTERROGATION, INVENTORY, PAUSED }
 
 const MAX_ENERGY := 10
-const DEFAULT_ENERGY := 10
+const DEFAULT_ENERGY := 4
 const DEFAULT_SLOTS := 6
 const MAX_CIGARETTES := 20
 const DEFAULT_CIGARETTES := 3

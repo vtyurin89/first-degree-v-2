@@ -93,6 +93,7 @@ func _on_node_choices(available_choices: Array) -> void:
 	_typing = false
 	_waiting_choice = true
 	_text_label.text = ""
+	_text_label.visible = false
 	_nameplate.text = ""
 	_hide_choices()
 	for choice in available_choices:
@@ -142,6 +143,7 @@ func _next() -> void:
 
 
 func _display_line(line: DialogueLine) -> void:
+	_text_label.visible = true
 	_nameplate.text = line.speaker
 	if line.internal_thought:
 		_nameplate.text = line.speaker + " " + tr("INTERNAL_SUFFIX")
@@ -195,6 +197,7 @@ func _advance() -> void:
 func _show_choices() -> void:
 	_typing = false
 	_text_label.text = ""
+	_text_label.visible = false
 	_nameplate.text = ""
 	var available := _available_choices()
 	if available.is_empty():
@@ -261,7 +264,7 @@ func _clear_container(container: Node) -> void:
 
 func _update_hint() -> void:
 	if _waiting_choice:
-		_hint.text = tr("CHOOSE_ACTION")
+		_hint.text = ""
 		return
 	if _typing:
 		_hint.text = ""

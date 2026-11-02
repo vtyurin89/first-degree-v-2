@@ -8,7 +8,7 @@ signal energy_depleted()
 signal milestone_reached(milestone_index: int)
 signal dialogue_ended()
 
-const VALID_TYPES := ["dialogue_line", "choice_hub", "milestone_event"]
+const VALID_TYPES := ["dialogue_line", "choice_hub", "milestone_event", "condition"]
 const RETURN_TOKEN := "@back"
 
 var nodes: Dictionary = {}
@@ -137,7 +137,7 @@ func _sync_state() -> void:
 func advance() -> void:
 	if _ended or current_node.is_empty():
 		return
-	var next_id := String(current_node.get("next", ""))
+	var next_id := _resolve_next(current_node)
 	if next_id == "":
 		_end()
 		return
@@ -184,7 +184,7 @@ func select_choice(choice_id: String) -> bool:
 	if bool(chosen.get("once", false)):
 		used_once_choices[node_id + "::" + choice_id] = true
 	_apply_mutations(chosen.get("on_select", {}))
-	var next_id := String(chosen.get("next", ""))
+	var next_id := _resolve_next(chosen)
 	if next_id == "":
 		_end()
 	else:
@@ -281,6 +281,20 @@ func _validate() -> bool:
 		var next_id := String(node.get("next", ""))
 		if next_id != "" and next_id != RETURN_TOKEN and not nodes.has(next_id):
 			errors.append("узел '%s': next='%s' не найден" % [node_id, next_id])
+		var branches = node.get("branches", null)
+		if branches != null:
+			if not (branches is Array):
+				errors.append("узел '%s': branches должен быть массивом" % node_id)
+			else:
+				for branch in branches:
+					if not (branch is Dictionary):
+						errors.append("узел '%s': элемент branches не является объектом" % node_id)
+						continue
+					var branch_next := String(branch.get("next", ""))
+					if branch_next != "" and branch_next != RETURN_TOKEN and not nodes.has(branch_next):
+						errors.append("узел '%s': ветка next='%s' не найдена" % [node_id, branch_next])
+		if node_type == "condition" and not (node.get("branches") is Array):
+			errors.append("узел '%s': condition должен иметь branches" % node_id)
 		if node_type == "choice_hub":
 			var choices = node.get("choices", null)
 			if not (choices is Array):
@@ -324,8 +338,10 @@ func _enter_node(node_id: String) -> void:
 			_emit_choices(node_id, current_node)
 		"milestone_event":
 			_emit_milestone_event(current_node)
+		"condition":
+			_emit_condition(current_node)
 		_:
-			push_error("[DialogueManager] Неизвестный тип узла: %s" % node_id)
+			push_error("[DialogueManager] неизвестный тип узла: %s" % node_id)
 			_end()
 
 
@@ -337,6 +353,20 @@ func _step_to(node_id: String) -> void:
 		_end()
 		return
 	_enter_node(node_id)
+
+
+func _resolve_next(node: Dictionary) -> String:
+	var branches = node.get("branches", [])
+	if branches is Array:
+		for branch in branches:
+			if not (branch is Dictionary):
+				continue
+			var forbidden = branch.get("forbidden", {})
+			if forbidden is Dictionary and not forbidden.is_empty() and _predicate_passes(forbidden):
+				continue
+			if _predicate_passes(branch.get("requires", {})):
+				return String(branch.get("next", ""))
+	return String(node.get("next", ""))
 
 
 func _emit_line(node_id: String, node: Dictionary) -> void:
@@ -352,7 +382,7 @@ func _emit_line(node_id: String, node: Dictionary) -> void:
 func _emit_choices(node_id: String, node: Dictionary) -> void:
 	var available := _filter_choices(node_id, node)
 	if available.is_empty():
-		var fallback := String(node.get("next", ""))
+		var fallback := _resolve_next(node)
 		if fallback != "":
 			_step_to(fallback)
 		else:
@@ -361,11 +391,19 @@ func _emit_choices(node_id: String, node: Dictionary) -> void:
 	choices_ready.emit(available)
 
 
+func _emit_condition(node: Dictionary) -> void:
+	var next_id := _resolve_next(node)
+	if next_id == "":
+		_end()
+	else:
+		_step_to(next_id)
+
+
 func _emit_milestone_event(node: Dictionary) -> void:
 	var milestone := int(node.get("milestone", -1))
 	if milestone >= 0:
 		_reach_milestone(milestone)
-	var next_id := String(node.get("next", ""))
+	var next_id := _resolve_next(node)
 	if next_id == "":
 		_end()
 	else:
@@ -431,6 +469,8 @@ func _predicate_passes(predicate) -> bool:
 	if predicate.has("attorney_max") and GameManager.attorney_resistance > int(predicate["attorney_max"]):
 		return false
 	if predicate.has("min_energy") and GameManager.player_energy < int(predicate["min_energy"]):
+		return false
+	if predicate.has("has_case_file") and bool(predicate["has_case_file"]) != GameManager.has_case_file:
 		return false
 	return true
 

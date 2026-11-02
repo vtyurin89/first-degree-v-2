@@ -1,11 +1,34 @@
 {
   "case_id": "CASE_1_WELLER",
   "title": "Брифинг",
-  "start_node": "weller_1",
+  "start_node": "check_briefing",
   "max_energy": 10,
   "reset_energy": false,
   "track_state": false,
   "nodes": {
+    "check_briefing": {
+      "id": "check_briefing",
+      "type": "condition",
+      "branches": [
+        {"requires": {"flags": ["weller_briefing_done"]}, "next": "return_intro"}
+      ],
+      "next": "weller_1"
+    },
+    "return_intro": {
+      "id": "return_intro",
+      "type": "dialogue_line",
+      "speaker": "Уэллер",
+      "text": "Ну что, готова?",
+      "next": "check_case_file"
+    },
+    "check_case_file": {
+      "id": "check_case_file",
+      "type": "condition",
+      "branches": [
+        {"requires": {"has_case_file": true}, "next": "last_line_weller"}
+      ],
+      "next": "ready_for_questioning_2"
+    },
     "weller_1": {
       "id": "weller_1",
       "type": "dialogue_line",
@@ -39,7 +62,7 @@
       "type": "dialogue_line",
       "speaker": "Уэллер",
       "text": "Знаешь, что было бы с любым другим следователем в отделе после третьей такой выходки за месяц?",
-      "next": "weller_choice_1"
+      "next": "anna_3"
     },
     "anna_3": {
       "id": "anna_3",
@@ -56,14 +79,14 @@
       "next": "weller_5"
     },
     "weller_5": {
-      "id": "weller_4",
+      "id": "weller_5",
       "type": "dialogue_line",
       "speaker": "Уэллер",
       "text": "Ладно, я не собирался читать нотации. Давай работать. Подозреваемый ждёт, пора начинать допрос.",
       "next": "weller_choice_1"
     },
     "weller_choice_1": {
-      "id": "weller_choice",
+      "id": "weller_choice_1",
       "type": "choice_hub",
       "next": "answer_suspect_1",
       "choices": [
@@ -75,12 +98,24 @@
         {
           "id": "smoke_question",
           "text": "Может, быстренько покурим перед допросом?",
-          "next": "answer_smoke_1"
+          "next": "answer_smoke_1",
+          "on_select": {
+            "add_flags": ["asked_about_smoking"]
+          },
+          "forbidden": {
+            "flags": ["asked_about_smoking"]
+          }
         },
         {
           "id": "stench_question",
           "text": "От меня сильно пахнет? Я, вроде, привела себя в порядок...",
-          "next": "answer_stench_1"
+          "next": "answer_stench_1",
+          "on_select": {
+            "add_flags": ["asked_about_stench"]
+          },
+          "forbidden": {
+            "flags": ["asked_about_stench"]
+          }
         }
       ]
     },
@@ -96,7 +131,7 @@
       "type": "dialogue_line",
       "speaker": "Уэллер",
       "text": "Покуришь, когда побеседуешь с ним.",
-      "next": "after_1"
+      "next": "answer_smoke_3"
     },
     "answer_smoke_3": {
       "id": "answer_smoke_3",
@@ -143,7 +178,7 @@
     "anna_suspect_comment_1": {
       "id": "anna_suspect_comment_1",
       "type": "dialogue_line",
-      "speaker": "Уэллер",
+      "speaker": "Анна",
       "text": "Бритва Окамма. Скорее всего, убийца - член семьи. И наверняка тот, который первый попал под подозрение.",
       "next": "answer_suspect_4"
     },
@@ -159,14 +194,14 @@
       "type": "dialogue_line",
       "speaker": "Уэллер",
       "text": "Готова начать допрос, Кроуфорд? Если тебе нужно еще несколько минут, чтобы посмотреть материалы на столе или выпить кофе, то я могу подождать.",
-      "next": "answer_suspect_4"
+      "next": "check_case_file"
     },
     "ready_for_questioning_2": {
       "id": "ready_for_questioning_2",
       "type": "dialogue_line",
       "speaker": "Уэллер",
       "text": "Обязательно возьми со стола материалы дела. Их ты сможешь посмотреть в любой момент даже в допросной, но все остальные улики лучше изучить сейчас, ведь в допросную их взять не получится.",
-      "next": "answer_suspect_4"
+      "next": "ready_for_questioning_3"
     },
     "ready_for_questioning_3": {
       "id": "ready_for_questioning_3",
@@ -178,7 +213,7 @@
     "weller_choice_2": {
       "id": "weller_choice_2",
       "type": "choice_hub",
-      "next": "after_1",
+      "next": "weller_choice_3",
       "choices": [
         {
           "id": "ready_1",
@@ -209,7 +244,7 @@
     "weller_choice_3": {
       "id": "weller_choice_3",
       "type": "choice_hub",
-      "next": "weller_choice_3",
+      "next": "last_line_weller",
       "choices": [
         {
           "id": "tank",
@@ -227,8 +262,7 @@
       "id": "last_line_weller",
       "type": "dialogue_line",
       "speaker": "Уэллер",
-      "text": "Конечно. Я буду в аппаратной, если что. Задай ему жару, Кроуфорд!",
-      "next": "last_line_weller"
+      "text": "Конечно. Я буду в аппаратной, если что. Задай ему жару, Кроуфорд!"
     },
     "not_ready_weller": {
       "id": "not_ready_weller",
