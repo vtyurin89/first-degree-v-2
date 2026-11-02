@@ -15,6 +15,8 @@ var _char_accum := 0.0
 var _waiting_choice := false
 var _hovered_url = null
 var _last_meta_frame := -1
+var _node_mode := false
+var _manager: DialogueManager
 
 var _dialogue_panel: PanelContainer
 var _nameplate: Label
@@ -36,6 +38,8 @@ func _ready() -> void:
 
 
 func play(lines: Array) -> void:
+	_node_mode = false
+	_manager = null
 	_queue.clear()
 	for line in lines:
 		_queue.append(line)
@@ -47,6 +51,72 @@ func play(lines: Array) -> void:
 	_nameplate.text = ""
 	_hint.text = ""
 	_next()
+
+
+func play_graph(manager: DialogueManager) -> void:
+	if manager == null:
+		finished.emit()
+		return
+	_node_mode = true
+	_manager = manager
+	_queue.clear()
+	_current = null
+	_typing = false
+	_waiting_choice = false
+	_hide_choices()
+	_text_label.text = ""
+	_nameplate.text = ""
+	_hint.text = ""
+	_manager.line_ready.connect(_on_node_line)
+	_manager.choices_ready.connect(_on_node_choices)
+	_manager.dialogue_ended.connect(_on_node_ended)
+	_manager.start()
+
+
+func _on_node_line(speaker: String, text: String, metadata: Dictionary) -> void:
+	if not _node_mode:
+		return
+	_waiting_choice = false
+	_hide_choices()
+	_hint.text = ""
+	var line := DialogueLine.new()
+	line.speaker = speaker
+	line.text = text
+	line.internal_thought = bool(metadata.get("internal", false))
+	_current = line
+	_display_line(line)
+
+
+func _on_node_choices(available_choices: Array) -> void:
+	if not _node_mode:
+		return
+	_typing = false
+	_waiting_choice = true
+	_text_label.text = ""
+	_nameplate.text = ""
+	_hide_choices()
+	for choice in available_choices:
+		var button := Button.new()
+		button.text = String(choice.get("text", ""))
+		button.theme_type_variation = UITheme.BUTTON
+		button.focus_mode = Control.FOCUS_NONE
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.pressed.connect(_select_node.bind(String(choice.get("id", ""))))
+		_choice_container.add_child(button)
+	_update_hint()
+
+
+func _select_node(choice_id: String) -> void:
+	_waiting_choice = false
+	_hide_choices()
+	if _manager != null:
+		_manager.select_choice(choice_id)
+
+
+func _on_node_ended() -> void:
+	_node_mode = false
+	_manager = null
+	finished.emit()
 
 
 func refresh() -> void:
@@ -111,6 +181,10 @@ func _advance() -> void:
 		return
 	if _typing:
 		_complete_typing()
+		return
+	if _node_mode:
+		if _manager != null:
+			_manager.advance()
 		return
 	if _current != null and _current.required_url != "" and not GameManager.clicked_urls.has(_current.required_url):
 		_update_hint()
@@ -230,6 +304,8 @@ func _speaker_color(speaker: String) -> Color:
 
 func _on_meta(meta) -> void:
 	_last_meta_frame = Engine.get_process_frames()
+	if _node_mode and _manager != null:
+		_manager.click_meta(str(meta))
 	meta_clicked.emit(str(meta))
 	_update_hint()
 

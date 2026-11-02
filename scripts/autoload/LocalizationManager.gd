@@ -45,6 +45,10 @@ func case_script_path() -> String:
 	return "%s/%s/case1_scolfield.json" % [DATA_ROOT, current_locale]
 
 
+func dialogues_path() -> String:
+	return "%s/%s/case1_dialogues.json" % [DATA_ROOT, current_locale]
+
+
 func narrative_path(locale: String = "") -> String:
 	var loc := locale if locale != "" else current_locale
 	return "%s/%s/narrative.json" % [DATA_ROOT, loc]

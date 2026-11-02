@@ -36,6 +36,7 @@ var _mat_one_way: ShaderMaterial
 func _ready() -> void:
 	GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
 	player.position = Vector3(-9.5, 0.1, 6.6)
+	player.rotation.y = atan2(-1.3, 0.6)
 	_build_materials()
 	_build_environment()
 	_build_shell()
@@ -84,7 +85,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 			else:
 				_show_toast(tr("NO_CIGARETTES"))
 		"weller":
-			_start_dialogue(Case1Scolfield.get_briefing(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
+			_start_node_dialogue(LocalizationManager.dialogues_path(), func(): GameManager.change_scene(GameManager.SCENE_INTERROGATION, 1.0), false)
 		_:
 			var lines := _flavor_sequence(id)
 			if not lines.is_empty():
@@ -262,6 +263,13 @@ func _build_anna_office() -> void:
 	_make_box(Vector3(0.55, 0.55, 0.04), Vector3(-9.0, 2.2, 7.68), _mat_paper, false)
 	_make_box(Vector3(0.32, 1.25, 0.5), Vector3(-6.9, 0.625, 7.2), _mat_wood)
 
+	var weller := Sprite3D.new()
+	weller.texture = _make_char_texture(Color(0.28, 0.38, 0.52))
+	weller.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	weller.pixel_size = 0.021
+	weller.position = Vector3(-8.2, 1.0, 6.0)
+	add_child(weller)
+
 
 func _build_breakroom() -> void:
 	_make_box(Vector3(4.6, 0.03, 5.6), Vector3(-3.7, 0.015, 4.4), _mat_carpet)
@@ -295,13 +303,6 @@ func _build_observation() -> void:
 		_add_cyl_to(self, 0.09, 0.05, Vector3(1.3 + i * 0.35, 0.94, 4.05), _mat_dark, false, Vector3(PI * 0.5, 0, 0))
 	_make_chair(Vector3(2.2, 0.0, 3.55), 0.0)
 	_make_chair(Vector3(4.9, 0.0, 2.7), PI * 0.5)
-
-	var weller := Sprite3D.new()
-	weller.texture = _make_char_texture(Color(0.28, 0.38, 0.52))
-	weller.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	weller.pixel_size = 0.021
-	weller.position = Vector3(4.6, 0.0, 2.8)
-	add_child(weller)
 
 
 func _build_interrogation_one() -> void:
@@ -421,7 +422,7 @@ func _build_interactables() -> void:
 	_make_interactable3d("sink", "PROMPT_SINK", Interactable3D.InteractionType.TRIGGER, Vector3(-3.6, 1.0, 7.0), Vector3(1.2, 1.4, 0.8))
 	_make_interactable3d("sofa", "PROMPT_SOFA", Interactable3D.InteractionType.TRIGGER, Vector3(-5.5, 0.8, 4.2), Vector3(0.9, 1.2, 2.6))
 	_make_interactable3d("equipment", "PROMPT_EQUIPMENT", Interactable3D.InteractionType.INSPECT, Vector3(2.5, 0.9, 4.1), Vector3(3.0, 1.0, 0.8))
-	var weller := _make_interactable3d("weller", "PROMPT_WELLER", Interactable3D.InteractionType.INSPECT, Vector3(4.6, 1.0, 2.8), Vector3(1.2, 2.0, 1.2))
+	var weller := _make_interactable3d("weller", "PROMPT_WELLER", Interactable3D.InteractionType.INSPECT, Vector3(-8.2, 1.0, 6.0), Vector3(1.2, 2.0, 1.2))
 	weller.highlight_root = null
 	_make_interactable3d("int1_table", "PROMPT_INT1_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(2.0, 0.9, 6.5), Vector3(1.8, 1.0, 0.9))
 	_make_interactable3d("int2_table", "PROMPT_INT2_TABLE", Interactable3D.InteractionType.TRIGGER, Vector3(6.9, 0.8, 3.0), Vector3(1.3, 1.0, 0.8))
@@ -490,6 +491,34 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 			on_finish.call()
 	)
 	box.play(lines)
+
+
+func _start_node_dialogue(path: String, on_finish: Callable, restore_control := true) -> void:
+	var manager := DialogueManager.new()
+	if not manager.load_script(path):
+		_show_toast(tr("DOCUMENT_MISSING"))
+		return
+	GameManager.set_state(GameManager.GameState.DIALOGUE_VN)
+	player.release_mouse()
+	player.set_physics_process(false)
+	if _prompt_tween != null and _prompt_tween.is_valid():
+		_prompt_tween.kill()
+	_prompt.visible = false
+	_vnbox = VNBox.new()
+	_vnbox.theme = ThemeManager.get_theme()
+	_ui_layer.add_child(_vnbox)
+	var box := _vnbox
+	box.finished.connect(func() -> void:
+		box.queue_free()
+		_vnbox = null
+		GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
+		if restore_control:
+			player.set_physics_process(true)
+			player.capture_mouse()
+		if on_finish.is_valid():
+			on_finish.call()
+	)
+	box.play_graph(manager)
 
 
 func _build_hud() -> void:

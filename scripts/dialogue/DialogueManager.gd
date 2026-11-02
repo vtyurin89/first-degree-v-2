@@ -33,6 +33,8 @@ var _ended := false
 var _loaded := false
 var _last_milestone := -1
 var started_from_resume := false
+var track_state := true
+var reset_energy := true
 
 
 func load_script(path: String) -> bool:
@@ -82,20 +84,23 @@ func start() -> void:
 		dialogue_ended.emit()
 		return
 	_ended = false
-	var resume_node := DialogueStateManager.consume_resume_node()
-	if resume_node != "":
-		started_from_resume = true
-		_restore_traversal_from(DialogueStateManager)
-		_enter_node(resume_node)
-		return
+	if track_state:
+		var resume_node := DialogueStateManager.consume_resume_node()
+		if resume_node != "":
+			started_from_resume = true
+			_restore_traversal_from(DialogueStateManager)
+			_enter_node(resume_node)
+			return
 	started_from_resume = false
-	DialogueStateManager.reset_traversal()
+	if track_state:
+		DialogueStateManager.reset_traversal()
 	node_history.clear()
 	visited_nodes.clear()
 	used_once_choices.clear()
 	_reached_milestones.clear()
 	_last_milestone = -1
-	GameManager.set_energy(max_energy)
+	if reset_energy:
+		GameManager.set_energy(max_energy)
 	for tactic_id in initial_tactics:
 		GameManager.unlock_tactic(String(tactic_id))
 	_enter_node(start_node)
@@ -112,6 +117,8 @@ func _restore_traversal_from(state) -> void:
 
 
 func _sync_state() -> void:
+	if not track_state:
+		return
 	if current_node_id == "":
 		return
 	DialogueStateManager.current_node_id = current_node_id
@@ -249,6 +256,8 @@ func _load_from_dict(data: Dictionary) -> bool:
 		initial_tactics = []
 	case_id = String(data.get("case_id", ""))
 	title = String(data.get("title", ""))
+	track_state = bool(data.get("track_state", true))
+	reset_energy = bool(data.get("reset_energy", true))
 	return _validate()
 
 
@@ -441,6 +450,14 @@ func _apply_mutations(mutations) -> void:
 		GameManager.modify_energy(int(mutations["modify_energy"]))
 	if mutations.has("modify_attorney_risk"):
 		GameManager.modify_attorney_risk(int(mutations["modify_attorney_risk"]))
+	if mutations.has("set_coping_style"):
+		GameManager.set_coping_style(String(mutations["set_coping_style"]))
+	elif mutations.has("coping"):
+		GameManager.set_coping_style(String(mutations["coping"]))
+	if mutations.has("weller_trust"):
+		GameManager.adjust_trust(int(mutations["weller_trust"]))
+	elif mutations.has("trust"):
+		GameManager.adjust_trust(int(mutations["trust"]))
 
 
 func _preprocess(text: String, node: Dictionary) -> String:
@@ -491,3 +508,5 @@ func _reset() -> void:
 	_palette = {}
 	_ended = false
 	_loaded = false
+	track_state = true
+	reset_energy = true

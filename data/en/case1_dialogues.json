@@ -1,0 +1,141 @@
+{
+  "case_id": "CASE_1_WELLER",
+  "title": "Briefing",
+  "start_node": "weller_1",
+  "max_energy": 10,
+  "reset_energy": false,
+  "track_state": false,
+  "nodes": {
+    "weller_1": {
+      "id": "weller_1",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "Finally. A little longer and I'd have come to pick you up myself for the second time tonight. You look: almost human. Progress, I'd say.",
+      "next": "anna_1"
+    },
+    "anna_1": {
+      "id": "anna_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "Thanks, Martin. I'm touched.",
+      "next": "weller_2"
+    },
+    "weller_2": {
+      "id": "weller_2",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "Crawford, I found you in a bar last night looking so bad the bartender was thinking ambulance, not taxi. Do you even remember how you got home?",
+      "next": "anna_2"
+    },
+    "anna_2": {
+      "id": "anna_2",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "Vaguely. I remember the shower. I remember the coffee was terrible.",
+      "next": "weller_3"
+    },
+    "weller_3": {
+      "id": "weller_3",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "The coffee was fine. You were terrible. I spent two hours bringing you back. Shower, coffee, more coffee, then you went out for a smoke and came back looking a little more like a living person. You know what would happen to any other detective in this department after the third time in a month?",
+      "next": "anna_3"
+    },
+    "anna_3": {
+      "id": "anna_3",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "Let me guess. A talk with the mentor, then HR, then a farewell party with a badge-shaped cake.",
+      "next": "weller_4"
+    },
+    "weller_4": {
+      "id": "weller_4",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "They wouldn't be here anymore, Anna. At all. They keep you because you're: Never mind. Just. This can't go on forever. I'm not going to lecture you every morning for the rest of my career. Just: one day I might not be around to pull you out of a bar before someone sees it who won't care that you're the best detective in the department.",
+      "next": "weller_choice"
+    },
+    "weller_choice": {
+      "id": "weller_choice",
+      "type": "choice_hub",
+      "next": "after_1",
+      "choices": [
+        {
+          "id": "sarcasm",
+          "text": "Then try to be around more often, Weller. You're clearly good at it.",
+          "next": "reply_sarcasm",
+          "on_select": {
+            "set_coping_style": "SARCASM",
+            "weller_trust": 0
+          }
+        },
+        {
+          "id": "denial",
+          "text": "I'm fine. Really. Just a rough week.",
+          "next": "reply_denial",
+          "on_select": {
+            "set_coping_style": "DENIAL",
+            "weller_trust": -5
+          }
+        },
+        {
+          "id": "vulnerable",
+          "text": "I know. I'm sorry. Really sorry - for last night, and for the fact that this clearly won't be the last time.",
+          "next": "reply_vulnerable",
+          "on_select": {
+            "set_coping_style": "VULNERABLE",
+            "weller_trust": 10
+          }
+        }
+      ]
+    },
+    "reply_sarcasm": {
+      "id": "reply_sarcasm",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "Then try to be around more often, Weller. You're clearly good at it.",
+      "next": "after_1"
+    },
+    "reply_denial": {
+      "id": "reply_denial",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "I'm fine. Really. Just a rough week.",
+      "next": "after_1"
+    },
+    "reply_vulnerable": {
+      "id": "reply_vulnerable",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "I know. I'm sorry. Really sorry - for last night, and for the fact that this clearly won't be the last time.",
+      "next": "after_1"
+    },
+    "after_1": {
+      "id": "after_1",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "By the way. Do I at least not smell? Be honest, because if someone with a dog's nose walks into the interrogation room right now:",
+      "next": "after_2"
+    },
+    "after_2": {
+      "id": "after_2",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "A little. But luckily most of our suspects come in smelling so bad they'd cover anything. Mint gum on the desk, by the way - I left it for you. Don't thank me.",
+      "next": "after_3"
+    },
+    "after_3": {
+      "id": "after_3",
+      "type": "dialogue_line",
+      "speaker": "Anna",
+      "text": "I won't. All right - tell me what we've got.",
+      "next": "after_4"
+    },
+    "after_4": {
+      "id": "after_4",
+      "type": "dialogue_line",
+      "speaker": "Weller",
+      "text": "Edward Scolfield. Former military, forty-three. Twenty years of service, retired three years ago. Wife - Tamara, stepson - Greg, fifteen. The relationship between them was: let's say not a relationship but a cold war. Neighbors heard shouting regularly. Tamara never called the police - the classic picture. Alibi - full of holes. The camera by the garage caught him leaving a few minutes after the estimated time of death. Apparently he thought the time gap would be written off as forensic error. It won't be."
+    }
+  }
+}
