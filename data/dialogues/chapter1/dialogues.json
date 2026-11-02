@@ -7,7 +7,7 @@
   "nodes": {
     "check_briefing": {"id":"check_briefing","type":"condition","branches":[{"requires":{"flags":["weller_briefing_done"]},"next":"return_intro"}],"next":"weller_1"},
     "return_intro": {"id":"return_intro","type":"dialogue_line","speaker":"weller","next":"check_case_file","text_key":"CH1_DLG_WELLER_RETURN_INTRO"},
-    "check_case_file": {"id":"check_case_file","type":"condition","branches":[{"requires":{"has_case_file":true},"next":"last_line_weller"}],"next":"ready_for_questioning_2"},
+    "check_case_file": {"id":"check_case_file","type":"condition","branches":[{"requires":{"has_case_file":true},"next":"weller_choice_2"}],"next":"ready_for_questioning_2"},
     "weller_1": {"id":"weller_1","type":"dialogue_line","speaker":"weller","next":"anna_1","text_key":"CH1_DLG_WELLER_1"},
     "anna_1": {"id":"anna_1","type":"dialogue_line","speaker":"anna","next":"weller_2","text_key":"CH1_DLG_WELLER_ANNA_1"},
     "weller_2": {"id":"weller_2","type":"dialogue_line","speaker":"weller","next":"anna_2","text_key":"CH1_DLG_WELLER_2"},
@@ -43,8 +43,11 @@
       "id": "weller_choice_2",
       "type": "choice_hub",
       "next": "weller_choice_3",
-      "choices": [{"id":"ready_1","next":"ready_weller_1","text_key":"CH1_DLG_WELLER_CHOICE_READY_1"},{"id":"not_ready_1","next":"not_ready_weller","text_key":"CH1_DLG_WELLER_CHOICE_NOT_READY_1"}]
+      "choices": [{"id":"ready_1","next":"ready_check_scolfield","text_key":"CH1_DLG_WELLER_CHOICE_READY_1"},{"id":"not_ready_1","next":"not_ready_weller","text_key":"CH1_DLG_WELLER_CHOICE_NOT_READY_1"}]
     },
+    "ready_check_scolfield": {"id": "ready_check_scolfield", "type":"condition", "branches":[{"requires":{"has_case_file":true},"next":"ready_weller_1"}],"next":"scolfield_file_missing"},
+    "scolfield_file_missing": {"id": "scolfield_file_missing", "type":"dialogue_line","speaker":"weller", "text_key":"CH1_SCOLFIELD_FILE_MISSING", "next":"scolfield_file_missing_reply"},
+    "scolfield_file_missing_reply": {"id": "scolfield_file_missing_reply", "type":"dialogue_line","speaker":"anna", "text_key":"CH1_SCOLFIELD_FILE_MISSING_REPLY"},
     "ready_weller_1": {"id":"ready_weller_1","type":"dialogue_line","speaker":"weller","next":"ready_weller_2","text_key":"CH1_DLG_WELLER_READY_1"},
     "ready_weller_2": {"id":"ready_weller_2","type":"dialogue_line","speaker":"weller","next":"weller_choice_3","text_key":"CH1_DLG_WELLER_READY_2"},
     "weller_choice_3": {

@@ -2,6 +2,7 @@
   "case_id": "CASE_1_SCOLFIELD",
   "start_node": "p1_intro",
   "max_energy": 10,
+  "reset_energy": false,
   "initial_tactics": ["good_guy_monster","appeal_to_honor"],
   "palette": {"clue":"#ffd76a","trait":"#7ad0ff","confession":"#ffd23f","flavor":"#c8c8c8"},
   "nodes": {
