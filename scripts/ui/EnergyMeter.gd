@@ -1,0 +1,71 @@
+extends Control
+class_name EnergyMeter
+
+const BAR_COUNT := 10
+const PLATE_SIZE := Vector2(248, 54)
+const TILT := 0.031
+const PADDING_X := 20.0
+const BAR_WIDTH := 16.0
+const BAR_HEIGHT := 8.0
+const BAR_GAP := 5.0
+const BAR_Y := 34.0
+
+var _energy := 0
+
+
+func _ready() -> void:
+	custom_minimum_size = PLATE_SIZE
+	size = PLATE_SIZE
+	pivot_offset = PLATE_SIZE * 0.5
+	rotation = TILT
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	theme = ThemeManager.get_theme()
+	LocalizationManager.locale_changed.connect(_on_locale_changed)
+	queue_redraw()
+
+
+func set_energy(value: int) -> void:
+	_energy = clampi(value, 0, BAR_COUNT)
+	queue_redraw()
+
+
+func _on_locale_changed(_locale: String) -> void:
+	queue_redraw()
+
+
+func _draw() -> void:
+	var w := PLATE_SIZE.x
+	var h := PLATE_SIZE.y
+	var points := PackedVector2Array([
+		Vector2(8, 0),
+		Vector2(w - 16, 0),
+		Vector2(w, 12),
+		Vector2(w, h - 10),
+		Vector2(w - 14, h),
+		Vector2(14, h),
+		Vector2(0, h - 12),
+		Vector2(0, 8),
+	])
+
+	var shadow := PackedVector2Array()
+	for point in points:
+		shadow.append(point + Vector2(2, 3))
+	draw_colored_polygon(shadow, Color(0, 0, 0, 0.35))
+	draw_colored_polygon(points, Color(0.105, 0.11, 0.12, 0.95))
+
+	var outline := PackedVector2Array(points)
+	outline.append(points[0])
+	draw_polyline(outline, Color(0.58, 0.58, 0.57, 0.9), 1.2, true)
+	draw_line(Vector2(18, 1.5), Vector2(w - 22, 1.5), Color(1, 1, 1, 0.07), 1.0)
+	draw_line(Vector2(18, h - 1.5), Vector2(w - 20, h - 1.5), Color(0.38, 0.38, 0.38, 0.35), 1.0)
+
+	var font := UITheme.default_font()
+	var font_size := 17
+	var label := tr("ENERGY_LABEL")
+	draw_string(font, Vector2(PADDING_X, 10 + font.get_ascent(font_size)), label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0.86, 0.85, 0.82))
+
+	for i in BAR_COUNT:
+		var rect := Rect2(Vector2(PADDING_X + i * (BAR_WIDTH + BAR_GAP), BAR_Y), Vector2(BAR_WIDTH, BAR_HEIGHT))
+		draw_rect(rect, Color(0.22, 0.22, 0.23), true, -1.0, true)
+		if i < _energy:
+			draw_rect(rect, Color(0.78, 0.78, 0.75), true, -1.0, true)

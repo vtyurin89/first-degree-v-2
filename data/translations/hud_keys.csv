@@ -23,5 +23,6 @@
 "EPILOGUE_TITLE","FIRST DEGREE","ПЕРВАЯ СТЕПЕНЬ"
 "EPILOGUE_SUBTITLE","End of the vertical slice.","Конец вертикального среза."
 "OFFICE_ENERGY","Energy: %d/%d","Энергия: %d/%d"
+"ENERGY_LABEL","Energy","Энергия"
 "OFFICE_CONTROLS","WASD — move    |    mouse — look    |    E — interact    |    Esc — pause","WASD — движение    |    мышь — обзор    |    E — взаимодействие    |    Esc — пауза"
 "CHAPTER_STATION","Department","Отдел"

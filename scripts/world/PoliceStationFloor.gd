@@ -11,7 +11,7 @@ const DOOR_H := 2.2
 var _ui_layer: CanvasLayer
 var _prompt: Label
 var _toast: Label
-var _energy_label: Label
+var _energy_meter: EnergyMeter
 var _controls_label: Label
 var _toast_tween: Tween
 var _prompt_tween: Tween
@@ -119,8 +119,8 @@ func _on_weller_finished() -> void:
 
 
 func _on_locale_changed(_locale: String) -> void:
-	if _energy_label != null:
-		_energy_label.text = tr("OFFICE_ENERGY") % [GameManager.player_energy, GameManager.MAX_ENERGY]
+	if _energy_meter != null:
+		_energy_meter.set_energy(GameManager.player_energy)
 	if _controls_label != null:
 		_controls_label.text = tr("OFFICE_CONTROLS")
 	if _interactor != null:
@@ -534,13 +534,11 @@ func _build_hud() -> void:
 	_ui_layer.layer = 50
 	add_child(_ui_layer)
 
-	var energy := Label.new()
-	energy.text = tr("OFFICE_ENERGY") % [GameManager.player_energy, GameManager.MAX_ENERGY]
-	energy.theme = ThemeManager.get_theme()
-	energy.theme_type_variation = UITheme.HUD
+	var energy := EnergyMeter.new()
 	energy.position = Vector2(24, 20)
 	_ui_layer.add_child(energy)
-	_energy_label = energy
+	energy.set_energy(GameManager.player_energy)
+	_energy_meter = energy
 	GameManager.energy_changed.connect(_on_energy_changed)
 
 	_prompt = Label.new()
@@ -586,8 +584,8 @@ func _build_hud() -> void:
 
 
 func _on_energy_changed(value: int) -> void:
-	if _energy_label != null:
-		_energy_label.text = tr("OFFICE_ENERGY") % [value, GameManager.MAX_ENERGY]
+	if _energy_meter != null:
+		_energy_meter.set_energy(value)
 
 
 func _show_toast(text: String) -> void:
