@@ -6,55 +6,55 @@
   "track_state": false,
   "nodes": {
     "check_briefing": {"id":"check_briefing","type":"condition","branches":[{"requires":{"flags":["weller_briefing_done"]},"next":"return_intro"}],"next":"weller_1"},
-    "return_intro": {"id":"return_intro","type":"dialogue_line","speaker":"weller","next":"check_case_file","text_key":"DLG_WELLER_RETURN_INTRO"},
+    "return_intro": {"id":"return_intro","type":"dialogue_line","speaker":"weller","next":"check_case_file","text_key":"CH1_DLG_WELLER_RETURN_INTRO"},
     "check_case_file": {"id":"check_case_file","type":"condition","branches":[{"requires":{"has_case_file":true},"next":"last_line_weller"}],"next":"ready_for_questioning_2"},
-    "weller_1": {"id":"weller_1","type":"dialogue_line","speaker":"weller","next":"anna_1","text_key":"DLG_WELLER_1"},
-    "anna_1": {"id":"anna_1","type":"dialogue_line","speaker":"anna","next":"weller_2","text_key":"DLG_WELLER_ANNA_1"},
-    "weller_2": {"id":"weller_2","type":"dialogue_line","speaker":"weller","next":"anna_2","text_key":"DLG_WELLER_2"},
-    "anna_2": {"id":"anna_2","type":"dialogue_line","speaker":"anna","next":"weller_3","text_key":"DLG_WELLER_ANNA_2"},
-    "weller_3": {"id":"weller_3","type":"dialogue_line","speaker":"weller","next":"anna_3","text_key":"DLG_WELLER_3"},
-    "anna_3": {"id":"anna_3","type":"dialogue_line","speaker":"anna","next":"weller_4","text_key":"DLG_WELLER_ANNA_3"},
-    "weller_4": {"id":"weller_4","type":"dialogue_line","speaker":"weller","next":"weller_5","text_key":"DLG_WELLER_4"},
-    "weller_5": {"id":"weller_5","type":"dialogue_line","speaker":"weller","next":"weller_choice_1","text_key":"DLG_WELLER_5"},
+    "weller_1": {"id":"weller_1","type":"dialogue_line","speaker":"weller","next":"anna_1","text_key":"CH1_DLG_WELLER_1"},
+    "anna_1": {"id":"anna_1","type":"dialogue_line","speaker":"anna","next":"weller_2","text_key":"CH1_DLG_WELLER_ANNA_1"},
+    "weller_2": {"id":"weller_2","type":"dialogue_line","speaker":"weller","next":"anna_2","text_key":"CH1_DLG_WELLER_2"},
+    "anna_2": {"id":"anna_2","type":"dialogue_line","speaker":"anna","next":"weller_3","text_key":"CH1_DLG_WELLER_ANNA_2"},
+    "weller_3": {"id":"weller_3","type":"dialogue_line","speaker":"weller","next":"anna_3","text_key":"CH1_DLG_WELLER_3"},
+    "anna_3": {"id":"anna_3","type":"dialogue_line","speaker":"anna","next":"weller_4","text_key":"CH1_DLG_WELLER_ANNA_3"},
+    "weller_4": {"id":"weller_4","type":"dialogue_line","speaker":"weller","next":"weller_5","text_key":"CH1_DLG_WELLER_4"},
+    "weller_5": {"id":"weller_5","type":"dialogue_line","speaker":"weller","next":"weller_choice_1","text_key":"CH1_DLG_WELLER_5"},
     "weller_choice_1": {
       "id": "weller_choice_1",
       "type": "choice_hub",
       "next": "answer_suspect_1",
       "choices": [
-        {"id":"suspect_question","next":"answer_suspect_1","text_key":"DLG_WELLER_CHOICE_SUSPECT_QUESTION"},
-        {"id":"smoke_question","next":"answer_smoke_1","on_select":{"add_flags":["asked_about_smoking"]},"forbidden":{"flags":["asked_about_smoking"]},"text_key":"DLG_WELLER_CHOICE_SMOKE_QUESTION"},
-        {"id":"stench_question","next":"answer_stench_1","on_select":{"add_flags":["asked_about_stench"]},"forbidden":{"flags":["asked_about_stench"]},"text_key":"DLG_WELLER_CHOICE_STENCH_QUESTION"}
+        {"id":"suspect_question","next":"answer_suspect_1","text_key":"CH1_DLG_WELLER_CHOICE_SUSPECT_QUESTION"},
+        {"id":"smoke_question","next":"answer_smoke_1","on_select":{"add_flags":["asked_about_smoking"]},"forbidden":{"flags":["asked_about_smoking"]},"text_key":"CH1_DLG_WELLER_CHOICE_SMOKE_QUESTION"},
+        {"id":"stench_question","next":"answer_stench_1","on_select":{"add_flags":["asked_about_stench"]},"forbidden":{"flags":["asked_about_stench"]},"text_key":"CH1_DLG_WELLER_CHOICE_STENCH_QUESTION"}
       ]
     },
-    "answer_smoke_1": {"id":"answer_smoke_1","type":"dialogue_line","speaker":"weller","next":"answer_smoke_2","text_key":"DLG_WELLER_ANSWER_SMOKE_1"},
-    "answer_smoke_2": {"id":"answer_smoke_2","type":"dialogue_line","speaker":"weller","next":"answer_smoke_3","text_key":"DLG_WELLER_ANSWER_SMOKE_2"},
-    "answer_smoke_3": {"id":"answer_smoke_3","type":"dialogue_line","speaker":"anna","next":"weller_choice_1","text_key":"DLG_WELLER_ANSWER_SMOKE_3"},
-    "answer_stench_1": {"id":"answer_stench_1","type":"dialogue_line","speaker":"weller","next":"answer_stench_2","text_key":"DLG_WELLER_ANSWER_STENCH_1"},
-    "answer_stench_2": {"id":"answer_stench_2","type":"dialogue_line","speaker":"anna","next":"weller_choice_1","text_key":"DLG_WELLER_ANSWER_STENCH_2"},
-    "answer_suspect_1": {"id":"answer_suspect_1","type":"dialogue_line","speaker":"weller","next":"answer_suspect_2","text_key":"DLG_WELLER_ANSWER_SUSPECT_1"},
-    "answer_suspect_2": {"id":"answer_suspect_2","type":"dialogue_line","speaker":"weller","next":"answer_suspect_3","text_key":"DLG_WELLER_ANSWER_SUSPECT_2"},
-    "answer_suspect_3": {"id":"answer_suspect_3","type":"dialogue_line","speaker":"weller","next":"anna_suspect_comment_1","text_key":"DLG_WELLER_ANSWER_SUSPECT_3"},
-    "anna_suspect_comment_1": {"id":"anna_suspect_comment_1","type":"dialogue_line","speaker":"anna","next":"answer_suspect_4","text_key":"DLG_WELLER_ANNA_SUSPECT_COMMENT_1"},
-    "answer_suspect_4": {"id":"answer_suspect_4","type":"dialogue_line","speaker":"weller","next":"ready_for_questioning_1","text_key":"DLG_WELLER_ANSWER_SUSPECT_4"},
-    "ready_for_questioning_1": {"id":"ready_for_questioning_1","type":"dialogue_line","speaker":"weller","next":"check_case_file","text_key":"DLG_WELLER_READY_FOR_QUESTIONING_1"},
-    "ready_for_questioning_2": {"id":"ready_for_questioning_2","type":"dialogue_line","speaker":"weller","next":"ready_for_questioning_3","text_key":"DLG_WELLER_READY_FOR_QUESTIONING_2"},
-    "ready_for_questioning_3": {"id":"ready_for_questioning_3","type":"dialogue_line","speaker":"weller","next":"weller_choice_2","text_key":"DLG_WELLER_READY_FOR_QUESTIONING_3"},
+    "answer_smoke_1": {"id":"answer_smoke_1","type":"dialogue_line","speaker":"weller","next":"answer_smoke_2","text_key":"CH1_DLG_WELLER_ANSWER_SMOKE_1"},
+    "answer_smoke_2": {"id":"answer_smoke_2","type":"dialogue_line","speaker":"weller","next":"answer_smoke_3","text_key":"CH1_DLG_WELLER_ANSWER_SMOKE_2"},
+    "answer_smoke_3": {"id":"answer_smoke_3","type":"dialogue_line","speaker":"anna","next":"weller_choice_1","text_key":"CH1_DLG_WELLER_ANSWER_SMOKE_3"},
+    "answer_stench_1": {"id":"answer_stench_1","type":"dialogue_line","speaker":"weller","next":"answer_stench_2","text_key":"CH1_DLG_WELLER_ANSWER_STENCH_1"},
+    "answer_stench_2": {"id":"answer_stench_2","type":"dialogue_line","speaker":"anna","next":"weller_choice_1","text_key":"CH1_DLG_WELLER_ANSWER_STENCH_2"},
+    "answer_suspect_1": {"id":"answer_suspect_1","type":"dialogue_line","speaker":"weller","next":"answer_suspect_2","text_key":"CH1_DLG_WELLER_ANSWER_SUSPECT_1"},
+    "answer_suspect_2": {"id":"answer_suspect_2","type":"dialogue_line","speaker":"weller","next":"answer_suspect_3","text_key":"CH1_DLG_WELLER_ANSWER_SUSPECT_2"},
+    "answer_suspect_3": {"id":"answer_suspect_3","type":"dialogue_line","speaker":"weller","next":"anna_suspect_comment_1","text_key":"CH1_DLG_WELLER_ANSWER_SUSPECT_3"},
+    "anna_suspect_comment_1": {"id":"anna_suspect_comment_1","type":"dialogue_line","speaker":"anna","next":"answer_suspect_4","text_key":"CH1_DLG_WELLER_ANNA_SUSPECT_COMMENT_1"},
+    "answer_suspect_4": {"id":"answer_suspect_4","type":"dialogue_line","speaker":"weller","next":"ready_for_questioning_1","text_key":"CH1_DLG_WELLER_ANSWER_SUSPECT_4"},
+    "ready_for_questioning_1": {"id":"ready_for_questioning_1","type":"dialogue_line","speaker":"weller","next":"check_case_file","text_key":"CH1_DLG_WELLER_READY_FOR_QUESTIONING_1"},
+    "ready_for_questioning_2": {"id":"ready_for_questioning_2","type":"dialogue_line","speaker":"weller","next":"ready_for_questioning_3","text_key":"CH1_DLG_WELLER_READY_FOR_QUESTIONING_2"},
+    "ready_for_questioning_3": {"id":"ready_for_questioning_3","type":"dialogue_line","speaker":"weller","next":"weller_choice_2","text_key":"CH1_DLG_WELLER_READY_FOR_QUESTIONING_3"},
     "weller_choice_2": {
       "id": "weller_choice_2",
       "type": "choice_hub",
       "next": "weller_choice_3",
-      "choices": [{"id":"ready_1","next":"ready_weller_1","text_key":"DLG_WELLER_CHOICE_READY_1"},{"id":"not_ready_1","next":"not_ready_weller","text_key":"DLG_WELLER_CHOICE_NOT_READY_1"}]
+      "choices": [{"id":"ready_1","next":"ready_weller_1","text_key":"CH1_DLG_WELLER_CHOICE_READY_1"},{"id":"not_ready_1","next":"not_ready_weller","text_key":"CH1_DLG_WELLER_CHOICE_NOT_READY_1"}]
     },
-    "ready_weller_1": {"id":"ready_weller_1","type":"dialogue_line","speaker":"weller","next":"ready_weller_2","text_key":"DLG_WELLER_READY_1"},
-    "ready_weller_2": {"id":"ready_weller_2","type":"dialogue_line","speaker":"weller","next":"weller_choice_3","text_key":"DLG_WELLER_READY_2"},
+    "ready_weller_1": {"id":"ready_weller_1","type":"dialogue_line","speaker":"weller","next":"ready_weller_2","text_key":"CH1_DLG_WELLER_READY_1"},
+    "ready_weller_2": {"id":"ready_weller_2","type":"dialogue_line","speaker":"weller","next":"weller_choice_3","text_key":"CH1_DLG_WELLER_READY_2"},
     "weller_choice_3": {
       "id": "weller_choice_3",
       "type": "choice_hub",
       "next": "last_line_weller",
-      "choices": [{"id":"tank","next":"last_line_weller","text_key":"DLG_WELLER_CHOICE_TANK"},{"id":"velvet","next":"last_line_weller","text_key":"DLG_WELLER_CHOICE_VELVET"}]
+      "choices": [{"id":"tank","next":"last_line_weller","text_key":"CH1_DLG_WELLER_CHOICE_TANK"},{"id":"velvet","next":"last_line_weller","text_key":"CH1_DLG_WELLER_CHOICE_VELVET"}]
     },
-    "last_line_weller": {"id":"last_line_weller","type":"dialogue_line","speaker":"weller","text_key":"DLG_WELLER_LAST_LINE_WELLER"},
-    "not_ready_weller": {"id":"not_ready_weller","type":"dialogue_line","speaker":"weller","text_key":"DLG_WELLER_NOT_READY_WELLER"}
+    "last_line_weller": {"id":"last_line_weller","type":"dialogue_line","speaker":"weller","text_key":"CH1_DLG_WELLER_LAST_LINE_WELLER"},
+    "not_ready_weller": {"id":"not_ready_weller","type":"dialogue_line","speaker":"weller","text_key":"CH1_DLG_WELLER_NOT_READY_WELLER"}
   },
-  "title_key": "DLG_WELLER_TITLE"
+  "title_key": "CH1_DLG_WELLER_TITLE"
 }

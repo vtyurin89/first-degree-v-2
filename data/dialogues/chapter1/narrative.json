@@ -1,31 +1,31 @@
 {
   "prologue": [
-    {"speaker":"anna","internal":true,"pause":1.4,"text_key":"NARR_PROLOGUE_1"},
+    {"speaker":"anna","internal":true,"pause":1.4,"text_key":"CH1_NARR_PROLOGUE_1"},
     {"speaker":"","internal":false,"pause":1.6},
-    {"speaker":"anna","internal":true,"pause":1,"text_key":"NARR_PROLOGUE_3"},
+    {"speaker":"anna","internal":true,"pause":1,"text_key":"CH1_NARR_PROLOGUE_3"},
     {"speaker":"","internal":false,"pause":1.2},
-    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"NARR_PROLOGUE_5"},
-    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"NARR_PROLOGUE_6"},
-    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"NARR_PROLOGUE_7"},
-    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"NARR_PROLOGUE_8"},
+    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"CH1_NARR_PROLOGUE_5"},
+    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"CH1_NARR_PROLOGUE_6"},
+    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"CH1_NARR_PROLOGUE_7"},
+    {"speaker":"anna","internal":true,"pause":0.8,"text_key":"CH1_NARR_PROLOGUE_8"},
     {"speaker":"","internal":false,"pause":1.4},
-    {"speaker":"anna","internal":true,"pause":0.6,"text_key":"NARR_PROLOGUE_10"}
+    {"speaker":"anna","internal":true,"pause":0.6,"text_key":"CH1_NARR_PROLOGUE_10"}
   ],
-  "epilogue": [{"speaker":"weller","internal":false,"pause":0.6,"text_key":"NARR_EPILOGUE_1"},{"speaker":"anna","internal":true,"pause":0.6,"text_key":"NARR_EPILOGUE_2"}],
+  "epilogue": [{"speaker":"weller","internal":false,"pause":0.6,"text_key":"CH1_NARR_EPILOGUE_1"},{"speaker":"anna","internal":true,"pause":0.6,"text_key":"CH1_NARR_EPILOGUE_2"}],
   "office": {
     "flavor": {
-      "window": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_WINDOW_1"}],
-      "water": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_WATER_1"}],
-      "clock": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_CLOCK_1"}],
-      "lockers": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_LOCKERS_1"}],
-      "notice": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_NOTICE_1"}],
-      "duty": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_DUTY_1"}],
-      "vending": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_VENDING_1"}],
-      "sink": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_SINK_1"}],
-      "sofa": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_SOFA_1"}],
-      "int1_table": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_INT1_TABLE_1"}],
-      "int2_table": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_INT2_TABLE_1"}],
-      "fire_escape": [{"speaker":"anna","internal":true,"text_key":"NARR_OFFICE_FIRE_ESCAPE_1"}]
+      "window": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_WINDOW_1"}],
+      "water": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_WATER_1"}],
+      "clock": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_CLOCK_1"}],
+      "lockers": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_LOCKERS_1"}],
+      "notice": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_NOTICE_1"}],
+      "duty": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_DUTY_1"}],
+      "vending": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_VENDING_1"}],
+      "sink": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_SINK_1"}],
+      "sofa": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_SOFA_1"}],
+      "int1_table": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_INT1_TABLE_1"}],
+      "int2_table": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_INT2_TABLE_1"}],
+      "fire_escape": [{"speaker":"anna","internal":true,"text_key":"CH1_NARR_OFFICE_FIRE_ESCAPE_1"}]
     }
   }
 }
