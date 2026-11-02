@@ -213,7 +213,11 @@ func _on_manager_choices(available_choices: Array) -> void:
 	_clear_choices()
 	_hint.text = ""
 	if interrogation_mode and _manager != null:
-		_update_chapter(String(_manager.get_current_node().get("chapter", "")))
+		var node := _manager.get_current_node()
+		var chapter := String(node.get("chapter", ""))
+		if chapter == "" and node.has("chapter_key"):
+			chapter = tr(String(node["chapter_key"]))
+		_update_chapter(chapter)
 	for choice in available_choices:
 		var button := Button.new()
 		button.text = String(choice.get("text", ""))

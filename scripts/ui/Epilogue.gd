@@ -86,7 +86,7 @@ func _display_current() -> void:
 		_end()
 		return
 	var entry: Dictionary = _lines[_index]
-	_text.text = entry.get("text", "")
+	_text.text = LocalizationManager.get_entry_text(entry)
 	_text.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if entry.get("internal", false) else Color(0.92, 0.9, 0.86))
 	_text.visible_characters = 0
 	_accum = 0.0

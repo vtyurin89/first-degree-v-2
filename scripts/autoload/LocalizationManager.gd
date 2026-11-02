@@ -7,6 +7,7 @@ const DEFAULT_LOCALE := "ru"
 const FALLBACK_LOCALE := "en"
 const DATA_ROOT := "res://data"
 const TRANSLATIONS_DIR := "res://data/translations"
+const DIALOGUES_DIR := "res://data/dialogues/chapter1"
 const SETTINGS_PATH := "user://settings.cfg"
 
 var current_locale := DEFAULT_LOCALE
@@ -42,16 +43,15 @@ func _apply_locale(locale: String, emit_signal: bool) -> void:
 
 
 func case_script_path() -> String:
-	return "%s/%s/case1_scolfield.json" % [DATA_ROOT, current_locale]
+	return "%s/scolfield.json" % DIALOGUES_DIR
 
 
 func dialogues_path() -> String:
-	return "%s/%s/case1_dialogues.json" % [DATA_ROOT, current_locale]
+	return "%s/dialogues.json" % DIALOGUES_DIR
 
 
-func narrative_path(locale: String = "") -> String:
-	var loc := locale if locale != "" else current_locale
-	return "%s/%s/narrative.json" % [DATA_ROOT, loc]
+func narrative_path(_locale: String = "") -> String:
+	return "%s/narrative.json" % DIALOGUES_DIR
 
 
 func fallback_locale() -> String:
@@ -91,24 +91,37 @@ func get_office_flavor(interact_id: String) -> Array:
 	return []
 
 
+func get_entry_text(entry: Dictionary) -> String:
+	var key := String(entry.get("text_key", ""))
+	if key != "":
+		return tr(key)
+	return String(entry.get("text", ""))
+
+
 func _load_translations() -> void:
-	var directory := DirAccess.open(TRANSLATIONS_DIR)
-	if directory == null:
-		push_error("[Localization] не найдена директория переводов: %s" % TRANSLATIONS_DIR)
-		return
 	var translations: Dictionary = {}
-	var files := directory.get_files()
-	files.sort()
-	for file in files:
-		if not file.ends_with(".csv"):
-			continue
-		_load_csv_file("%s/%s" % [TRANSLATIONS_DIR, file], translations)
+	_load_csv_directory(TRANSLATIONS_DIR, translations)
 	if translations.is_empty():
 		push_error("[Localization] не найдено ни одного файла переводов в %s" % TRANSLATIONS_DIR)
 		return
 	for locale in translations.keys():
 		TranslationServer.add_translation(translations[locale])
 
+
+func _load_csv_directory(path: String, translations: Dictionary) -> void:
+	var directory := DirAccess.open(path)
+	if directory == null:
+		push_error("[Localization] не найдена директория переводов: %s" % path)
+		return
+	var files := directory.get_files()
+	files.sort()
+	for file in files:
+		if file.ends_with(".csv"):
+			_load_csv_file("%s/%s" % [path, file], translations)
+	var directories := directory.get_directories()
+	directories.sort()
+	for subdirectory in directories:
+		_load_csv_directory("%s/%s" % [path, subdirectory], translations)
 
 func _load_csv_file(path: String, translations: Dictionary) -> void:
 	if not FileAccess.file_exists(path):

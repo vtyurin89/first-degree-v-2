@@ -122,7 +122,11 @@ func _sync_state() -> void:
 	if current_node_id == "":
 		return
 	DialogueStateManager.current_node_id = current_node_id
-	DialogueStateManager.chapter_title = String(current_node.get("chapter", DialogueStateManager.chapter_title))
+	var chapter := String(current_node.get("chapter", ""))
+	if chapter == "" and current_node.has("chapter_key"):
+		chapter = tr(String(current_node["chapter_key"]))
+	if chapter != "":
+		DialogueStateManager.chapter_title = chapter
 	DialogueStateManager.milestone_index = _last_milestone
 	DialogueStateManager.dialogue_active = not _ended
 	var history: Array = []
@@ -256,6 +260,8 @@ func _load_from_dict(data: Dictionary) -> bool:
 		initial_tactics = []
 	case_id = String(data.get("case_id", ""))
 	title = String(data.get("title", ""))
+	if data.has("title_key"):
+		title = tr(String(data["title_key"]))
 	track_state = bool(data.get("track_state", true))
 	reset_energy = bool(data.get("reset_energy", true))
 	return _validate()
@@ -371,10 +377,17 @@ func _resolve_next(node: Dictionary) -> String:
 
 func _emit_line(node_id: String, node: Dictionary) -> void:
 	var text := String(node.get("text", ""))
-	if int(visited_nodes.get(node_id, 0)) > 1 and node.has("text_repeat"):
-		text = String(node["text_repeat"])
+	if node.has("text_key"):
+		text = tr(String(node["text_key"]))
+	if int(visited_nodes.get(node_id, 0)) > 1:
+		if node.has("text_repeat_key"):
+			text = tr(String(node["text_repeat_key"]))
+		elif node.has("text_repeat"):
+			text = String(node["text_repeat"])
 	text = _preprocess(text, node)
 	var metadata: Dictionary = node.duplicate()
+	if node.has("chapter_key"):
+		metadata["chapter"] = tr(String(node["chapter_key"]))
 	metadata["id"] = node_id
 	line_ready.emit(String(node.get("speaker", "")), text, metadata)
 
@@ -416,7 +429,10 @@ func _reach_milestone(index: int) -> void:
 	_reached_milestones[index] = true
 	_last_milestone = index
 	GameManager.set_admissibility("CLEAN")
-	GameManager.mark_milestone(index, String(current_node.get("milestone_name", "")))
+	var milestone_name := String(current_node.get("milestone_name", ""))
+	if milestone_name == "" and current_node.has("milestone_name_key"):
+		milestone_name = tr(String(current_node["milestone_name_key"]))
+	GameManager.mark_milestone(index, milestone_name)
 	milestone_reached.emit(index)
 	_sync_state()
 
@@ -436,9 +452,12 @@ func _filter_choices(node_id: String, node: Dictionary) -> Array:
 		var forbidden = choice.get("forbidden", {})
 		if forbidden is Dictionary and not forbidden.is_empty() and _predicate_passes(forbidden):
 			continue
+		var choice_text := String(choice.get("text", ""))
+		if choice.has("text_key"):
+			choice_text = tr(String(choice["text_key"]))
 		result.append({
 			"id": choice_id,
-			"text": String(choice.get("text", "")),
+			"text": choice_text,
 			"next": String(choice.get("next", "")),
 		})
 	return result

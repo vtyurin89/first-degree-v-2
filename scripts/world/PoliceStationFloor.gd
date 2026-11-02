@@ -467,7 +467,7 @@ func _flavor_sequence(interact_id: String) -> Array:
 func _flavor_line(entry: Dictionary) -> DialogueLine:
 	var line := DialogueLine.new()
 	line.speaker = entry.get("speaker", "")
-	line.text = entry.get("text", "")
+	line.text = LocalizationManager.get_entry_text(entry)
 	line.internal_thought = entry.get("internal", false)
 	return line
 

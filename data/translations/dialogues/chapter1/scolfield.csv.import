@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bhjotwtyqmwpp"
+
+[deps]
+
+files=["res://data/translations/dialogues/chapter1/scolfield.en.translation", "res://data/translations/dialogues/chapter1/scolfield.ru.translation"]
+
+source_file="res://data/translations/dialogues/chapter1/scolfield.csv"
+dest_files=["res://data/translations/dialogues/chapter1/scolfield.en.translation", "res://data/translations/dialogues/chapter1/scolfield.ru.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

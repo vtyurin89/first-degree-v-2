@@ -1,0 +1,190 @@
+{
+  "case_id": "CASE_1_SCOLFIELD",
+  "start_node": "p1_intro",
+  "max_energy": 10,
+  "initial_tactics": ["good_guy_monster","appeal_to_honor"],
+  "palette": {"clue":"#ffd76a","trait":"#7ad0ff","confession":"#ffd23f","flavor":"#c8c8c8"},
+  "nodes": {
+    "p1_intro": {"id":"p1_intro","type":"dialogue_line","speaker":"scolfield","next":"p1_hub","chapter_key":"DLG_SCOLFIELD_CHAPTER_1","text_key":"DLG_SCOLFIELD_P1_INTRO"},
+    "p1_hub": {
+      "id": "p1_hub",
+      "type": "choice_hub",
+      "next": "p2_intro",
+      "choices": [
+        {"id":"probe_army","next":"p1_army_1","once":true,"text_key":"DLG_SCOLFIELD_CHOICE_P1_HUB_PROBE_ARMY"},
+        {"id":"probe_feelings","next":"p1_feel_1","once":true,"text_key":"DLG_SCOLFIELD_CHOICE_P1_HUB_PROBE_FEELINGS"},
+        {"id":"continue_p1","next":"p2_intro","text_key":"DLG_SCOLFIELD_CHOICE_P1_HUB_CONTINUE_P1"}
+      ],
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_1"
+    },
+    "p1_army_1": {"id":"p1_army_1","type":"dialogue_line","speaker":"anna","next":"p1_army_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_1","text_key":"DLG_SCOLFIELD_P1_ARMY_1"},
+    "p1_army_2": {
+      "id": "p1_army_2",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "meta": {"clue_army":{"kind":"trait","trait":"NARCISSISM","clue_id":"narcissism_revealed","energy_cost":0}},
+      "next": "p1_army_3",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_1",
+      "text_key": "DLG_SCOLFIELD_P1_ARMY_2"
+    },
+    "p1_army_3": {"id":"p1_army_3","type":"dialogue_line","speaker":"anna","internal":true,"next":"@back","chapter_key":"DLG_SCOLFIELD_CHAPTER_1","text_key":"DLG_SCOLFIELD_P1_ARMY_3"},
+    "p1_feel_1": {"id":"p1_feel_1","type":"dialogue_line","speaker":"anna","next":"p1_feel_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_1","text_key":"DLG_SCOLFIELD_P1_FEEL_1"},
+    "p1_feel_2": {"id":"p1_feel_2","type":"dialogue_line","speaker":"scolfield","next":"@back","chapter_key":"DLG_SCOLFIELD_CHAPTER_1","text_key":"DLG_SCOLFIELD_P1_FEEL_2"},
+    "p2_intro": {"id":"p2_intro","type":"dialogue_line","speaker":"anna","next":"p2_pool","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_INTRO"},
+    "p2_pool": {
+      "id": "p2_pool",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "meta": {"junk_concrete":{"kind":"flavor","energy_cost":0},"clue_schedule":{"kind":"clue","clue_id":"victim_pool_habit","energy_cost":0}},
+      "next": "p2_knew",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_2",
+      "text_key": "DLG_SCOLFIELD_P2_POOL"
+    },
+    "p2_knew": {"id":"p2_knew","type":"dialogue_line","speaker":"anna","next":"p2_what","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_KNEW"},
+    "p2_what": {"id":"p2_what","type":"dialogue_line","speaker":"scolfield","next":"p2_camera","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_WHAT"},
+    "p2_camera": {"id":"p2_camera","type":"dialogue_line","speaker":"anna","next":"p2_camreply","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_CAMERA"},
+    "p2_camreply": {"id":"p2_camreply","type":"dialogue_line","speaker":"scolfield","next":"p2_observed","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_CAMREPLY"},
+    "p2_observed": {"id":"p2_observed","type":"dialogue_line","speaker":"anna","next":"p2_why","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_OBSERVED"},
+    "p2_why": {"id":"p2_why","type":"dialogue_line","speaker":"scolfield","next":"p2_hub","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_WHY"},
+    "p2_hub": {
+      "id": "p2_hub",
+      "type": "choice_hub",
+      "next": "p2_tactic_1",
+      "choices": [
+        {"id":"good_guy_monster","next":"p2_tactic_1","requires":{"tactics":["good_guy_monster"]},"text_key":"DLG_SCOLFIELD_CHOICE_P2_HUB_GOOD_GUY_MONSTER"},
+        {
+          "id": "flatter_service",
+          "next": "p2_flatter_1",
+          "once": true,
+          "requires": {"traits":["NARCISSISM"]},
+          "on_select": {"add_flags":["flattered_scolfield"]},
+          "text_key": "DLG_SCOLFIELD_CHOICE_P2_HUB_FLATTER_SERVICE"
+        },
+        {
+          "id": "threaten",
+          "next": "p2_threat_1",
+          "once": true,
+          "requires": {"attorney_max":30},
+          "on_select": {"modify_attorney_risk":35,"add_flags":["threatened_scolfield"]},
+          "text_key": "DLG_SCOLFIELD_CHOICE_P2_HUB_THREATEN"
+        }
+      ],
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_2"
+    },
+    "p2_flatter_1": {"id":"p2_flatter_1","type":"dialogue_line","speaker":"anna","next":"p2_flatter_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_FLATTER_1"},
+    "p2_flatter_2": {"id":"p2_flatter_2","type":"dialogue_line","speaker":"scolfield","next":"@back","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_FLATTER_2"},
+    "p2_threat_1": {"id":"p2_threat_1","type":"dialogue_line","speaker":"anna","next":"p2_threat_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_THREAT_1"},
+    "p2_threat_2": {"id":"p2_threat_2","type":"dialogue_line","speaker":"scolfield","next":"@back","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_THREAT_2"},
+    "p2_tactic_1": {"id":"p2_tactic_1","type":"dialogue_line","speaker":"anna","next":"p2_tactic_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_TACTIC_1"},
+    "p2_tactic_2": {
+      "id": "p2_tactic_2",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "target_confession": "confession_tampering",
+      "milestone": 1,
+      "meta": {"confession_tampering":{"kind":"confession","energy_cost":0}},
+      "next": "p2_internal",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_2",
+      "milestone_name_key": "DLG_SCOLFIELD_MILESTONE_1",
+      "text_key": "DLG_SCOLFIELD_P2_TACTIC_2"
+    },
+    "p2_internal": {"id":"p2_internal","type":"dialogue_line","speaker":"anna","internal":true,"next":"p3_intro","chapter_key":"DLG_SCOLFIELD_CHAPTER_2","text_key":"DLG_SCOLFIELD_P2_INTERNAL"},
+    "p3_intro": {"id":"p3_intro","type":"dialogue_line","speaker":"anna","next":"p3_slip","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_INTRO"},
+    "p3_slip": {
+      "id": "p3_slip",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "meta": {"clue_slip":{"kind":"clue","clue_id":"medical_discrepancy","tactic":"present_forensics","energy_cost":0}},
+      "next": "p3_forensics_hub",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_3",
+      "text_key": "DLG_SCOLFIELD_P3_SLIP"
+    },
+    "p3_forensics_hub": {
+      "id": "p3_forensics_hub",
+      "type": "choice_hub",
+      "next": "p3_honor_hub",
+      "choices": [
+        {
+          "id": "present_forensics",
+          "next": "p3_forensics_1",
+          "requires": {"tactics":["present_forensics"],"clues":["medical_discrepancy"]},
+          "text_key": "DLG_SCOLFIELD_CHOICE_P3_FORENSICS_HUB_PRESENT_FORENSICS"
+        }
+      ],
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_3"
+    },
+    "p3_forensics_1": {"id":"p3_forensics_1","type":"dialogue_line","speaker":"anna","next":"p3_forensics_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_FORENSICS_1"},
+    "p3_forensics_2": {"id":"p3_forensics_2","type":"dialogue_line","speaker":"scolfield","next":"p3_forensics_3","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_FORENSICS_2"},
+    "p3_forensics_3": {"id":"p3_forensics_3","type":"dialogue_line","speaker":"anna","next":"p3_honor_hub","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_FORENSICS_3"},
+    "p3_honor_hub": {
+      "id": "p3_honor_hub",
+      "type": "choice_hub",
+      "next": "p3_honor_1",
+      "choices": [{"id":"appeal_to_honor","next":"p3_honor_1","requires":{"tactics":["appeal_to_honor"]},"text_key":"DLG_SCOLFIELD_CHOICE_P3_HONOR_HUB_APPEAL_TO_HONOR"}],
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_3"
+    },
+    "p3_honor_1": {"id":"p3_honor_1","type":"dialogue_line","speaker":"anna","next":"p3_honor_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_HONOR_1"},
+    "p3_honor_2": {
+      "id": "p3_honor_2",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "target_confession": "confession_manslaughter",
+      "milestone": 2,
+      "meta": {"confession_manslaughter":{"kind":"confession","energy_cost":0}},
+      "next": "p3_internal",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_3",
+      "milestone_name_key": "DLG_SCOLFIELD_MILESTONE_2",
+      "text_key": "DLG_SCOLFIELD_P3_HONOR_2"
+    },
+    "p3_internal": {"id":"p3_internal","type":"dialogue_line","speaker":"anna","internal":true,"next":"p4_intro","chapter_key":"DLG_SCOLFIELD_CHAPTER_3","text_key":"DLG_SCOLFIELD_P3_INTERNAL"},
+    "p4_intro": {"id":"p4_intro","type":"dialogue_line","speaker":"anna","next":"p4_history","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_INTRO"},
+    "p4_history": {"id":"p4_history","type":"dialogue_line","speaker":"scolfield","next":"p4_threat","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_HISTORY"},
+    "p4_threat": {"id":"p4_threat","type":"dialogue_line","speaker":"anna","next":"p4_defense","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_THREAT"},
+    "p4_defense": {
+      "id": "p4_defense",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "meta": {"clue_defense_trap":{"kind":"clue","clue_id":"premature_defense","tactic":"direct_confrontation","energy_cost":0}},
+      "next": "p4_why",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_4",
+      "text_key": "DLG_SCOLFIELD_P4_DEFENSE"
+    },
+    "p4_why": {"id":"p4_why","type":"dialogue_line","speaker":"anna","next":"p4_monster","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_WHY"},
+    "p4_monster": {"id":"p4_monster","type":"dialogue_line","speaker":"scolfield","next":"p4_hub","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_MONSTER"},
+    "p4_hub": {
+      "id": "p4_hub",
+      "type": "choice_hub",
+      "next": "p4_force_1",
+      "choices": [{"id":"direct_confrontation","next":"p4_confront_1","requires":{"tactics":["direct_confrontation"],"clues":["premature_defense"]},"text_key":"DLG_SCOLFIELD_CHOICE_P4_HUB_DIRECT_CONFRONTATION"}],
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_4"
+    },
+    "p4_confront_1": {"id":"p4_confront_1","type":"dialogue_line","speaker":"anna","next":"p4_confront_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_CONFRONT_1"},
+    "p4_confront_2": {
+      "id": "p4_confront_2",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "target_confession": "confession_premeditation",
+      "milestone": 3,
+      "meta": {"confession_premeditation":{"kind":"confession","energy_cost":0}},
+      "next": "p4_final",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_4",
+      "milestone_name_key": "DLG_SCOLFIELD_MILESTONE_3",
+      "text_key": "DLG_SCOLFIELD_P4_CONFRONT_2"
+    },
+    "p4_force_1": {"id":"p4_force_1","type":"dialogue_line","speaker":"anna","next":"p4_force_2","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_FORCE_1"},
+    "p4_force_2": {
+      "id": "p4_force_2",
+      "type": "dialogue_line",
+      "speaker": "scolfield",
+      "target_confession": "confession_premeditation",
+      "milestone": 3,
+      "meta": {"confession_premeditation":{"kind":"confession","energy_cost":0}},
+      "next": "p4_final",
+      "chapter_key": "DLG_SCOLFIELD_CHAPTER_4",
+      "milestone_name_key": "DLG_SCOLFIELD_MILESTONE_3",
+      "text_key": "DLG_SCOLFIELD_P4_FORCE_2"
+    },
+    "p4_final": {"id":"p4_final","type":"dialogue_line","speaker":"anna","internal":true,"next":"","chapter_key":"DLG_SCOLFIELD_CHAPTER_4","text_key":"DLG_SCOLFIELD_P4_FINAL"}
+  },
+  "title_key": "DLG_SCOLFIELD_TITLE"
+}

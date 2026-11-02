@@ -91,7 +91,7 @@ func _display_current() -> void:
 		_end()
 		return
 	var entry: Dictionary = _lines[_index]
-	var body: String = entry.get("text", "")
+	var body: String = LocalizationManager.get_entry_text(entry)
 	if body == "":
 		_text.text = ""
 		_typing = false
