@@ -229,8 +229,8 @@ func _open_reading() -> void:
 		_reading_title.text = tr("ITEM_CASE_FILE")
 		_reading_body.text = tr("DOCUMENT_MISSING")
 	else:
-		_reading_title.text = document.title
-		_reading_body.text = document.body
+		_reading_title.text = document.get_title()
+		_reading_body.text = document.get_body()
 	_reading_hint.text = tr("READ_CLOSE_HINT")
 	_reading_overlay.visible = true
 

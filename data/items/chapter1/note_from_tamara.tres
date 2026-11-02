@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_wd")
 id = "note_from_tamara"
-title = "Note — Tamara"
-body = "'He never hit Greg in front of me. But Greg was afraid to be alone with him. I thought it would pass. I thought I could fix it. Forgive me.'"
+title_key = "DOC_NOTE_FROM_TAMARA_TITLE"
+body_key = "DOC_NOTE_FROM_TAMARA_BODY"
 kind = "note"
-author = "Tamara"
+author_key = "DOC_NOTE_FROM_TAMARA_AUTHOR"
 date = ""

@@ -6,7 +6,7 @@ const SUPPORTED_LOCALES := ["ru", "en"]
 const DEFAULT_LOCALE := "ru"
 const FALLBACK_LOCALE := "en"
 const DATA_ROOT := "res://data"
-const CSV_PATH := "res://data/translations.csv"
+const TRANSLATIONS_DIR := "res://data/translations"
 const SETTINGS_PATH := "user://settings.cfg"
 
 var current_locale := DEFAULT_LOCALE
@@ -54,11 +54,6 @@ func narrative_path(locale: String = "") -> String:
 	return "%s/%s/narrative.json" % [DATA_ROOT, loc]
 
 
-func document_path(id: String, locale: String = "") -> String:
-	var loc := locale if locale != "" else current_locale
-	return "%s/items/%s/%s.tres" % [DATA_ROOT, loc, id]
-
-
 func fallback_locale() -> String:
 	return FALLBACK_LOCALE if current_locale != FALLBACK_LOCALE else "ru"
 
@@ -97,25 +92,44 @@ func get_office_flavor(interact_id: String) -> Array:
 
 
 func _load_translations() -> void:
-	if not FileAccess.file_exists(CSV_PATH):
-		push_error("[Localization] Не найден translations.csv: %s" % CSV_PATH)
+	var directory := DirAccess.open(TRANSLATIONS_DIR)
+	if directory == null:
+		push_error("[Localization] не найдена директория переводов: %s" % TRANSLATIONS_DIR)
 		return
-	var text := FileAccess.get_file_as_string(CSV_PATH).replace("\r", "")
+	var translations: Dictionary = {}
+	var files := directory.get_files()
+	files.sort()
+	for file in files:
+		if not file.ends_with(".csv"):
+			continue
+		_load_csv_file("%s/%s" % [TRANSLATIONS_DIR, file], translations)
+	if translations.is_empty():
+		push_error("[Localization] не найдено ни одного файла переводов в %s" % TRANSLATIONS_DIR)
+		return
+	for locale in translations.keys():
+		TranslationServer.add_translation(translations[locale])
+
+
+func _load_csv_file(path: String, translations: Dictionary) -> void:
+	if not FileAccess.file_exists(path):
+		push_error("[Localization] не найден файл переводов: %s" % path)
+		return
+	var text := FileAccess.get_file_as_string(path).replace("\r", "")
 	var lines := text.split("\n", false)
 	if lines.is_empty():
 		return
 	var header := _parse_csv_line(lines[0])
 	if header.size() < 2:
-		push_error("[Localization] Некорректный заголовок translations.csv")
+		push_error("[Localization] некорректный заголовок CSV: %s" % path)
 		return
-	var translations: Dictionary = {}
 	for index in range(1, header.size()):
 		var locale := header[index].strip_edges()
 		if locale == "":
 			continue
-		var translation := Translation.new()
-		translation.locale = locale
-		translations[locale] = translation
+		if not translations.has(locale):
+			var translation := Translation.new()
+			translation.locale = locale
+			translations[locale] = translation
 	for line_index in range(1, lines.size()):
 		var line := lines[line_index]
 		if line.strip_edges() == "":
@@ -134,9 +148,6 @@ func _load_translations() -> void:
 			if index < fields.size():
 				value = fields[index]
 			translations[locale].add_message(key, value)
-	for loc in translations.keys():
-		TranslationServer.add_translation(translations[loc])
-
 
 func _parse_csv_line(line: String) -> PackedStringArray:
 	var fields := PackedStringArray()

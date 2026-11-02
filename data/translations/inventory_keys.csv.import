@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d03e6w4ndn5qs"
+
+[deps]
+
+files=["res://data/translations/inventory_keys.en.translation", "res://data/translations/inventory_keys.ru.translation"]
+
+source_file="res://data/translations/inventory_keys.csv"
+dest_files=["res://data/translations/inventory_keys.en.translation", "res://data/translations/inventory_keys.ru.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

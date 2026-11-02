@@ -269,12 +269,7 @@ func _build_anna_office() -> void:
 	_make_box(Vector3(0.55, 0.55, 0.04), Vector3(-9.0, 2.2, 7.68), _mat_paper, false)
 	_make_box(Vector3(0.32, 1.25, 0.5), Vector3(-6.9, 0.625, 7.2), _mat_wood)
 
-	var weller := Sprite3D.new()
-	weller.texture = _make_char_texture(Color(0.28, 0.38, 0.52))
-	weller.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	weller.pixel_size = 0.021
-	weller.position = Vector3(-8.2, 1.0, 6.0)
-	add_child(weller)
+	_add_character_sprite("weller", Vector3(-8.2, 0.0, 6.0))
 
 
 func _build_breakroom() -> void:
@@ -444,18 +439,20 @@ func _build_interactables() -> void:
 		add_child(pickup)
 
 
-func _document_sequence(id: String) -> Array:
+func _document_sequence(id: String, chapter: String = "chapter1") -> Array:
 	var lines: Array[DialogueLine] = []
-	var document := DocumentLibrary.load_document(id)
+	var document := DocumentLibrary.load_document(id, chapter)
 	if document == null:
 		lines.append(_flavor_line({"speaker": "", "text": tr("DOCUMENT_MISSING"), "internal": false}))
 		return lines
-	var paragraphs := document.body.split("\n\n", false)
+	var title := document.get_title()
+	var body := document.get_body()
+	var paragraphs := body.split("\n\n", false)
 	if paragraphs.is_empty():
-		lines.append(_flavor_line({"speaker": document.title, "text": document.body}))
+		lines.append(_flavor_line({"speaker": title, "text": body}))
 	else:
 		for paragraph in paragraphs:
-			lines.append(_flavor_line({"speaker": document.title, "text": String(paragraph)}))
+			lines.append(_flavor_line({"speaker": title, "text": String(paragraph)}))
 	return lines
 
 
@@ -935,6 +932,18 @@ func _make_concrete_texture() -> ImageTexture:
 			var value := (noise.get_noise_2d(float(x), float(y)) + 1.0) * 0.5
 			img.set_pixel(x, y, base.lerp(Color(0.3, 0.3, 0.29), value))
 	return ImageTexture.create_from_image(img)
+
+
+func _add_character_sprite(character_id: String, ground_position: Vector3) -> void:
+	var character := CharacterDatabase.get_character(character_id)
+	if character == null:
+		return
+	var sprite := Sprite3D.new()
+	sprite.texture = character.sprite_texture if character.sprite_texture != null else _make_char_texture(character.sprite_color)
+	sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	sprite.pixel_size = character.sprite_pixel_size
+	sprite.position = ground_position + Vector3(0, character.sprite_ground_offset, 0)
+	add_child(sprite)
 
 
 func _make_char_texture(base: Color) -> ImageTexture:

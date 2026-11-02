@@ -1,0 +1,23 @@
+[gd_resource type="Resource" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/CharacterData.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/portraits/anna_neutral.svg" id="2_neutral"]
+[ext_resource type="Texture2D" path="res://assets/portraits/anna_serious.svg" id="3_serious"]
+[ext_resource type="Texture2D" path="res://assets/sprites/anna.svg" id="4_sprite"]
+
+[resource]
+script = ExtResource("1_data")
+id = "anna"
+name_key = "CHARACTER_ANNA_NAME"
+full_name_key = "CHARACTER_ANNA_FULL_NAME"
+role_key = "CHARACTER_ANNA_ROLE"
+name_color = Color(0.52, 0.32, 0.48, 1)
+default_portrait = ExtResource("2_neutral")
+portraits = {
+"neutral": ExtResource("2_neutral"),
+"serious": ExtResource("3_serious")
+}
+sprite_texture = ExtResource("4_sprite")
+sprite_color = Color(0.52, 0.32, 0.48, 1)
+sprite_pixel_size = 0.021
+sprite_ground_offset = 1.0

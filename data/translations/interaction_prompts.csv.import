@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dfexku4od7hx4"
+
+[deps]
+
+files=["res://data/translations/interaction_prompts.en.translation", "res://data/translations/interaction_prompts.ru.translation"]
+
+source_file="res://data/translations/interaction_prompts.csv"
+dest_files=["res://data/translations/interaction_prompts.en.translation", "res://data/translations/interaction_prompts.ru.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

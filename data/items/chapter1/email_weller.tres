@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/WorldDocument.gd" id="1_wd"]
+
+[resource]
+script = ExtResource("1_wd")
+id = "email_weller"
+title_key = "DOC_EMAIL_WELLER_TITLE"
+body_key = "DOC_EMAIL_WELLER_BODY"
+kind = "email"
+author_key = "CHARACTER_WELLER_FULL_NAME"
+date = ""

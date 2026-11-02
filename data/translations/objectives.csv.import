@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ckt4fdju7rr2o"
+
+[deps]
+
+files=["res://data/translations/objectives.en.translation", "res://data/translations/objectives.ru.translation"]
+
+source_file="res://data/translations/objectives.csv"
+dest_files=["res://data/translations/objectives.en.translation", "res://data/translations/objectives.ru.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
