@@ -437,6 +437,11 @@ func _build_interactables() -> void:
 		pickup.name = "CaseFilePickup"
 		pickup.position = Vector3(-8.4, 0.82, 4.95)
 		add_child(pickup)
+	if not GameManager.has_flag(MentholGumPickup.FLAG_TAKEN):
+		var gum := MentholGumPickup.new()
+		gum.name = "MentholGumPickup"
+		gum.position = Vector3(-9.15, 0.8, 5.38)
+		add_child(gum)
 
 
 func _document_sequence(id: String, chapter: String = "chapter1") -> Array:
