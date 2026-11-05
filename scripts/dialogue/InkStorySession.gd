@@ -175,10 +175,10 @@ func _parse_tags(tags: Array) -> Dictionary:
 
 
 func _localized(id: String, fallback: String) -> String:
-	if id == "":
+	if id == "" or LocalizationManager.current_locale == "ru":
 		return fallback
 	var translated := tr(id)
-	if translated == id:
+	if translated == id or translated.is_empty():
 		return fallback
 	return translated
 

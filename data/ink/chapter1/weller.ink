@@ -35,7 +35,7 @@ EXTERNAL add_flag(flag)
 -> anna_3
 
 === anna_3 ===
-Дай угадаю. Его бы на хер уволили. А все вокруг вздохнули бы с облегчением. # speaker: anna # id: CH1_DLG_WELLER_ANNA_3
+Дай угадаю. Его бы к чертям уволили. А все вокруг вздохнули бы с облегчением. # speaker: anna # id: CH1_DLG_WELLER_ANNA_3
 -> weller_4
 
 === weller_4 ===
@@ -166,3 +166,7 @@ EXTERNAL add_flag(flag)
     
 === function has_case_file() ===
     ~ return true
+    
+=== function add_flag(flag) ===
+    // Пустая заглушка, чтобы Inky не падал при выборе вариантов
+    ~ return
