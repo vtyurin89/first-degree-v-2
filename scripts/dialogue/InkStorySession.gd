@@ -2,7 +2,7 @@ extends DialogueManager
 class_name InkStorySession
 
 const META_CONFIG := {
-	"clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0},
+	"clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0, "flags": ["found_medals_display"]},
 	"junk_concrete": {"kind": "flavor", "energy_cost": 0},
 	"clue_schedule": {"kind": "clue", "clue_id": "victim_pool_habit", "energy_cost": 0},
 	"confession_tampering": {"kind": "confession", "energy_cost": 0},
@@ -18,6 +18,8 @@ const META_COLORS := {
 	"confession": "#ffd23f",
 	"flavor": "#c8c8c8",
 }
+
+var current_suspect_id := "scolfield"
 
 var _story: InkStory
 var _path := ""
@@ -302,6 +304,8 @@ func _bind_externals() -> void:
 	_story.bind_external_function("has_flag", self, "_ink_has_flag", true)
 	_story.bind_external_function("has_case_file", self, "_ink_has_case_file", true)
 	_story.bind_external_function("has_trait", self, "_ink_has_trait", true)
+	_story.bind_external_function("has_confirmed_trait", self, "_ink_has_confirmed_trait", true)
+	_story.bind_external_function("has_suspected_trait", self, "_ink_has_suspected_trait", true)
 	_story.bind_external_function("has_tactic", self, "_ink_has_tactic", true)
 	_story.bind_external_function("has_clue", self, "_ink_has_clue", true)
 	_story.bind_external_function("get_attorney_risk", self, "_ink_get_attorney_risk", true)
@@ -318,7 +322,15 @@ func _ink_has_case_file() -> bool:
 
 
 func _ink_has_trait(trait_name: String) -> bool:
-	return GameManager.unlocked_traits.has(trait_name)
+	return SuspectProfileManager.has_trait_at_least(current_suspect_id, trait_name, TraitStatus.Level.SUSPECTED)
+
+
+func _ink_has_confirmed_trait(trait_name: String) -> bool:
+	return SuspectProfileManager.is_trait_confirmed(current_suspect_id, trait_name)
+
+
+func _ink_has_suspected_trait(trait_name: String) -> bool:
+	return SuspectProfileManager.has_trait_at_least(current_suspect_id, trait_name, TraitStatus.Level.SUSPECTED)
 
 
 func _ink_has_tactic(tactic_id: String) -> bool:

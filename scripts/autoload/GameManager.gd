@@ -77,6 +77,7 @@ func reset_run() -> void:
 	completed_milestones.clear()
 	clicked_urls.clear()
 	flags.clear()
+	SuspectProfileManager.reset_all()
 	DialogueStateManager.reset_all()
 	ObjectiveManager.reset_to_defaults()
 	cigarettes_changed.emit(cigarettes)
@@ -101,6 +102,7 @@ func capture_state() -> Dictionary:
 		"completed_milestones": completed_milestones.duplicate(),
 		"clicked_urls": clicked_urls.duplicate(true),
 		"flags": flags.duplicate(true),
+		"suspect_profiles": SuspectProfileManager.snapshot(),
 	}
 
 
@@ -135,6 +137,13 @@ func restore_state(data: Dictionary) -> void:
 		flags = flags_data.duplicate(true)
 	else:
 		flags = {}
+	var profiles = data.get("suspect_profiles", {})
+	if profiles is Dictionary:
+		SuspectProfileManager.restore(profiles)
+	else:
+		SuspectProfileManager.restore({})
+	for flag in flags.keys():
+		SuspectProfileManager.register_flag(String(flag))
 	var restored_state := int(data.get("current_state", GameState.EXPLORATION_3D))
 	if restored_state == GameState.PAUSED or restored_state == GameState.MAIN_MENU or restored_state == GameState.INVENTORY:
 		restored_state = GameState.EXPLORATION_3D

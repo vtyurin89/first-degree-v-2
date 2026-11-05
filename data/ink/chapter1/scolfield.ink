@@ -1,5 +1,7 @@
 EXTERNAL has_flag(flag)
 EXTERNAL has_trait(trait)
+EXTERNAL has_confirmed_trait(trait)
+EXTERNAL has_suspected_trait(trait)
 EXTERNAL has_tactic(tactic)
 EXTERNAL has_clue(clue)
 EXTERNAL get_attorney_risk()
@@ -209,3 +211,25 @@ EXTERNAL modify_attorney_risk(delta)
 === p4_final ===
 Третий кирпичик. Убийство первой степени. Он сядет до конца жизни. Я должна чувствовать облегчение. Я не чувствую ничего. # speaker: anna # chapter: CH1_DLG_SCOLFIELD_CHAPTER_4 # internal: true # id: CH1_DLG_SCOLFIELD_P4_FINAL
 -> END
+
+=== function has_flag(flag) ===
+    ~ return false
+
+=== function has_trait(trait) ===
+    // Для тестов в Inky можно временно возвращать true
+    ~ return true
+
+=== function has_tactic(tactic) ===
+    ~ return true
+
+=== function has_clue(clue) ===
+    ~ return true
+
+=== function get_attorney_risk() ===
+    ~ return 0
+
+=== function add_flag(flag) ===
+    ~ return
+
+=== function modify_attorney_risk(delta) ===
+    ~ return
