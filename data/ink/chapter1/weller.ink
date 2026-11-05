@@ -181,7 +181,7 @@ EXTERNAL add_flag(flag)
 === function has_flag(flag) ===
     // Проверяем, совпадает ли переданный флаг с нужным нам
     { flag == "weller_briefing_done":
-        ~ return true
+        ~ return false
     }
     // Если условие выше не сработало, код идёт дальше и возвращает false
     ~ return false

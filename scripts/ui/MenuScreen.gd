@@ -167,7 +167,7 @@ func _rebuild_items() -> void:
 
 func _style_item(button: Button) -> void:
 	var normal := _item_box(Color(0, 0, 0, 0))
-	var hover := _item_box(UIPalette.SELECTED_BG)
+	var hover := _item_box(Color(0, 0, 0, 0))
 	var pressed := _item_box(UIPalette.SELECTED_BG.darkened(0.1))
 	var focus := _item_box(UIPalette.SELECTED_BG)
 
@@ -176,9 +176,19 @@ func _style_item(button: Button) -> void:
 	button.add_theme_stylebox_override("pressed", pressed)
 	button.add_theme_stylebox_override("focus", focus)
 	button.add_theme_color_override("font_color", UIPalette.TEXT)
-	button.add_theme_color_override("font_hover_color", UIPalette.SELECTED_TEXT)
+	button.add_theme_color_override("font_hover_color", UIPalette.TEXT)
 	button.add_theme_color_override("font_pressed_color", UIPalette.SELECTED_TEXT)
 	button.add_theme_color_override("font_focus_color", UIPalette.SELECTED_TEXT)
+	# Godot draws the hover style under the pointer even when the focus moved
+	# elsewhere with the keyboard, which lit up two items at once. Hovering still
+	# grabs focus, so only the focused item gets the highlighted hover look.
+	button.focus_entered.connect(_set_item_hovered.bind(button, true))
+	button.focus_exited.connect(_set_item_hovered.bind(button, false))
+
+
+func _set_item_hovered(button: Button, hovered: bool) -> void:
+	button.add_theme_stylebox_override("hover", _item_box(UIPalette.SELECTED_BG if hovered else Color(0, 0, 0, 0)))
+	button.add_theme_color_override("font_hover_color", UIPalette.SELECTED_TEXT if hovered else UIPalette.TEXT)
 
 
 func _item_box(bg: Color) -> StyleBoxFlat:
