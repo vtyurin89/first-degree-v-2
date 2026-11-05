@@ -50,7 +50,6 @@ func _ready() -> void:
 
 	_lines = Case1Scolfield.get_prologue()
 	_next_line()
-	gui_input.connect(_on_gui_input)
 	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
@@ -60,11 +59,6 @@ func _on_locale_changed(_locale: String) -> void:
 	_lines = Case1Scolfield.get_prologue()
 	if _index >= 0 and _index < _lines.size():
 		_display_current()
-
-
-func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_on_advance()
 
 
 func _process(delta: float) -> void:
@@ -135,8 +129,6 @@ func _on_advance() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	var advance := event.is_action_pressed("advance")
-	var clicked: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
-	if advance or clicked:
+	if event.is_action_pressed("advance"):
 		_on_advance()
 		get_viewport().set_input_as_handled()

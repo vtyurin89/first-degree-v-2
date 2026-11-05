@@ -160,7 +160,7 @@ func _build() -> void:
 	_add_control_row("WASD / ARROWS", "CONTROLS_MOVE")
 	_add_control_row("MOUSE", "CONTROLS_LOOK")
 	_add_control_row("E", "CONTROLS_INTERACT")
-	_add_control_row("LMB / SPACE / ENTER", "CONTROLS_ADVANCE")
+	_add_control_row("SPACE / ENTER", "CONTROLS_ADVANCE")
 	_add_control_row("LMB", "CONTROLS_PIN")
 	_add_control_row("ESC", "CONTROLS_PAUSE")
 	_add_control_row("TAB", "CONTROLS_INVENTORY")

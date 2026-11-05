@@ -20,7 +20,6 @@ var _current: DialogueLine = null
 var _typing := false
 var _char_accum := 0.0
 var _waiting_choice := false
-var _hovered_meta = null
 var _last_meta_frame := -1
 var _active_dialogue_path := ""
 
@@ -349,15 +348,6 @@ func _update_hint() -> void:
 		_hint.text = tr("ADVANCE_HINT")
 
 
-func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _hovered_meta != null:
-			return
-		if Engine.get_process_frames() == _last_meta_frame:
-			return
-		_advance()
-
-
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("advance"):
 		_advance()
@@ -375,15 +365,6 @@ func _on_meta(meta) -> void:
 			_refresh_status()
 	meta_clicked.emit(str(meta))
 	_update_hint()
-
-
-func _on_meta_hover_started(meta) -> void:
-	_hovered_meta = meta
-
-
-func _on_meta_hover_ended(meta) -> void:
-	if _hovered_meta == meta:
-		_hovered_meta = null
 
 
 func _on_manager_ended() -> void:
@@ -664,8 +645,6 @@ func _build_ui() -> void:
 	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_text_label.theme_type_variation = UITheme.BODY
 	_text_label.meta_clicked.connect(_on_meta)
-	_text_label.meta_hover_started.connect(_on_meta_hover_started)
-	_text_label.meta_hover_ended.connect(_on_meta_hover_ended)
 	vbox.add_child(_text_label)
 
 	_choice_container = VBoxContainer.new()
@@ -714,8 +693,6 @@ func _build_ui() -> void:
 		_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		add_child(_flash)
-
-	gui_input.connect(_on_gui_input)
 
 
 func _set_rect(control: Control, left: float, top: float, right: float, bottom: float, offset_left: float, offset_top: float, offset_right: float, offset_bottom: float) -> void:
