@@ -85,7 +85,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 			else:
 				_show_toast(tr("NO_CIGARETTES"))
 		"weller":
-			_start_node_dialogue(LocalizationManager.dialogues_path(), Callable(self, "_on_weller_finished"))
+			_start_ink_dialogue(LocalizationManager.weller_ink_path(), Callable(self, "_on_weller_finished"))
 		_:
 			var lines := _flavor_sequence(id)
 			if not lines.is_empty():
@@ -503,6 +503,34 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 
 func _start_node_dialogue(path: String, on_finish: Callable, restore_control := true) -> void:
 	var manager := DialogueManager.new()
+	if not manager.load_script(path):
+		_show_toast(tr("DOCUMENT_MISSING"))
+		return
+	GameManager.set_state(GameManager.GameState.DIALOGUE_VN)
+	player.release_mouse()
+	player.set_physics_process(false)
+	if _prompt_tween != null and _prompt_tween.is_valid():
+		_prompt_tween.kill()
+	_prompt.visible = false
+	_vnbox = VNBox.new()
+	_vnbox.theme = ThemeManager.get_theme()
+	_ui_layer.add_child(_vnbox)
+	var box := _vnbox
+	box.finished.connect(func() -> void:
+		box.queue_free()
+		_vnbox = null
+		GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
+		if restore_control:
+			player.set_physics_process(true)
+			player.capture_mouse()
+		if on_finish.is_valid():
+			on_finish.call()
+	)
+	box.play_graph(manager)
+
+
+func _start_ink_dialogue(path: String, on_finish: Callable, restore_control := true) -> void:
+	var manager := InkStorySession.new()
 	if not manager.load_script(path):
 		_show_toast(tr("DOCUMENT_MISSING"))
 		return

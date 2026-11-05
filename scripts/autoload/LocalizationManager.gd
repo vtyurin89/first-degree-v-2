@@ -42,16 +42,16 @@ func _apply_locale(locale: String, emit_signal: bool) -> void:
 		locale_changed.emit(locale)
 
 
-func case_script_path() -> String:
-	return "%s/scolfield.json" % DIALOGUES_DIR
+func scolfield_ink_path() -> String:
+	return "res://data/ink/chapter1/scolfield.ink.json"
 
 
-func dialogues_path() -> String:
-	return "%s/dialogues.json" % DIALOGUES_DIR
+func weller_ink_path() -> String:
+	return "res://data/ink/chapter1/weller.ink.json"
 
 
 func narrative_path(_locale: String = "") -> String:
-	return "%s/narrative.json" % DIALOGUES_DIR
+	return "%s/narrative.data" % DIALOGUES_DIR
 
 
 func fallback_locale() -> String:

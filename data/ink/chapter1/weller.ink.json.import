@@ -1,0 +1,15 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://c3ck505q6t7nr"
+path="res://.godot/imported/weller.ink.json-d7214bce7779afa752b7eafe20742255.res"
+
+[deps]
+
+source_file="res://data/ink/chapter1/weller.ink.json"
+dest_files=["res://.godot/imported/weller.ink.json-d7214bce7779afa752b7eafe20742255.res"]
+
+[params]
+
+compress=true

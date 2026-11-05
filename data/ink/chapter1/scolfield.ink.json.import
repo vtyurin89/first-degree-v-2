@@ -1,0 +1,15 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://dm0vqyywrtmm3"
+path="res://.godot/imported/scolfield.ink.json-b52724a405eaff39a095f7b357d68121.res"
+
+[deps]
+
+source_file="res://data/ink/chapter1/scolfield.ink.json"
+dest_files=["res://.godot/imported/scolfield.ink.json-b52724a405eaff39a095f7b357d68121.res"]
+
+[params]
+
+compress=true

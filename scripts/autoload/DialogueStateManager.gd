@@ -8,6 +8,12 @@ var visited_nodes: Dictionary = {}
 var used_once_choices: Dictionary = {}
 var node_history: Array = []
 var reached_milestones: Dictionary = {}
+var ink_state_json := ""
+var ink_path := ""
+var ink_current_tags: Array = []
+var ink_current_meta: Dictionary = {}
+var ink_current_text := ""
+var ink_showing_choices := false
 
 var _pending_resume_node := ""
 
@@ -25,6 +31,12 @@ func reset_all() -> void:
 	used_once_choices.clear()
 	node_history.clear()
 	reached_milestones.clear()
+	ink_state_json = ""
+	ink_path = ""
+	ink_current_tags = []
+	ink_current_meta = {}
+	ink_current_text = ""
+	ink_showing_choices = false
 	_pending_resume_node = ""
 
 
@@ -42,6 +54,12 @@ func snapshot() -> Dictionary:
 		"used_once_choices": used_once_choices.duplicate(true),
 		"node_history": node_history.duplicate(),
 		"reached_milestones": reached_milestones.duplicate(true),
+		"ink_state_json": ink_state_json,
+		"ink_path": ink_path,
+		"ink_current_tags": ink_current_tags.duplicate(),
+		"ink_current_meta": ink_current_meta.duplicate(true),
+		"ink_current_text": ink_current_text,
+		"ink_showing_choices": ink_showing_choices,
 	}
 
 
@@ -70,9 +88,26 @@ func restore(data: Dictionary) -> void:
 		reached_milestones = reached.duplicate(true)
 	else:
 		reached_milestones = {}
+	ink_state_json = String(data.get("ink_state_json", ""))
+	ink_path = String(data.get("ink_path", ""))
+	var ink_tags = data.get("ink_current_tags", [])
+	ink_current_tags = ink_tags.duplicate() if ink_tags is Array else []
+	var ink_meta = data.get("ink_current_meta", {})
+	ink_current_meta = ink_meta.duplicate(true) if ink_meta is Dictionary else {}
+	ink_current_text = String(data.get("ink_current_text", ""))
+	ink_showing_choices = bool(data.get("ink_showing_choices", false))
 	_pending_resume_node = ""
 	if current_node_id != "":
 		_pending_resume_node = current_node_id
+
+
+func clear_ink_state() -> void:
+	ink_state_json = ""
+	ink_path = ""
+	ink_current_tags = []
+	ink_current_meta = {}
+	ink_current_text = ""
+	ink_showing_choices = false
 
 
 func request_resume(node_id: String) -> void:

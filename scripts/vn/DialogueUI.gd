@@ -66,8 +66,10 @@ func start_interrogation(path: String = "") -> void:
 func _start_interrogation() -> void:
 	var path := dialogue_path
 	if path == "":
-		path = LocalizationManager.case_script_path()
-	var manager := DialogueManager.new()
+		path = LocalizationManager.scolfield_ink_path()
+	if not SaveManager.is_loading():
+		DialogueStateManager.clear_ink_state()
+	var manager := InkStorySession.new()
 	if not manager.load_script(path):
 		_mode = "error"
 		_refresh_status()

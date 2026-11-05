@@ -27,11 +27,20 @@ SaveManager="*res://scripts/autoload/SaveManager.gd"
 ThemeManager="*res://scripts/autoload/ThemeManager.gd"
 AudioManager="*res://scripts/autoload/AudioManager.gd"
 MenuController="*res://scripts/autoload/MenuController.gd"
+__InkRuntime="*res://addons/inkgd/ink_runtime.gd"
 
 [display]
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/inkgd/plugin.cfg")
+
+[inkgd]
+
+register_templates=false
 
 [layer_names]
 
