@@ -56,8 +56,8 @@ func add_entry_from_event(event: DiscoveryEvent) -> Dictionary:
 		"event_id": event.event_id,
 		"type": note_type,
 		"type_key": String(TYPE_KEYS.get(note_type, "NOTE_TYPE_FACT")),
-		"title": event.notebook_title if event.notebook_title != "" else event.event_id,
-		"text": event.notebook_text,
+		"title_key": event.notebook_title_key if event.notebook_title_key != "" else event.event_id,
+		"text_key": event.notebook_text_key,
 		"influence": {
 			"suspect_id": event.suspect_id,
 			"trait_id": event.trait_id,

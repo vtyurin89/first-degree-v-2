@@ -21,11 +21,11 @@ enum EventType {
 @export var attorney_risk_delta: int = 0
 
 @export_group("Нотификация")
-@export var notification_header: String = ""
-@export var notification_title: String = ""
+@export var notification_header_key: String = ""
+@export var notification_title_key: String = ""
 @export var notification_color: Color = Color("e0a944")
 
 @export_group("Запись в блокнот")
 @export var generates_notebook_entry: bool = true
-@export var notebook_title: String = ""
-@export_multiline var notebook_text: String = ""
+@export var notebook_title_key: String = ""
+@export var notebook_text_key: String = ""

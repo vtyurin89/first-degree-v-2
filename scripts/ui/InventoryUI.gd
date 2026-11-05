@@ -503,7 +503,8 @@ func _make_note_row(entry: Dictionary) -> VBoxContainer:
 	header.add_child(type_label)
 
 	var title := Label.new()
-	title.text = String(entry.get("title", ""))
+	var title_key := String(entry.get("title_key", ""))
+	title.text = tr(title_key) if title_key != "" else String(entry.get("title", ""))
 	title.theme_type_variation = UITheme.SMALL
 	title.add_theme_color_override("font_color", INK)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -511,7 +512,8 @@ func _make_note_row(entry: Dictionary) -> VBoxContainer:
 	header.add_child(title)
 
 	var text := Label.new()
-	text.text = String(entry.get("text", ""))
+	var text_key := String(entry.get("text_key", ""))
+	text.text = tr(text_key) if text_key != "" else String(entry.get("text", ""))
 	text.theme_type_variation = UITheme.SMALL
 	text.add_theme_color_override("font_color", Color(0.28, 0.23, 0.18))
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

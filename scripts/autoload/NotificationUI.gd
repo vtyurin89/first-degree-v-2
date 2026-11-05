@@ -27,7 +27,9 @@ func _ready() -> void:
 func show_event_notification(event: DiscoveryEvent) -> void:
 	if event == null or _stack == null:
 		return
-	if event.notification_header == "" and event.notification_title == "":
+	var header_text := tr(event.notification_header_key) if event.notification_header_key != "" else ""
+	var title_text := tr(event.notification_title_key) if event.notification_title_key != "" else ""
+	if header_text == "" and title_text == "":
 		return
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -47,14 +49,14 @@ func show_event_notification(event: DiscoveryEvent) -> void:
 	panel.add_child(box)
 
 	var header := Label.new()
-	header.text = event.notification_header
+	header.text = header_text
 	header.add_theme_color_override("font_color", event.notification_color)
 	header.add_theme_font_size_override("font_size", 13)
 	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(header)
 
 	var title := Label.new()
-	title.text = event.notification_title
+	title.text = title_text
 	title.add_theme_color_override("font_color", Color(0.92, 0.9, 0.86))
 	title.add_theme_font_size_override("font_size", 16)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
