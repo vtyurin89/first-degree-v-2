@@ -11,9 +11,12 @@ const BAR_GAP := 5.0
 const BAR_Y := 34.0
 
 var _energy := 0
+var _preview_cost := 0
+var _preview_insufficient := false
 
 
 func _ready() -> void:
+	add_to_group("energy_meter")
 	custom_minimum_size = PLATE_SIZE
 	size = PLATE_SIZE
 	pivot_offset = PLATE_SIZE * 0.5
@@ -26,6 +29,18 @@ func _ready() -> void:
 
 func set_energy(value: int) -> void:
 	_energy = clampi(value, 0, BAR_COUNT)
+	queue_redraw()
+
+
+func preview_cost(cost: int) -> void:
+	_preview_cost = maxi(cost, 0)
+	_preview_insufficient = _preview_cost > GameManager.player_energy
+	queue_redraw()
+
+
+func clear_preview() -> void:
+	_preview_cost = 0
+	_preview_insufficient = false
 	queue_redraw()
 
 
@@ -69,3 +84,14 @@ func _draw() -> void:
 		draw_rect(rect, Color(0.22, 0.22, 0.23), true, -1.0, true)
 		if i < _energy:
 			draw_rect(rect, Color(0.78, 0.78, 0.75), true, -1.0, true)
+
+	if _preview_cost > 0:
+		var preview_rect := Rect2(Vector2(PADDING_X, BAR_Y - 4), Vector2(BAR_COUNT * (BAR_WIDTH + BAR_GAP) - BAR_GAP, BAR_HEIGHT + 8))
+		var color := Color(0.35, 0.86, 1.0, 0.9)
+		if _preview_insufficient:
+			color = Color(0.95, 0.2, 0.18, 0.95)
+		draw_rect(preview_rect, color, false, 2.0, true)
+		var first := maxi(0, _energy - _preview_cost)
+		for i in range(first, mini(_energy, BAR_COUNT)):
+			var rect := Rect2(Vector2(PADDING_X + i * (BAR_WIDTH + BAR_GAP), BAR_Y), Vector2(BAR_WIDTH, BAR_HEIGHT))
+			draw_rect(rect, Color(0.35, 0.86, 1.0, 0.35), true)

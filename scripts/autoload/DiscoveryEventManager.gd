@@ -27,6 +27,16 @@ func restore(data: Dictionary) -> void:
 		_triggered = data.duplicate(true)
 
 
+func get_event_cost(event_id: String) -> int:
+	if registry.has(event_id):
+		return int(registry[event_id].energy_cost)
+	return 0
+
+
+func is_triggered(event_id: String) -> bool:
+	return _triggered.has(event_id)
+
+
 func trigger_event(event_id: String) -> bool:
 	if not registry.has(event_id):
 		push_warning("[DiscoveryEventManager] Unknown event: %s" % event_id)

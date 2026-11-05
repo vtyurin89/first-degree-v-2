@@ -5,9 +5,9 @@ EXTERNAL add_flag(flag)
 -> start
 
 === start ===
-// { has_flag("weller_briefing_done"):
-//     -> return_intro
-// }
+{ has_flag("weller_briefing_done"):
+    -> return_intro
+}
 -> weller_1
 
 === return_intro ===

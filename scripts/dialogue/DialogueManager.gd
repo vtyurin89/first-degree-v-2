@@ -241,6 +241,14 @@ func is_meta_registered(meta_id: String) -> bool:
 	return GameManager.clicked_urls.has(meta_id)
 
 
+func is_meta_used(meta_id: String) -> bool:
+	return is_meta_registered(meta_id)
+
+
+func get_meta_cost(_meta_id: String) -> int:
+	return 0
+
+
 func get_current_node() -> Dictionary:
 	return current_node
 

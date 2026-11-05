@@ -7,6 +7,10 @@ signal meta_clicked(url_id: String)
 signal line_shown(line: DialogueLine)
 
 const CHARS_PER_SEC := 45.0
+const LINK_DEFAULT_COLOR := "#c8a47b"
+const LINK_HOVER_COLOR := "#62dcff"
+const LINK_DEFAULT_OUTLINE := "#4a3826"
+const LINK_HOVER_OUTLINE := "#12475a"
 
 @export var interrogation_mode := false
 @export var dialogue_path := ""
@@ -22,6 +26,16 @@ var _char_accum := 0.0
 var _waiting_choice := false
 var _last_meta_frame := -1
 var _active_dialogue_path := ""
+var _line_source_text := ""
+var _updating_text := false
+var _hovered_meta := ""
+var _hold_active := false
+var _hold_meta := ""
+var _hold_elapsed := 0.0
+var _hold_duration := 0.0
+var _hold_ring: HoldProgressRing
+var _cost_hint: CostHint
+var _energy_meter: EnergyMeter
 
 var _nameplate: Label
 var _text_label: RichTextLabel
@@ -50,6 +64,8 @@ func _ready() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		GameManager.set_state(GameManager.GameState.INTERROGATION)
 	_build_ui()
+	_build_meta_feedback()
+	_setup_energy_meter()
 	if interrogation_mode:
 		_connect_game()
 		if auto_start_interrogation:
@@ -191,7 +207,9 @@ func _on_manager_line(speaker: String, text: String, metadata: Dictionary) -> vo
 	_nameplate.modulate = _speaker_color(speaker)
 	_update_portrait(speaker, internal, emotion)
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if internal else Color(0.92, 0.9, 0.86))
-	_text_label.text = text
+	_line_source_text = text
+	_clear_meta_feedback()
+	_text_label.text = _format_interactive_text(text)
 	_text_label.visible_characters = 0
 	_hint.text = ""
 	var line := DialogueLine.new()
@@ -204,6 +222,8 @@ func _on_manager_line(speaker: String, text: String, metadata: Dictionary) -> vo
 
 
 func _on_manager_choices(available_choices: Array) -> void:
+	_clear_meta_feedback()
+	_line_source_text = ""
 	_mode = "choice"
 	_typing = false
 	_waiting_choice = true
@@ -304,7 +324,231 @@ func _process(delta: float) -> void:
 		_text_label.visible_characters = int(_char_accum)
 		if total > 0 and int(_char_accum) >= total:
 			_complete_typing()
+	_update_hold(delta)
+	if _cost_hint != null and _cost_hint.visible:
+		_cost_hint.follow_mouse(get_global_mouse_position())
 
+
+func _build_meta_feedback() -> void:
+	_cost_hint = CostHint.new()
+	add_child(_cost_hint)
+	_hold_ring = HoldProgressRing.new()
+	add_child(_hold_ring)
+
+
+func _setup_energy_meter() -> void:
+	_energy_meter = null
+	for node in get_tree().get_nodes_in_group("energy_meter"):
+		if node is EnergyMeter and is_instance_valid(node):
+			_energy_meter = node
+			break
+	if _energy_meter == null:
+		_energy_meter = EnergyMeter.new()
+		_energy_meter.position = Vector2(24, 20)
+		add_child(_energy_meter)
+		_energy_meter.set_energy(GameManager.player_energy)
+		GameManager.energy_changed.connect(_on_ui_energy_changed)
+
+
+func _on_ui_energy_changed(value: int) -> void:
+	if _energy_meter != null:
+		_energy_meter.set_energy(value)
+
+
+func _clear_meta_feedback() -> void:
+	_hovered_meta = ""
+	_cancel_hold()
+	if _cost_hint != null:
+		_cost_hint.hide_hint()
+	if _energy_meter != null:
+		_energy_meter.clear_preview()
+
+
+func _meta_is_used(meta_id: String) -> bool:
+	if _manager == null:
+		return false
+	return _manager.is_meta_used(meta_id)
+
+
+func _format_interactive_text(text: String) -> String:
+	var regex := RegEx.new()
+	if regex.compile("\\[url=([^\\]]+)\\](.*?)\\[/url\\]") != OK:
+		return text
+	var output := ""
+	var cursor := 0
+	for found in regex.search_all(text):
+		output += text.substr(cursor, found.get_start() - cursor)
+		var meta_id := found.get_string(1)
+		var inner := found.get_string(2)
+		cursor = found.get_end()
+		if _meta_is_used(meta_id):
+			output += inner
+			continue
+		var hovered := meta_id == _hovered_meta
+		var color := LINK_HOVER_COLOR if hovered else LINK_DEFAULT_COLOR
+		var outline := LINK_HOVER_OUTLINE if hovered else LINK_DEFAULT_OUTLINE
+		var outline_size := 2 if hovered else 1
+		output += "[url=%s][outline_color=%s][outline_size=%d][color=%s]%s[/color][/outline_size][/outline_color][/url]" % [meta_id, outline, outline_size, color, inner]
+	output += text.substr(cursor)
+	return output
+
+
+func _refresh_interactive_text() -> void:
+	if _line_source_text == "" or _updating_text:
+		return
+	_updating_text = true
+	var visible := _text_label.visible_characters
+	_text_label.text = _format_interactive_text(_line_source_text)
+	if visible >= 0:
+		_text_label.visible_characters = visible
+	_updating_text = false
+
+
+func _on_meta_hover_started(meta) -> void:
+	if _updating_text:
+		return
+	_hovered_meta = String(meta)
+	_refresh_interactive_text()
+	if _manager == null or _meta_is_used(_hovered_meta):
+		_hide_meta_hint()
+		return
+	var cost := _manager.get_meta_cost(_hovered_meta)
+	if cost <= 0:
+		_hide_meta_hint()
+		return
+	if _cost_hint != null:
+		_cost_hint.show_cost(cost, GameManager.player_energy < cost)
+		_cost_hint.follow_mouse(get_global_mouse_position())
+	if _energy_meter != null:
+		_energy_meter.preview_cost(cost)
+
+
+func _on_meta_hover_ended(meta) -> void:
+	if _updating_text:
+		return
+	if _hovered_meta == String(meta):
+		_hovered_meta = ""
+		_refresh_interactive_text()
+	if _hold_active:
+		_cancel_hold()
+	_hide_meta_hint()
+
+
+func _hide_meta_hint() -> void:
+	if _cost_hint != null:
+		_cost_hint.hide_hint()
+	if _energy_meter != null:
+		_energy_meter.clear_preview()
+
+
+func _input(event: InputEvent) -> void:
+	if not _node_mode or _manager == null or _waiting_choice:
+		return
+	if not (event is InputEventMouseButton) or event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if event.pressed:
+		if _hovered_meta != "" and not _meta_is_used(_hovered_meta):
+			_begin_hold()
+			get_viewport().set_input_as_handled()
+	elif _hold_active:
+		_finish_hold()
+		get_viewport().set_input_as_handled()
+
+
+func _begin_hold() -> void:
+	if _manager == null or _hovered_meta == "" or _meta_is_used(_hovered_meta):
+		return
+	var cost := _manager.get_meta_cost(_hovered_meta)
+	if GameManager.player_energy < cost:
+		if _cost_hint != null:
+			_cost_hint.show_cost(cost, true)
+			_cost_hint.follow_mouse(get_global_mouse_position())
+		if _energy_meter != null:
+			_energy_meter.preview_cost(cost)
+		return
+	_hold_active = true
+	_hold_meta = _hovered_meta
+	_hold_elapsed = 0.0
+	_hold_duration = 1.0 if cost > 0 else 0.3
+	if _hold_ring != null:
+		_hold_ring.show_ring(get_global_mouse_position())
+		_hold_ring.set_progress(0.0)
+	if cost > 0 and _energy_meter != null:
+		_energy_meter.preview_cost(cost)
+
+
+func _update_hold(delta: float) -> void:
+	if not _hold_active:
+		return
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_finish_hold()
+		return
+	if _hovered_meta != _hold_meta:
+		_cancel_hold()
+		return
+	_hold_elapsed += delta
+	var progress := clampf(_hold_elapsed / _hold_duration, 0.0, 1.0)
+	if _hold_ring != null:
+		_hold_ring.set_progress(progress)
+		_hold_ring.follow(get_global_mouse_position(), delta)
+	if progress >= 1.0:
+		_finish_hold()
+
+
+func _finish_hold() -> void:
+	if not _hold_active:
+		return
+	var meta_id := _hold_meta
+	var completed := _hold_elapsed + 0.0001 >= _hold_duration
+	_hold_active = false
+	_hold_elapsed = 0.0
+	if _hold_ring != null:
+		_hold_ring.hide_ring()
+	if _cost_hint != null:
+		_cost_hint.hide_hint()
+	if _energy_meter != null:
+		_energy_meter.clear_preview()
+	if not completed or _hovered_meta != meta_id:
+		return
+	if _manager == null or _manager.click_meta(meta_id) == false:
+		_refresh_status()
+		return
+	_last_meta_frame = Engine.get_process_frames()
+	_hovered_meta = ""
+	_refresh_interactive_text()
+	_micro_impulse()
+	meta_clicked.emit(meta_id)
+	_update_hint()
+
+
+func _cancel_hold() -> void:
+	if not _hold_active:
+		if _cost_hint != null:
+			_cost_hint.hide_hint()
+		if _energy_meter != null:
+			_energy_meter.clear_preview()
+		return
+	_hold_active = false
+	_hold_elapsed = 0.0
+	if _hold_ring != null:
+		_hold_ring.hide_ring()
+	if _cost_hint != null:
+		_cost_hint.hide_hint()
+	if _energy_meter != null:
+		_energy_meter.clear_preview()
+
+
+func _micro_impulse() -> void:
+	if _flash != null:
+		_flash.color = Color(0.6, 0.95, 1.0, 0.28)
+		var tween := create_tween()
+		tween.tween_property(_flash, "color:a", 0.0, 0.35)
+	if _text_label != null:
+		var original := _text_label.position
+		var shake := create_tween()
+		shake.tween_property(_text_label, "position", original + Vector2(1, 0), 0.04)
+		shake.tween_property(_text_label, "position", original + Vector2(-1, 0), 0.04)
+		shake.tween_property(_text_label, "position", original, 0.04)
 
 func _complete_typing() -> void:
 	_typing = false
@@ -356,20 +600,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func _on_meta(meta) -> void:
-	_last_meta_frame = Engine.get_process_frames()
-	if _node_mode and _manager != null:
-		if interrogation_mode and _manager.is_meta_registered(str(meta)):
-			_log(tr("META_ALREADY"))
-			return
-		_manager.click_meta(str(meta))
-		if interrogation_mode:
-			_refresh_status()
-	meta_clicked.emit(str(meta))
-	_update_hint()
-
 
 func _on_manager_ended() -> void:
+	_clear_meta_feedback()
 	_mode = "ended"
 	_typing = false
 	_hint.text = ""
@@ -481,6 +714,8 @@ func _on_string_changed(_value: String) -> void:
 
 
 func _refresh_status() -> void:
+	if _energy_meter != null:
+		_energy_meter.set_energy(GameManager.player_energy)
 	if _status_label == null:
 		return
 	_status_label.text = tr("HUD_STATUS") % [
@@ -646,7 +881,8 @@ func _build_ui() -> void:
 	_text_label.custom_minimum_size = Vector2(0, 120)
 	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_text_label.theme_type_variation = UITheme.BODY
-	_text_label.meta_clicked.connect(_on_meta)
+	_text_label.meta_hover_started.connect(_on_meta_hover_started)
+	_text_label.meta_hover_ended.connect(_on_meta_hover_ended)
 	vbox.add_child(_text_label)
 
 	_choice_container = VBoxContainer.new()

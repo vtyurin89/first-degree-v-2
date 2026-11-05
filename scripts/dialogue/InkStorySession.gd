@@ -12,13 +12,6 @@ const META_CONFIG := {
 	"confession_premeditation": {"kind": "confession", "energy_cost": 0},
 }
 
-const META_COLORS := {
-	"clue": "#ffd76a",
-	"trait": "#7ad0ff",
-	"confession": "#ffd23f",
-	"flavor": "#c8c8c8",
-}
-
 var current_suspect_id := "scolfield"
 
 var _story: InkStory
@@ -187,6 +180,19 @@ func _localized(id: String, fallback: String) -> String:
 	return translated
 
 
+func is_meta_used(meta_id: String) -> bool:
+	if meta_id.begins_with("event:"):
+		return DiscoveryEventManager.is_triggered(meta_id.substr(6))
+	return GameManager.clicked_urls.has(meta_id)
+
+
+func get_meta_cost(meta_id: String) -> int:
+	if meta_id.begins_with("event:"):
+		return DiscoveryEventManager.get_event_cost(meta_id.substr(6))
+	var config: Dictionary = META_CONFIG.get(meta_id, {})
+	return int(config.get("energy_cost", 0))
+
+
 func click_meta(meta_id: String) -> bool:
 	if _ink_ended or _story == null or meta_id == "":
 		return false
@@ -250,10 +256,7 @@ func _preprocess_ink_text(text: String) -> String:
 		output += text.substr(cursor, found.get_start() - cursor)
 		var meta_id := found.get_string(1)
 		var inner := found.get_string(2)
-		var config: Dictionary = META_CONFIG.get(meta_id, {})
-		var kind := String(config.get("kind", "flavor"))
-		var color := String(META_COLORS.get(kind, META_COLORS["flavor"]))
-		output += "[url=%s][color=%s]%s[/color][/url]" % [meta_id, color, inner]
+		output += "[url=%s]%s[/url]" % [meta_id, inner]
 		cursor = found.get_end()
 	output += text.substr(cursor)
 	return output
