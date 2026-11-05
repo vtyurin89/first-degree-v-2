@@ -35,3 +35,8 @@
 "CH1_DLG_WELLER_NOT_READY_WELLER","Let me know when you're ready, Crawford.","Дай знать, когда будешь готова, Кроуфорд."
 "CH1_SCOLFIELD_FILE_MISSING","Wait, take the case files from the table.","Постой, возьми материалы дела со стола."
 "CH1_SCOLFIELD_FILE_MISSING_REPLY","Okay, okay...","Ладно, сейчас..."
+"CH1_DLG_WELLER_CHOICE_SCOLFIELD_OPINION_1","","А ты сам что о нём думаешь? Успел его изучить, хоть немного?"
+"CH1_DLG_WELLER_SCOLFIELD_OPINION_1","","Ну, я наблюдал за ним через стекло, пока ждали тебя."
+"CH1_DLG_WELLER_SCOLFIELD_OPINION_2","","Мужик потерял пасынка, а сидит и всё время косится в зеркало. Манжеты поправляет, как перед фотографией. И дежурному, который его привёл, успел рассказать про свою службу. Его даже не спрашивали."
+"CH1_DLG_WELLER_SCOLFIELD_OPINION_3","","[url=trait_scolfield_narcissism]Такое чувство, что ему важнее, как он выглядит, чем что случилось.[/url]"
+"CH1_DLG_WELLER_SCOLFIELD_OPINION_4","","Так будешь его допрашивать?"

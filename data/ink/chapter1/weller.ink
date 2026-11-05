@@ -119,6 +119,24 @@ EXTERNAL add_flag(flag)
     -> ready_check_scolfield
 * [Мне нужно еще пару минут на подготовку. # id: CH1_DLG_WELLER_CHOICE_NOT_READY_1]
     -> not_ready_weller
+* [А ты сам что о нём думаешь? Успел его изучить, хоть немного? # id: CH1_DLG_WELLER_CHOICE_SCOLFIELD_OPINION_1]
+-> weller_scolfield_opinion_1
+
+=== weller_scolfield_opinion_1 ===
+Ну, я наблюдал за ним через стекло, пока ждали тебя. # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_1
+-> weller_scolfield_opinion_2
+
+=== weller_scolfield_opinion_2 ===
+Мужик потерял пасынка, а сидит и всё время косится в зеркало. Манжеты поправляет, как перед фотографией. И дежурному, который его привёл, успел рассказать про свою службу. Его даже не спрашивали. # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_2
+-> weller_scolfield_opinion_3
+
+=== weller_scolfield_opinion_3 ===
+[url=trait_scolfield_narcissism]Такое чувство, что ему важнее, как он выглядит, чем что случилось.[/url] # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_3
+-> weller_scolfield_opinion_4
+
+=== weller_scolfield_opinion_4 ===
+Так будешь его допрашивать? # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_4
+-> weller_choice_2
 
 === ready_check_scolfield ===
 { has_case_file():
