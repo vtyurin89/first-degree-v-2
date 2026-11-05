@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scripts/autoload/GameManager.gd"
 SuspectProfileManager="*res://scripts/autoload/SuspectProfileManager.gd"
+NotebookManager="*res://scripts/autoload/NotebookManager.gd"
+DiscoveryEventManager="*res://scripts/autoload/DiscoveryEventManager.gd"
 LocalizationManager="*res://scripts/autoload/LocalizationManager.gd"
 GameSettings="*res://scripts/autoload/GameSettings.gd"
 CharacterDatabase="*res://scripts/autoload/CharacterDatabase.gd"
@@ -28,6 +30,7 @@ SaveManager="*res://scripts/autoload/SaveManager.gd"
 ThemeManager="*res://scripts/autoload/ThemeManager.gd"
 AudioManager="*res://scripts/autoload/AudioManager.gd"
 MenuController="*res://scripts/autoload/MenuController.gd"
+NotificationUI="*res://scripts/autoload/NotificationUI.gd"
 __InkRuntime="*res://addons/inkgd/ink_runtime.gd"
 
 [display]

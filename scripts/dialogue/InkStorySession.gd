@@ -2,7 +2,7 @@ extends DialogueManager
 class_name InkStorySession
 
 const META_CONFIG := {
-	"clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0, "flags": ["found_medals_display"]},
+	"clue_army": {"kind": "trait", "trait": "NARCISSISM", "clue_id": "narcissism_revealed", "energy_cost": 0, "flags": ["found_medals_display"], "event_id": "scolfield_narcissism_probe"},
 	"junk_concrete": {"kind": "flavor", "energy_cost": 0},
 	"clue_schedule": {"kind": "clue", "clue_id": "victim_pool_habit", "energy_cost": 0},
 	"confession_tampering": {"kind": "confession", "energy_cost": 0},
@@ -134,6 +134,8 @@ func _emit_ink_line() -> void:
 	if meta.has("internal"):
 		meta["internal"] = String(meta["internal"]).to_lower() == "true"
 	_current_meta = meta
+	if meta.has("event"):
+		DiscoveryEventManager.trigger_event(String(meta["event"]))
 	_showing_choices = false
 	_sync_ink_state()
 	line_ready.emit(speaker, _preprocess_ink_text(text), meta)
@@ -188,6 +190,8 @@ func _localized(id: String, fallback: String) -> String:
 func click_meta(meta_id: String) -> bool:
 	if _ink_ended or _story == null or meta_id == "":
 		return false
+	if meta_id.begins_with("event:"):
+		return DiscoveryEventManager.trigger_event(meta_id.substr(6))
 	if GameManager.clicked_urls.has(meta_id):
 		return false
 	var config: Dictionary = META_CONFIG.get(meta_id, {})
@@ -212,6 +216,10 @@ func click_meta(meta_id: String) -> bool:
 		GameManager.add_flag(String(flag))
 
 	clue_registered.emit(clue_id if clue_id != "" else meta_id, GameManager.player_energy)
+
+	var event_id := String(config.get("event_id", ""))
+	if event_id != "":
+		DiscoveryEventManager.trigger_event(event_id)
 
 	if String(_current_meta.get("target_confession", "")) == meta_id:
 		var milestone := int(_current_meta.get("milestone", -1))

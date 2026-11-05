@@ -78,6 +78,8 @@ func reset_run() -> void:
 	clicked_urls.clear()
 	flags.clear()
 	SuspectProfileManager.reset_all()
+	NotebookManager.reset_all()
+	DiscoveryEventManager.reset_all()
 	DialogueStateManager.reset_all()
 	ObjectiveManager.reset_to_defaults()
 	cigarettes_changed.emit(cigarettes)
@@ -103,6 +105,8 @@ func capture_state() -> Dictionary:
 		"clicked_urls": clicked_urls.duplicate(true),
 		"flags": flags.duplicate(true),
 		"suspect_profiles": SuspectProfileManager.snapshot(),
+		"notebook_entries": NotebookManager.snapshot(),
+		"triggered_discoveries": DiscoveryEventManager.snapshot(),
 	}
 
 
@@ -144,6 +148,10 @@ func restore_state(data: Dictionary) -> void:
 		SuspectProfileManager.restore({})
 	for flag in flags.keys():
 		SuspectProfileManager.register_flag(String(flag))
+	var entries = data.get("notebook_entries", [])
+	NotebookManager.restore(entries if entries is Array else [])
+	var triggered = data.get("triggered_discoveries", {})
+	DiscoveryEventManager.restore(triggered if triggered is Dictionary else {})
 	var restored_state := int(data.get("current_state", GameState.EXPLORATION_3D))
 	if restored_state == GameState.PAUSED or restored_state == GameState.MAIN_MENU or restored_state == GameState.INVENTORY:
 		restored_state = GameState.EXPLORATION_3D

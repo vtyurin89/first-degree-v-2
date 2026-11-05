@@ -3,6 +3,7 @@ class_name InventoryUI
 
 const INK := Color(0.16, 0.12, 0.09)
 const PAPER := Color(0.86, 0.82, 0.72)
+const NOTES_PER_PAGE := 3
 
 const ITEMS := [
 	{"id": "case_file", "name_key": "ITEM_CASE_FILE", "icon": "res://assets/icons/items/ic_case_file.svg", "pos": Vector2(0.06, 0.12), "size": Vector2(240, 310), "color": Color(0.75, 0.62, 0.32)},
@@ -12,9 +13,16 @@ const ITEMS := [
 	{"id": "badge", "name_key": "ITEM_BADGE", "icon": "res://assets/icons/items/ic_badge.svg", "pos": Vector2(0.80, 0.60), "size": Vector2(110, 140), "color": Color(0.2, 0.28, 0.4)},
 ]
 
-var _title: Label
+var _tasks_title: Label
+var _notes_title: Label
 var _close_hint: Label
 var _tasks_box: VBoxContainer
+var _notes_box: VBoxContainer
+var _page_label: Label
+var _prev_page: Button
+var _next_page: Button
+var _notes_page := 0
+var _last_notes_count := 0
 var _items_area: Control
 var _task_rows: Array = []
 var _item_slots: Dictionary = {}
@@ -30,8 +38,10 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build()
 	_refresh_tasks()
+	_refresh_notes()
 	ObjectiveManager.objective_status_changed.connect(_on_objective_changed)
 	ObjectiveManager.objectives_reset.connect(_on_objectives_reset)
+	NotebookManager.entries_changed.connect(_on_notes_changed)
 	LocalizationManager.locale_changed.connect(_on_locale_changed)
 
 
@@ -55,16 +65,47 @@ func _build() -> void:
 	_close_hint.text = tr("INVENTORY_CLOSE_HINT")
 	add_child(_close_hint)
 
+	_build_task_sticky()
 	_build_notebook()
 	_build_bag()
 	_build_reading_overlay()
 
 
+func _build_task_sticky() -> void:
+	var panel := PanelContainer.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	_set_rect(panel, 0.03, 0.045, 0.38, 0.31, 0, 0, 0, 0)
+	panel.rotation = -0.028
+	panel.resized.connect(func() -> void: panel.pivot_offset = panel.size * 0.5)
+	var sticky_style := UIPalette.make_style(Color(0.94, 0.87, 0.45), Color(0.55, 0.45, 0.18), 1, 3, 16)
+	sticky_style.shadow_color = Color(0.0, 0.0, 0.0, 0.5)
+	sticky_style.shadow_size = 8
+	sticky_style.shadow_offset = Vector2(4, 5)
+	panel.add_theme_stylebox_override("panel", sticky_style)
+	add_child(panel)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	_tasks_title = Label.new()
+	_tasks_title.theme_type_variation = UITheme.MODAL_TITLE
+	_tasks_title.add_theme_color_override("font_color", INK)
+	_tasks_title.add_theme_font_size_override("font_size", 17)
+	_tasks_title.text = tr("INVENTORY_TASKS_TITLE")
+	vbox.add_child(_tasks_title)
+
+	_tasks_box = VBoxContainer.new()
+	_tasks_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_tasks_box.add_theme_constant_override("separation", 8)
+	vbox.add_child(_tasks_box)
+
+
 func _build_notebook() -> void:
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-	_set_rect(panel, 0.03, 0.07, 0.38, 0.94, 0, 0, 0, 0)
-	var paper_style := UIPalette.make_style(PAPER, Color(0.42, 0.35, 0.26), 1, 3, 22)
+	_set_rect(panel, 0.03, 0.35, 0.38, 0.94, 0, 0, 0, 0)
+	var paper_style := UIPalette.make_style(PAPER, Color(0.42, 0.35, 0.26), 1, 3, 18)
 	paper_style.shadow_color = Color(0.0, 0.0, 0.0, 0.55)
 	paper_style.shadow_size = 10
 	paper_style.shadow_offset = Vector2(5, 6)
@@ -72,27 +113,28 @@ func _build_notebook() -> void:
 	add_child(panel)
 
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
+	vbox.add_theme_constant_override("separation", 8)
 	panel.add_child(vbox)
 
 	var spiral := HBoxContainer.new()
-	spiral.add_theme_constant_override("separation", 26)
+	spiral.add_theme_constant_override("separation", 24)
 	vbox.add_child(spiral)
 	var ring_style := StyleBoxFlat.new()
 	ring_style.bg_color = Color(0.34, 0.33, 0.35)
 	ring_style.set_corner_radius_all(5)
-	for i in 8:
+	for i in 7:
 		var ring := Panel.new()
-		ring.custom_minimum_size = Vector2(10, 10)
+		ring.custom_minimum_size = Vector2(9, 9)
 		ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		ring.add_theme_stylebox_override("panel", ring_style)
 		spiral.add_child(ring)
 
-	_title = Label.new()
-	_title.theme_type_variation = UITheme.MODAL_TITLE
-	_title.add_theme_color_override("font_color", INK)
-	_title.text = tr("INVENTORY_TITLE")
-	vbox.add_child(_title)
+	_notes_title = Label.new()
+	_notes_title.theme_type_variation = UITheme.MODAL_TITLE
+	_notes_title.add_theme_color_override("font_color", INK)
+	_notes_title.add_theme_font_size_override("font_size", 17)
+	_notes_title.text = tr("INVENTORY_NOTES_TITLE")
+	vbox.add_child(_notes_title)
 
 	var line := ColorRect.new()
 	line.color = Color(0.5, 0.42, 0.32, 0.6)
@@ -100,10 +142,35 @@ func _build_notebook() -> void:
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(line)
 
-	_tasks_box = VBoxContainer.new()
-	_tasks_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_tasks_box.add_theme_constant_override("separation", 12)
-	vbox.add_child(_tasks_box)
+	_notes_box = VBoxContainer.new()
+	_notes_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_notes_box.add_theme_constant_override("separation", 10)
+	vbox.add_child(_notes_box)
+
+	var pagination := HBoxContainer.new()
+	pagination.alignment = BoxContainer.ALIGNMENT_CENTER
+	pagination.add_theme_constant_override("separation", 12)
+	vbox.add_child(pagination)
+
+	_prev_page = Button.new()
+	_prev_page.text = "‹"
+	_prev_page.custom_minimum_size = Vector2(32, 28)
+	_prev_page.focus_mode = Control.FOCUS_NONE
+	_prev_page.pressed.connect(_change_notes_page.bind(-1))
+	pagination.add_child(_prev_page)
+
+	_page_label = Label.new()
+	_page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_page_label.theme_type_variation = UITheme.SMALL
+	_page_label.add_theme_color_override("font_color", INK)
+	pagination.add_child(_page_label)
+
+	_next_page = Button.new()
+	_next_page.text = "›"
+	_next_page.custom_minimum_size = Vector2(32, 28)
+	_next_page.focus_mode = Control.FOCUS_NONE
+	_next_page.pressed.connect(_change_notes_page.bind(1))
+	pagination.add_child(_next_page)
 
 
 func _build_bag() -> void:
@@ -377,6 +444,97 @@ func _refresh_tasks() -> void:
 	_animate_strikes.call_deferred()
 
 
+func _on_notes_changed() -> void:
+	_refresh_notes()
+
+
+func _refresh_notes() -> void:
+	if _notes_box == null:
+		return
+	var entries := NotebookManager.get_entries()
+	var count := entries.size()
+	if count > _last_notes_count:
+		_notes_page = maxi(0, int((count - 1) / NOTES_PER_PAGE))
+	_last_notes_count = count
+	var page_count := maxi(1, int(ceil(float(count) / float(NOTES_PER_PAGE))))
+	_notes_page = clampi(_notes_page, 0, page_count - 1)
+	for child in _notes_box.get_children():
+		_notes_box.remove_child(child)
+		child.queue_free()
+	if count == 0:
+		var empty := Label.new()
+		empty.text = tr("NOTEBOOK_EMPTY")
+		empty.theme_type_variation = UITheme.SMALL
+		empty.add_theme_color_override("font_color", Color(0.36, 0.29, 0.22))
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_notes_box.add_child(empty)
+	else:
+		var start := _notes_page * NOTES_PER_PAGE
+		var end := mini(start + NOTES_PER_PAGE, count)
+		for i in range(start, end):
+			_notes_box.add_child(_make_note_row(entries[i]))
+	if _page_label != null:
+		_page_label.text = tr("NOTEBOOK_PAGE") % [_notes_page + 1, page_count]
+		_page_label.visible = page_count > 1
+	if _prev_page != null:
+		_prev_page.visible = page_count > 1
+		_prev_page.disabled = _notes_page <= 0
+	if _next_page != null:
+		_next_page.visible = page_count > 1
+		_next_page.disabled = _notes_page >= page_count - 1
+
+
+func _change_notes_page(delta: int) -> void:
+	_notes_page += delta
+	_refresh_notes()
+
+
+func _make_note_row(entry: Dictionary) -> VBoxContainer:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 2)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 6)
+	row.add_child(header)
+
+	var type_label := Label.new()
+	type_label.text = "[" + tr(String(entry.get("type_key", "NOTE_TYPE_FACT"))) + "]"
+	type_label.add_theme_font_size_override("font_size", 12)
+	type_label.add_theme_color_override("font_color", _note_type_color(int(entry.get("type", 1))))
+	header.add_child(type_label)
+
+	var title := Label.new()
+	title.text = String(entry.get("title", ""))
+	title.theme_type_variation = UITheme.SMALL
+	title.add_theme_color_override("font_color", INK)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+
+	var text := Label.new()
+	text.text = String(entry.get("text", ""))
+	text.theme_type_variation = UITheme.SMALL
+	text.add_theme_color_override("font_color", Color(0.28, 0.23, 0.18))
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	row.add_child(text)
+
+	var separator := ColorRect.new()
+	separator.color = Color(0.5, 0.42, 0.32, 0.35)
+	separator.custom_minimum_size = Vector2(0, 1)
+	row.add_child(separator)
+	return row
+
+
+func _note_type_color(note_type: int) -> Color:
+	match note_type:
+		NotebookManager.NoteType.LIE:
+			return Color(0.72, 0.18, 0.16)
+		NotebookManager.NoteType.FACT:
+			return Color(0.2, 0.48, 0.22)
+		NotebookManager.NoteType.DISCREPANCY:
+			return Color(0.72, 0.38, 0.12)
+		_:
+			return Color(0.62, 0.48, 0.1)
+
 func _make_task_row(objective: Dictionary) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
@@ -479,11 +637,15 @@ func _on_objectives_reset() -> void:
 
 
 func _on_locale_changed(_locale: String) -> void:
-	_title.text = tr("INVENTORY_TITLE")
+	if _tasks_title != null:
+		_tasks_title.text = tr("INVENTORY_TASKS_TITLE")
+	if _notes_title != null:
+		_notes_title.text = tr("INVENTORY_NOTES_TITLE")
 	_close_hint.text = tr("INVENTORY_CLOSE_HINT")
 	if _reading_hint != null:
 		_reading_hint.text = tr("READ_CLOSE_HINT")
 	_refresh_tasks()
+	_refresh_notes()
 
 
 func _make_placeholder_icon(color: Color) -> ImageTexture:
