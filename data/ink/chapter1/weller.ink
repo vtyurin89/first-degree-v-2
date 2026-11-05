@@ -122,6 +122,10 @@ EXTERNAL add_flag(flag)
 * [А ты сам что о нём думаешь? Успел его изучить, хоть немного? # id: CH1_DLG_WELLER_CHOICE_SCOLFIELD_OPINION_1]
 -> weller_scolfield_opinion_1
 
+=== weller_discovery_test_1 ===
+[url=event:scolfield_narcissism_from_weller]Такое чувство, что ему важнее то, как он выглядит, чем что случилось.[/url]
+-> weller_choice_2
+
 === weller_scolfield_opinion_1 ===
 Ну, я наблюдал за ним через стекло, пока ждали тебя. # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_1
 -> weller_scolfield_opinion_2
@@ -131,7 +135,7 @@ EXTERNAL add_flag(flag)
 -> weller_scolfield_opinion_3
 
 === weller_scolfield_opinion_3 ===
-[url=trait_scolfield_narcissism]Такое чувство, что ему важнее, как он выглядит, чем что случилось.[/url] # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_3
+[url=event:scolfield_narcissism_from_weller]Такое чувство, что ему важнее, как он выглядит, чем что случилось.[/url] # speaker: weller # id: CH1_DLG_WELLER_SCOLFIELD_OPINION_3
 -> weller_scolfield_opinion_4
 
 === weller_scolfield_opinion_4 ===
