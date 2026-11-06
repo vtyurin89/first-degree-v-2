@@ -17,9 +17,9 @@ const LINK_USED_COLOR := "#7c8087"
 @export var dialogue_path := ""
 @export var auto_start_interrogation := true
 
-var _manager: DialogueManager
+var _manager: BaseDialogueSession
 var _mode := "idle"
-var _node_mode := false
+var _manager_mode := false
 var _queue: Array[DialogueLine] = []
 var _current: DialogueLine = null
 var _typing := false
@@ -103,8 +103,8 @@ func _start_interrogation() -> void:
 		SaveManager.autosave_checkpoint()
 
 
-func _begin_manager(manager: DialogueManager) -> void:
-	_node_mode = true
+func _begin_manager(manager: BaseDialogueSession) -> void:
+	_manager_mode = true
 	_manager = manager
 	_queue.clear()
 	_current = null
@@ -125,7 +125,7 @@ func _begin_manager(manager: DialogueManager) -> void:
 
 
 func play(lines: Array) -> void:
-	_node_mode = false
+	_manager_mode = false
 	_manager = null
 	_active_dialogue_path = ""
 	_queue.clear()
@@ -143,7 +143,7 @@ func play(lines: Array) -> void:
 	_next()
 
 
-func play_graph(manager: DialogueManager) -> void:
+func play_session(manager: BaseDialogueSession) -> void:
 	if manager == null:
 		finished.emit()
 		return
@@ -572,7 +572,7 @@ func _hide_meta_hint() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not _node_mode or _manager == null or _waiting_choice:
+	if not _manager_mode or _manager == null or _waiting_choice:
 		return
 	if not (event is InputEventMouseButton) or event.button_index != MOUSE_BUTTON_LEFT:
 		return
@@ -708,7 +708,7 @@ func _advance() -> void:
 	if _typing:
 		_complete_typing()
 		return
-	if _node_mode:
+	if _manager_mode:
 		if _manager == null:
 			return
 		if interrogation_mode:
@@ -756,7 +756,7 @@ func _on_manager_ended() -> void:
 		set_process(false)
 		GameManager.change_scene(GameManager.SCENE_EPILOGUE, 1.0)
 	else:
-		_node_mode = false
+		_manager_mode = false
 		_manager = null
 		finished.emit()
 

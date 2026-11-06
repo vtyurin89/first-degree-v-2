@@ -160,34 +160,6 @@ func _start_dialogue(lines: Array, on_finish: Callable, restore_control := true)
 	box.play(lines)
 
 
-func _start_node_dialogue(path: String, on_finish: Callable, restore_control := true) -> void:
-	var manager := DialogueManager.new()
-	if not manager.load_script(path):
-		_show_toast(tr("DOCUMENT_MISSING"))
-		return
-	_dialogue_active = true
-	GameManager.set_state(GameManager.GameState.DIALOGUE_VN)
-	player.release_mouse()
-	player.set_physics_process(false)
-	_prompt.visible = false
-	_vnbox = VNBox.new()
-	_vnbox.theme = ThemeManager.get_theme()
-	_ui_layer.add_child(_vnbox)
-	var box := _vnbox
-	box.finished.connect(func() -> void:
-		box.queue_free()
-		_vnbox = null
-		_dialogue_active = false
-		GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
-		if restore_control:
-			player.set_physics_process(true)
-			player.capture_mouse()
-		if on_finish.is_valid():
-			on_finish.call()
-	)
-	box.play_graph(manager)
-
-
 func _start_ink_dialogue(path: String, on_finish: Callable, restore_control := true) -> void:
 	var manager := InkStorySession.new()
 	if not manager.load_script(path):
@@ -213,7 +185,7 @@ func _start_ink_dialogue(path: String, on_finish: Callable, restore_control := t
 		if on_finish.is_valid():
 			on_finish.call()
 	)
-	box.play_graph(manager)
+	box.play_session(manager)
 
 
 func _build_materials() -> void:

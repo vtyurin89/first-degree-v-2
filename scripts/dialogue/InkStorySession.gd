@@ -1,4 +1,4 @@
-extends DialogueManager
+extends BaseDialogueSession
 class_name InkStorySession
 
 const META_CONFIG := {
@@ -14,6 +14,8 @@ const META_CONFIG := {
 
 var current_suspect_id := "scolfield"
 
+var _loaded := false
+var _reached_milestones: Dictionary = {}
 var _story: InkStory
 var _path := ""
 var _ink_ended := false
@@ -183,6 +185,10 @@ func _localized(id: String, fallback: String) -> String:
 func is_meta_used(meta_id: String) -> bool:
 	if meta_id.begins_with("event:"):
 		return DiscoveryEventManager.is_triggered(meta_id.substr(6))
+	return GameManager.clicked_urls.has(meta_id)
+
+
+func is_meta_registered(meta_id: String) -> bool:
 	return GameManager.clicked_urls.has(meta_id)
 
 
