@@ -7,10 +7,11 @@ signal meta_clicked(url_id: String)
 signal line_shown(line: DialogueLine)
 
 const CHARS_PER_SEC := 45.0
-const LINK_DEFAULT_COLOR := "#c8a47b"
-const LINK_HOVER_COLOR := "#62dcff"
-const LINK_DEFAULT_OUTLINE := "#4a3826"
-const LINK_HOVER_OUTLINE := "#12475a"
+const LINK_DEFAULT_COLOR := "#e6d6bf"
+const LINK_HOVER_COLOR := "#f2feff"
+const LINK_DEFAULT_OUTLINE := "#3a2a1c"
+const LINK_HOVER_OUTLINE := "#38bdf8"
+const LINK_USED_COLOR := "#7c8087"
 
 @export var interrogation_mode := false
 @export var dialogue_path := ""
@@ -27,6 +28,8 @@ var _waiting_choice := false
 var _last_meta_frame := -1
 var _active_dialogue_path := ""
 var _line_source_text := ""
+var _line_plain_text := ""
+var _line_parts: Array = []
 var _updating_text := false
 var _hovered_meta := ""
 var _hold_active := false
@@ -35,6 +38,7 @@ var _hold_elapsed := 0.0
 var _hold_duration := 0.0
 var _hold_ring: HoldProgressRing
 var _cost_hint: CostHint
+var _clue_underlay: ClueUnderlay
 var _energy_meter: EnergyMeter
 
 var _nameplate: Label
@@ -183,6 +187,11 @@ func _display_line(line: DialogueLine) -> void:
 	_nameplate.modulate = _speaker_color(line.speaker)
 	_update_portrait(line.speaker, line.internal_thought, line.portrait_emotion)
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if line.internal_thought else Color(0.92, 0.9, 0.86))
+	_line_source_text = ""
+	_line_plain_text = ""
+	_line_parts.clear()
+	if _clue_underlay != null:
+		_clue_underlay.clear()
 	_text_label.text = line.text
 	_text_label.visible_characters = 0
 	_hint.text = ""
@@ -325,8 +334,6 @@ func _process(delta: float) -> void:
 		if total > 0 and int(_char_accum) >= total:
 			_complete_typing()
 	_update_hold(delta)
-	if _cost_hint != null and _cost_hint.visible:
-		_cost_hint.follow_mouse(get_global_mouse_position())
 
 
 func _build_meta_feedback() -> void:
@@ -357,9 +364,13 @@ func _on_ui_energy_changed(value: int) -> void:
 
 func _clear_meta_feedback() -> void:
 	_hovered_meta = ""
+	_line_plain_text = ""
+	_line_parts.clear()
 	_cancel_hold()
 	if _cost_hint != null:
 		_cost_hint.hide_hint()
+	if _clue_underlay != null:
+		_clue_underlay.clear()
 	if _energy_meter != null:
 		_energy_meter.clear_preview()
 
@@ -370,26 +381,51 @@ func _meta_is_used(meta_id: String) -> bool:
 	return _manager.is_meta_used(meta_id)
 
 
-func _format_interactive_text(text: String) -> String:
+func _parse_interactive_parts(text: String) -> Dictionary:
 	var regex := RegEx.new()
 	if regex.compile("\\[url=([^\\]]+)\\](.*?)\\[/url\\]") != OK:
-		return text
-	var output := ""
+		return {"plain": text, "parts": []}
+	var plain := ""
+	var parts: Array = []
 	var cursor := 0
 	for found in regex.search_all(text):
-		output += text.substr(cursor, found.get_start() - cursor)
-		var meta_id := found.get_string(1)
+		plain += text.substr(cursor, found.get_start() - cursor)
 		var inner := found.get_string(2)
+		var start := plain.length()
+		plain += inner
+		parts.append({
+			"meta": found.get_string(1),
+			"start": start,
+			"end": plain.length() - 1,
+			"text": inner,
+		})
 		cursor = found.get_end()
+	plain += text.substr(cursor)
+	return {"plain": plain, "parts": parts}
+
+
+func _format_interactive_text(text: String) -> String:
+	var parsed := _parse_interactive_parts(text)
+	_line_plain_text = String(parsed.get("plain", text))
+	_line_parts = parsed.get("parts", [])
+	var output := ""
+	var cursor := 0
+	for part in _line_parts:
+		var start := int(part.get("start", 0))
+		var end := int(part.get("end", -1))
+		var meta_id := String(part.get("meta", ""))
+		output += _line_plain_text.substr(cursor, start - cursor)
+		var inner := _line_plain_text.substr(start, end - start + 1)
 		if _meta_is_used(meta_id):
-			output += inner
-			continue
-		var hovered := meta_id == _hovered_meta
-		var color := LINK_HOVER_COLOR if hovered else LINK_DEFAULT_COLOR
-		var outline := LINK_HOVER_OUTLINE if hovered else LINK_DEFAULT_OUTLINE
-		var outline_size := 2 if hovered else 1
-		output += "[url=%s][outline_color=%s][outline_size=%d][color=%s]%s[/color][/outline_size][/outline_color][/url]" % [meta_id, outline, outline_size, color, inner]
-	output += text.substr(cursor)
+			output += "[color=%s]%s[/color]" % [LINK_USED_COLOR, inner]
+		else:
+			var hovered := meta_id == _hovered_meta
+			var color := LINK_HOVER_COLOR if hovered else LINK_DEFAULT_COLOR
+			var outline := LINK_HOVER_OUTLINE if hovered else LINK_DEFAULT_OUTLINE
+			var outline_size := 3 if hovered else 1
+			output += "[url=%s][outline_color=%s][outline_size=%d][color=%s]%s[/color][/outline_size][/outline_color][/url]" % [meta_id, outline, outline_size, color, inner]
+		cursor = end + 1
+	output += _line_plain_text.substr(cursor)
 	return output
 
 
@@ -402,23 +438,117 @@ func _refresh_interactive_text() -> void:
 	if visible >= 0:
 		_text_label.visible_characters = visible
 	_updating_text = false
+	_update_clue_underlay()
+
+
+func _on_text_label_resized() -> void:
+	if _typing or _updating_text or _line_source_text == "":
+		return
+	_update_clue_underlay.call_deferred()
+
+
+func _update_clue_underlay() -> void:
+	if _clue_underlay == null:
+		return
+	if _typing or _line_plain_text == "" or _line_parts.is_empty():
+		_clue_underlay.clear()
+		return
+	var font := _text_label.get_theme_font("normal_font")
+	if font == null:
+		font = ThemeDB.fallback_font
+	var font_size := _text_label.get_theme_font_size("normal_font_size")
+	var font_height := font.get_height(font_size)
+	var line_data: Array = []
+	for line_index in _text_label.get_line_count():
+		var line_range := _text_label.get_line_range(line_index)
+		var line_start := int(line_range.x)
+		var line_end := mini(int(line_range.y), _line_plain_text.length() - 1)
+		if line_end < line_start:
+			continue
+		line_data.append({
+			"index": line_index,
+			"start": line_start,
+			"end": line_end,
+			"y": float(_text_label.get_line_offset(line_index)),
+			"height": float(_text_label.get_line_height(line_index)),
+			"width": float(_text_label.get_line_width(line_index)),
+		})
+	var fragments: Array = []
+	for part in _line_parts:
+		var meta_id := String(part.get("meta", ""))
+		if _meta_is_used(meta_id):
+			continue
+		var part_start := int(part.get("start", 0))
+		var part_end := int(part.get("end", -1))
+		var rects: Array = []
+		var anchor := Rect2()
+		for line in line_data:
+			var line_start := int(line.get("start", 0))
+			var line_end := int(line.get("end", -1))
+			var segment_start := maxi(part_start, line_start)
+			var segment_end := mini(part_end, line_end)
+			if segment_end < segment_start:
+				continue
+			var prefix := _line_plain_text.substr(line_start, segment_start - line_start)
+			var segment := _line_plain_text.substr(segment_start, segment_end - segment_start + 1)
+			var x := font.get_string_size(prefix, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+			x += _line_alignment_offset(float(line.get("width", 0.0)))
+			var width := font.get_string_size(segment, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+			var y := float(line.get("y", 0.0)) + (float(line.get("height", 0.0)) - font_height) * 0.5
+			var rect := Rect2(
+				x - ClueUnderlay.PAD_X,
+				y - ClueUnderlay.PAD_Y,
+				width + ClueUnderlay.PAD_X * 2.0,
+				font_height + ClueUnderlay.PAD_Y * 2.0
+			)
+			rects.append(rect)
+			if anchor.size == Vector2.ZERO:
+				anchor = rect
+		if not rects.is_empty():
+			fragments.append({"meta": meta_id, "rects": rects, "anchor": anchor})
+	_clue_underlay.set_hovered(_hovered_meta)
+	_clue_underlay.set_fragments(fragments)
+
+
+func _line_alignment_offset(line_width: float) -> float:
+	match _text_label.horizontal_alignment:
+		HORIZONTAL_ALIGNMENT_CENTER:
+			return maxf((_text_label.size.x - line_width) * 0.5, 0.0)
+		HORIZONTAL_ALIGNMENT_RIGHT:
+			return maxf(_text_label.size.x - line_width, 0.0)
+		_:
+			return 0.0
+
+
+func _meta_global_rect(meta_id: String) -> Rect2:
+	if _clue_underlay == null:
+		return Rect2()
+	var local := _clue_underlay.get_fragment_rect(meta_id)
+	if local.size == Vector2.ZERO:
+		return Rect2()
+	return Rect2(_clue_underlay.global_position + local.position, local.size)
 
 
 func _on_meta_hover_started(meta) -> void:
 	if _updating_text:
 		return
-	_hovered_meta = String(meta)
+	var meta_id := String(meta)
+	_hovered_meta = meta_id
 	_refresh_interactive_text()
-	if _manager == null or _meta_is_used(_hovered_meta):
+	if _manager == null or _meta_is_used(meta_id):
 		_hide_meta_hint()
 		return
-	var cost := _manager.get_meta_cost(_hovered_meta)
+	var cost := _manager.get_meta_cost(meta_id)
 	if cost <= 0:
 		_hide_meta_hint()
 		return
 	if _cost_hint != null:
-		_cost_hint.show_cost(cost, GameManager.player_energy < cost)
-		_cost_hint.follow_mouse(get_global_mouse_position())
+		var rect := _meta_global_rect(meta_id)
+		if rect.size == Vector2.ZERO:
+			_cost_hint.show_cost(cost, GameManager.player_energy < cost)
+			_cost_hint.follow_mouse(get_global_mouse_position())
+		else:
+			_cost_hint.display_at(rect, cost, GameManager.player_energy < cost)
 	if _energy_meter != null:
 		_energy_meter.preview_cost(cost)
 
@@ -461,8 +591,12 @@ func _begin_hold() -> void:
 	var cost := _manager.get_meta_cost(_hovered_meta)
 	if GameManager.player_energy < cost:
 		if _cost_hint != null:
-			_cost_hint.show_cost(cost, true)
-			_cost_hint.follow_mouse(get_global_mouse_position())
+			var rect := _meta_global_rect(_hovered_meta)
+			if rect.size == Vector2.ZERO:
+				_cost_hint.show_cost(cost, true)
+				_cost_hint.follow_mouse(get_global_mouse_position())
+			else:
+				_cost_hint.display_at(rect, cost, true)
 		if _energy_meter != null:
 			_energy_meter.preview_cost(cost)
 		return
@@ -510,12 +644,14 @@ func _finish_hold() -> void:
 		_energy_meter.clear_preview()
 	if not completed or _hovered_meta != meta_id:
 		return
+	var burst_rect := _meta_global_rect(meta_id)
 	if _manager == null or _manager.click_meta(meta_id) == false:
 		_refresh_status()
 		return
 	_last_meta_frame = Engine.get_process_frames()
 	_hovered_meta = ""
 	_refresh_interactive_text()
+	_spawn_shards(burst_rect)
 	_micro_impulse()
 	meta_clicked.emit(meta_id)
 	_update_hint()
@@ -538,6 +674,13 @@ func _cancel_hold() -> void:
 		_energy_meter.clear_preview()
 
 
+func _spawn_shards(rect: Rect2) -> void:
+	var center := rect.get_center() if rect.size != Vector2.ZERO else get_global_mouse_position()
+	var burst := ClueShardBurst.new()
+	add_child(burst)
+	burst.spawn(center - global_position, Color(0.35, 0.9, 1.0))
+
+
 func _micro_impulse() -> void:
 	if _flash != null:
 		_flash.color = Color(0.6, 0.95, 1.0, 0.28)
@@ -553,6 +696,7 @@ func _micro_impulse() -> void:
 func _complete_typing() -> void:
 	_typing = false
 	_text_label.visible_characters = -1
+	_update_clue_underlay()
 	_update_hint()
 
 
@@ -877,12 +1021,19 @@ func _build_ui() -> void:
 	_text_label = RichTextLabel.new()
 	_text_label.bbcode_enabled = true
 	_text_label.scroll_active = false
+	_text_label.meta_underlined = false
+	_text_label.clip_contents = false
 	_text_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_text_label.custom_minimum_size = Vector2(0, 120)
 	_text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_text_label.theme_type_variation = UITheme.BODY
+	_text_label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
 	_text_label.meta_hover_started.connect(_on_meta_hover_started)
 	_text_label.meta_hover_ended.connect(_on_meta_hover_ended)
+	_text_label.resized.connect(_on_text_label_resized)
+	_clue_underlay = ClueUnderlay.new()
+	_clue_underlay.show_behind_parent = true
+	_text_label.add_child(_clue_underlay)
 	vbox.add_child(_text_label)
 
 	_choice_container = VBoxContainer.new()

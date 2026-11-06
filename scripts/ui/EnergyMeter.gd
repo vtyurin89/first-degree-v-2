@@ -13,6 +13,7 @@ const BAR_Y := 34.0
 var _energy := 0
 var _preview_cost := 0
 var _preview_insufficient := false
+var _pulse_time := 0.0
 
 
 func _ready() -> void:
@@ -41,6 +42,14 @@ func preview_cost(cost: int) -> void:
 func clear_preview() -> void:
 	_preview_cost = 0
 	_preview_insufficient = false
+	_pulse_time = 0.0
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	if _preview_cost <= 0:
+		return
+	_pulse_time += delta
 	queue_redraw()
 
 
@@ -86,12 +95,13 @@ func _draw() -> void:
 			draw_rect(rect, Color(0.78, 0.78, 0.75), true, -1.0, true)
 
 	if _preview_cost > 0:
+		var pulse := 0.5 + 0.5 * sin(_pulse_time * 9.0)
 		var preview_rect := Rect2(Vector2(PADDING_X, BAR_Y - 4), Vector2(BAR_COUNT * (BAR_WIDTH + BAR_GAP) - BAR_GAP, BAR_HEIGHT + 8))
-		var color := Color(0.35, 0.86, 1.0, 0.9)
+		var color := Color(0.35, 0.86, 1.0, 0.55 + 0.4 * pulse)
 		if _preview_insufficient:
-			color = Color(0.95, 0.2, 0.18, 0.95)
+			color = Color(0.95, 0.2, 0.18, 0.6 + 0.35 * pulse)
 		draw_rect(preview_rect, color, false, 2.0, true)
 		var first := maxi(0, _energy - _preview_cost)
 		for i in range(first, mini(_energy, BAR_COUNT)):
 			var rect := Rect2(Vector2(PADDING_X + i * (BAR_WIDTH + BAR_GAP), BAR_Y), Vector2(BAR_WIDTH, BAR_HEIGHT))
-			draw_rect(rect, Color(0.35, 0.86, 1.0, 0.35), true)
+			draw_rect(rect, Color(0.35, 0.86, 1.0, 0.22 + 0.38 * pulse), true)

@@ -55,7 +55,7 @@ func _process(_delta: float) -> void:
 		return
 	_current = player.get_interactable()
 	if _current != null:
-		_prompt.text = tr(_current.prompt)
+		_prompt.text = "[E] " + tr(_current.prompt)
 		_prompt.visible = true
 		if Input.is_action_just_pressed("interact"):
 			_trigger(_current)

@@ -96,7 +96,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 
 
 func _on_interact_focused(prompt_text: String, _screen_position: Vector2) -> void:
-	_prompt.text = prompt_text
+	_prompt.text = "[E] " + prompt_text
 	_prompt.visible = true
 	if _prompt_tween != null and _prompt_tween.is_valid():
 		_prompt_tween.kill()
