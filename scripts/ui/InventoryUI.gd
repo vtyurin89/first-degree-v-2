@@ -104,7 +104,7 @@ func _build_task_sticky() -> void:
 func _build_notebook() -> void:
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-	_set_rect(panel, 0.03, 0.35, 0.38, 0.94, 0, 0, 0, 0)
+	_set_rect(panel, 0.03, 0.40, 0.38, 0.94, 0, 0, 0, 0)
 	var paper_style := UIPalette.make_style(PAPER, Color(0.42, 0.35, 0.26), 1, 3, 18)
 	paper_style.shadow_color = Color(0.0, 0.0, 0.0, 0.55)
 	paper_style.shadow_size = 10
@@ -116,18 +116,8 @@ func _build_notebook() -> void:
 	vbox.add_theme_constant_override("separation", 8)
 	panel.add_child(vbox)
 
-	var spiral := HBoxContainer.new()
-	spiral.add_theme_constant_override("separation", 24)
+	var spiral := SpiralBinding.new()
 	vbox.add_child(spiral)
-	var ring_style := StyleBoxFlat.new()
-	ring_style.bg_color = Color(0.34, 0.33, 0.35)
-	ring_style.set_corner_radius_all(5)
-	for i in 7:
-		var ring := Panel.new()
-		ring.custom_minimum_size = Vector2(9, 9)
-		ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		ring.add_theme_stylebox_override("panel", ring_style)
-		spiral.add_child(ring)
 
 	_notes_title = Label.new()
 	_notes_title.theme_type_variation = UITheme.MODAL_TITLE
