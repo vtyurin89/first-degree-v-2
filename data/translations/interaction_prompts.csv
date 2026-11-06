@@ -1,6 +1,7 @@
 "keys","en","ru"
 "COFFEE_FULL","No room for more coffee. Already jittery.","Больше кофе не влезет. И так трясёт."
 "COFFEE_DRANK","Coffee. One step closer to sober. Energy +1.","Кофе. Плюс один шаг к трезвости. Энергия +1."
+"COFFEE_LIMIT","That's enough coffee for now.","На сегодня кофе хватит."
 "PROMPT_COFFEE","Coffee machine — grab a coffee","Кофемашина — взять кофе"
 "PROMPT_BOARD","Case board — review the files","Доска дел — изучить материалы"
 "PROMPT_CABINET","File cabinet — take a look","Шкаф с делами — осмотреть"

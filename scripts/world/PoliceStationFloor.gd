@@ -12,7 +12,6 @@ var _ui_layer: CanvasLayer
 var _prompt: Label
 var _toast: Label
 var _energy_meter: EnergyMeter
-var _controls_label: Label
 var _toast_tween: Tween
 var _prompt_tween: Tween
 var _overlay_rect: ColorRect
@@ -58,10 +57,12 @@ func _ready() -> void:
 func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 	match id:
 		"coffee":
-			if GameManager.player_energy >= GameManager.MAX_ENERGY:
+			if not GameManager.can_drink_coffee():
+				_show_toast(tr("COFFEE_LIMIT"))
+			elif GameManager.player_energy >= GameManager.MAX_ENERGY:
 				_show_toast(tr("COFFEE_FULL"))
 			else:
-				GameManager.add_energy(1)
+				GameManager.drink_coffee()
 				GameManager.play_cue(660.0, 0.14, -8.0)
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
@@ -95,7 +96,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 
 
 func _on_interact_focused(prompt_text: String, _screen_position: Vector2) -> void:
-	_prompt.text = "[E] " + prompt_text
+	_prompt.text = prompt_text
 	_prompt.visible = true
 	if _prompt_tween != null and _prompt_tween.is_valid():
 		_prompt_tween.kill()
@@ -121,8 +122,6 @@ func _on_weller_finished() -> void:
 func _on_locale_changed(_locale: String) -> void:
 	if _energy_meter != null:
 		_energy_meter.set_energy(GameManager.player_energy)
-	if _controls_label != null:
-		_controls_label.text = tr("OFFICE_CONTROLS")
 	if _interactor != null:
 		_interactor.refresh_focus()
 
@@ -244,9 +243,13 @@ func _build_anna_office() -> void:
 	for sx in [-1.0, 1.0]:
 		for sz in [-1.0, 1.0]:
 			_make_box(Vector3(0.08, 0.72, 0.08), Vector3(-9.0 + sx * 1.0, 0.36, 5.0 + sz * 0.5), _mat_dark)
-	_make_box(Vector3(0.16, 0.3, 0.3), Vector3(-9.6, 1.18, 5.0), _mat_black_device())
-	_make_box(Vector3(0.5, 0.32, 0.05), Vector3(-9.6, 1.2, 5.0), _make_emissive(Color(0.5, 0.6, 0.55), 0.6))
-	_make_box(Vector3(0.45, 0.14, 0.4), Vector3(-9.9, 1.0, 4.7), _mat_dark)
+	# Monitor: CRT-style body on a stand, screen facing the player's side of the desk.
+	_make_box(Vector3(0.34, 0.03, 0.22), Vector3(-9.55, 0.815, 5.08), _mat_metal, false)
+	_make_box(Vector3(0.08, 0.18, 0.08), Vector3(-9.55, 0.9, 5.12), _mat_metal, false)
+	_make_box(Vector3(0.56, 0.4, 0.28), Vector3(-9.55, 1.19, 5.14), _mat_dark, false)
+	_make_box(Vector3(0.46, 0.3, 0.015), Vector3(-9.55, 1.19, 4.993), _make_emissive(Color(0.3, 0.38, 0.43), 0.45), false)
+	_make_box(Vector3(0.42, 0.03, 0.16), Vector3(-9.55, 0.815, 4.8), _mat_dark, false)
+	_make_box(Vector3(0.3, 0.12, 0.28), Vector3(-10.0, 0.86, 4.62), _mat_dark, false)
 	_make_box(Vector3(0.24, 0.01, 0.3), Vector3(-8.5, 0.81, 4.7), _mat_paper, false)
 	_make_box(Vector3(0.24, 0.01, 0.3), Vector3(-8.45, 0.82, 4.65), _mat_paper, false)
 	_add_cyl_to(self, 0.05, 0.09, Vector3(-8.3, 0.84, 5.25), _mat_metal)
@@ -285,8 +288,35 @@ func _build_breakroom() -> void:
 	_add_cyl_to(self, 0.045, 0.12, Vector3(-1.45, 1.08, 3.72), _mat_metal)
 	_make_box(Vector3(0.5, 0.03, 0.28), Vector3(-1.45, 1.02, 3.75), _mat_metal, false)
 
-	_make_box(Vector3(0.9, 1.9, 0.6), Vector3(-4.6, 0.95, 7.15), _mat_dark)
-	_make_box(Vector3(0.7, 1.2, 0.03), Vector3(-4.6, 1.15, 6.58), _make_emissive(Color(0.5, 0.6, 0.7), 0.7), false)
+	# Vending machine: cabinet with a lit product window, control panel and dispenser.
+	var vend_body := _make_material(Color(0.16, 0.18, 0.2), null, 1.0, 0.55, 0.25)
+	var vend_glass := _make_material(Color(0.35, 0.45, 0.5, 0.2), null, 1.0, 0.12, 0.0, Color(0, 0, 0), 0.0, 0.2)
+	_make_box(Vector3(0.9, 1.9, 0.6), Vector3(-4.6, 0.95, 7.15), vend_body)
+	_make_box(Vector3(0.66, 1.3, 0.02), Vector3(-4.72, 1.14, 6.845), _mat_dark, false)
+	var product_colors := [
+		Color(0.62, 0.24, 0.17), Color(0.72, 0.55, 0.16), Color(0.24, 0.42, 0.25),
+		Color(0.2, 0.34, 0.55), Color(0.55, 0.3, 0.5), Color(0.5, 0.45, 0.32),
+	]
+	for row in 4:
+		var shelf_y := 0.585 + row * 0.3
+		_make_box(Vector3(0.66, 0.02, 0.08), Vector3(-4.72, shelf_y, 6.82), _mat_metal, false)
+		for col in 4:
+			var product_color: Color = product_colors[(row * 4 + col) % product_colors.size()]
+			var product := _make_material(product_color, null, 1.0, 0.75, 0.0)
+			_make_box(Vector3(0.11, 0.16, 0.06), Vector3(-4.94 + col * 0.15, shelf_y + 0.09, 6.83), product, false)
+	_make_box(Vector3(0.68, 1.32, 0.012), Vector3(-4.72, 1.14, 6.795), vend_glass, false)
+	_make_box(Vector3(0.72, 0.04, 0.03), Vector3(-4.72, 1.82, 6.79), _mat_metal, false)
+	_make_box(Vector3(0.72, 0.04, 0.03), Vector3(-4.72, 0.46, 6.79), _mat_metal, false)
+	_make_box(Vector3(0.04, 1.4, 0.03), Vector3(-5.06, 1.14, 6.79), _mat_metal, false)
+	_make_box(Vector3(0.04, 1.4, 0.03), Vector3(-4.38, 1.14, 6.79), _mat_metal, false)
+	_make_box(Vector3(0.16, 0.46, 0.02), Vector3(-4.24, 1.36, 6.83), _mat_metal, false)
+	for row in 3:
+		for col in 2:
+			_make_box(Vector3(0.03, 0.03, 0.01), Vector3(-4.28 + col * 0.08, 1.24 + row * 0.08, 6.815), _make_emissive(Color(0.55, 0.65, 0.5), 0.6), false)
+	_make_box(Vector3(0.09, 0.015, 0.01), Vector3(-4.24, 1.08, 6.815), _mat_dark, false)
+	_make_box(Vector3(0.52, 0.16, 0.03), Vector3(-4.72, 0.28, 6.83), _mat_dark, false)
+	_make_box(Vector3(0.54, 0.03, 0.05), Vector3(-4.72, 0.37, 6.815), _mat_metal, false)
+	_add_omni(Vector3(-4.72, 1.25, 6.6), Color(0.55, 0.7, 0.85), 0.45, 1.4, false)
 	_make_box(Vector3(0.6, 1.0, 0.35), Vector3(-2.6, 0.5, 7.05), _mat_metal)
 	_make_box(Vector3(1.2, 0.06, 0.5), Vector3(-3.6, 0.9, 7.05), _mat_dark, false)
 	_make_box(Vector3(0.9, 0.8, 0.03), Vector3(-3.6, 1.45, 7.28), _mat_glass, false)
@@ -595,21 +625,6 @@ func _build_hud() -> void:
 	_toast.offset_bottom = 84
 	_ui_layer.add_child(_toast)
 
-	var controls := Label.new()
-	controls.text = tr("OFFICE_CONTROLS")
-	controls.theme = ThemeManager.get_theme()
-	controls.theme_type_variation = UITheme.SMALL
-	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
-	controls.anchor_left = 0.0
-	controls.anchor_right = 1.0
-	controls.anchor_top = 1.0
-	controls.anchor_bottom = 1.0
-	controls.offset_top = -34
-	controls.offset_bottom = -8
-	controls.offset_left = 24
-	_ui_layer.add_child(controls)
-	_controls_label = controls
-
 
 func _on_energy_changed(value: int) -> void:
 	if _energy_meter != null:
@@ -904,10 +919,6 @@ func _make_material(color: Color, tex: Texture2D = null, uv_scale: float = 1.0, 
 
 func _make_emissive(color: Color, energy: float) -> StandardMaterial3D:
 	return _make_material(color, null, 1.0, 0.4, 0.0, color, energy)
-
-
-func _mat_black_device() -> StandardMaterial3D:
-	return _mat_dark
 
 
 func _make_tile_texture() -> ImageTexture:

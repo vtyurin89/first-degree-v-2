@@ -21,6 +21,7 @@ const DEFAULT_ENERGY := 4
 const DEFAULT_SLOTS := 6
 const MAX_CIGARETTES := 20
 const DEFAULT_CIGARETTES := 3
+const COFFEE_USES_PER_CHAPTER := 1
 
 const SCENE_PROLOGUE := "res://scenes/Prologue.tscn"
 const SCENE_OFFICE := "res://scenes/Office3D.tscn"
@@ -36,6 +37,7 @@ var weller_trust: int = 50
 var alex_monologue_index: int = 0
 var cigarettes: int = DEFAULT_CIGARETTES
 var cigarettes_smoked_today: int = 0
+var coffee_uses_this_chapter: int = 0
 var has_case_file := false
 
 var admissibility_status: String = "CLEAN"
@@ -67,6 +69,7 @@ func reset_run() -> void:
 	alex_monologue_index = 0
 	cigarettes = DEFAULT_CIGARETTES
 	cigarettes_smoked_today = 0
+	coffee_uses_this_chapter = 0
 	has_case_file = false
 	admissibility_status = "CLEAN"
 	attorney_resistance = 0
@@ -94,6 +97,7 @@ func capture_state() -> Dictionary:
 		"alex_monologue_index": alex_monologue_index,
 		"cigarettes": cigarettes,
 		"cigarettes_smoked_today": cigarettes_smoked_today,
+		"coffee_uses_this_chapter": coffee_uses_this_chapter,
 		"has_case_file": has_case_file,
 		"admissibility_status": admissibility_status,
 		"attorney_resistance": attorney_resistance,
@@ -119,6 +123,7 @@ func restore_state(data: Dictionary) -> void:
 	alex_monologue_index = int(data.get("alex_monologue_index", 0))
 	cigarettes = clampi(int(data.get("cigarettes", DEFAULT_CIGARETTES)), 0, MAX_CIGARETTES)
 	cigarettes_smoked_today = maxi(int(data.get("cigarettes_smoked_today", 0)), 0)
+	coffee_uses_this_chapter = maxi(int(data.get("coffee_uses_this_chapter", 0)), 0)
 	has_case_file = bool(data.get("has_case_file", false))
 	admissibility_status = String(data.get("admissibility_status", "CLEAN"))
 	attorney_resistance = clampi(int(data.get("attorney_resistance", 0)), 0, 100)
@@ -223,6 +228,22 @@ func smoke_cigarette() -> bool:
 	cigarettes_smoked_today += 1
 	cigarettes_changed.emit(cigarettes)
 	return true
+
+
+func can_drink_coffee() -> bool:
+	return coffee_uses_this_chapter < COFFEE_USES_PER_CHAPTER
+
+
+func drink_coffee() -> bool:
+	if not can_drink_coffee():
+		return false
+	coffee_uses_this_chapter += 1
+	add_energy(1)
+	return true
+
+
+func reset_coffee_limit() -> void:
+	coffee_uses_this_chapter = 0
 
 
 func modify_energy(delta: int) -> int:

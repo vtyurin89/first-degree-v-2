@@ -322,6 +322,7 @@ func _bind_externals() -> void:
 	_story.bind_external_function("get_attorney_risk", self, "_ink_get_attorney_risk", true)
 	_story.bind_external_function("add_flag", self, "_ink_add_flag", false)
 	_story.bind_external_function("modify_attorney_risk", self, "_ink_modify_attorney_risk", false)
+	_story.bind_external_function("reset_coffee_limit", self, "_ink_reset_coffee_limit", false)
 
 
 func _ink_has_flag(flag: String) -> bool:
@@ -362,3 +363,7 @@ func _ink_add_flag(flag: String) -> void:
 
 func _ink_modify_attorney_risk(delta: int) -> void:
 	GameManager.modify_attorney_risk(delta)
+
+
+func _ink_reset_coffee_limit() -> void:
+	GameManager.reset_coffee_limit()

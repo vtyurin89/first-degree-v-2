@@ -10,7 +10,6 @@ var _ui_layer: CanvasLayer
 var _prompt: Label
 var _toast: Label
 var _energy_meter: EnergyMeter
-var _controls_label: Label
 var _toast_tween: Tween
 var _overlay_rect: ColorRect
 var _vnbox: VNBox
@@ -56,7 +55,7 @@ func _process(_delta: float) -> void:
 		return
 	_current = player.get_interactable()
 	if _current != null:
-		_prompt.text = "[E] " + tr(_current.prompt)
+		_prompt.text = tr(_current.prompt)
 		_prompt.visible = true
 		if Input.is_action_just_pressed("interact"):
 			_trigger(_current)
@@ -67,10 +66,12 @@ func _process(_delta: float) -> void:
 func _trigger(target: Interactable) -> void:
 	match target.interact_id:
 		"coffee":
-			if GameManager.player_energy >= GameManager.MAX_ENERGY:
+			if not GameManager.can_drink_coffee():
+				_show_toast(tr("COFFEE_LIMIT"))
+			elif GameManager.player_energy >= GameManager.MAX_ENERGY:
 				_show_toast(tr("COFFEE_FULL"))
 			else:
-				GameManager.add_energy(1)
+				GameManager.drink_coffee()
 				GameManager.play_cue(660.0, 0.14, -8.0)
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
@@ -100,8 +101,6 @@ func _on_weller_finished() -> void:
 func _on_locale_changed(_locale: String) -> void:
 	if _energy_meter != null:
 		_energy_meter.set_energy(GameManager.player_energy)
-	if _controls_label != null:
-		_controls_label.text = tr("OFFICE_CONTROLS")
 
 
 func _document_sequence(id: String, chapter: String = "chapter1") -> Array:
@@ -651,21 +650,6 @@ func _build_hud() -> void:
 	_toast.offset_top = 56
 	_toast.offset_bottom = 84
 	_ui_layer.add_child(_toast)
-
-	var controls := Label.new()
-	controls.text = tr("OFFICE_CONTROLS")
-	controls.theme = ThemeManager.get_theme()
-	controls.theme_type_variation = UITheme.SMALL
-	controls.modulate = Color(0.7, 0.7, 0.7, 0.8)
-	controls.anchor_left = 0.0
-	controls.anchor_right = 1.0
-	controls.anchor_top = 1.0
-	controls.anchor_bottom = 1.0
-	controls.offset_top = -34
-	controls.offset_bottom = -8
-	controls.offset_left = 24
-	_ui_layer.add_child(controls)
-	_controls_label = controls
 
 
 func _on_energy_changed(value: int) -> void:
