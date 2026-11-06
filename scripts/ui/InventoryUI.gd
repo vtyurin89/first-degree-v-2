@@ -7,9 +7,9 @@ const NOTES_PER_PAGE := 3
 
 const ITEMS := [
 	{"id": "case_file", "name_key": "ITEM_CASE_FILE", "icon": "res://assets/icons/items/ic_case_file.svg", "pos": Vector2(0.06, 0.12), "size": Vector2(240, 310), "color": Color(0.75, 0.62, 0.32)},
-	{"id": "cigarettes", "name_key": "ITEM_CIGARETTES", "icon": "res://assets/icons/items/ic_cigarettes.svg", "pos": Vector2(0.62, 0.05), "size": Vector2(110, 150), "color": Color(0.82, 0.8, 0.74)},
-	{"id": "lighter", "name_key": "ITEM_LIGHTER", "icon": "res://assets/icons/items/ic_lighter.svg", "pos": Vector2(0.84, 0.13), "size": Vector2(55, 100), "color": Color(0.15, 0.15, 0.16)},
-	{"id": "keys", "name_key": "ITEM_KEYS", "icon": "res://assets/icons/items/ic_keys.svg", "pos": Vector2(0.53, 0.62), "size": Vector2(140, 100), "color": Color(0.7, 0.6, 0.3)},
+	{"id": "cigarettes", "name_key": "ITEM_CIGARETTES", "icon": "res://assets/icons/items/ic_cigarettes.png", "icon_region": Rect2(318, 34, 421, 697), "pos": Vector2(0.62, 0.05), "size": Vector2(110, 150), "color": Color(0.82, 0.8, 0.74)},
+	{"id": "lighter", "name_key": "ITEM_LIGHTER", "icon": "res://assets/icons/items/ic_lighter.png", "pos": Vector2(0.84, 0.13), "size": Vector2(55, 130), "color": Color(0.15, 0.15, 0.16)},
+	{"id": "keys", "name_key": "ITEM_KEYS", "icon": "res://assets/icons/items/ic_keys.png", "pos": Vector2(0.53, 0.62), "size": Vector2(160, 120), "color": Color(0.7, 0.6, 0.3)},
 	{"id": "badge", "name_key": "ITEM_BADGE", "icon": "res://assets/icons/items/ic_badge.svg", "pos": Vector2(0.80, 0.60), "size": Vector2(110, 140), "color": Color(0.2, 0.28, 0.4)},
 ]
 
@@ -363,6 +363,11 @@ func _make_item_slot(item: Dictionary) -> void:
 	var texture = load(String(item["icon"]))
 	if texture == null:
 		texture = _make_placeholder_icon(item["color"])
+	elif item.has("icon_region") and texture is Texture2D:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = texture
+		atlas.region = item["icon_region"]
+		texture = atlas
 	icon.texture = texture
 	slot.add_child(icon)
 

@@ -1,7 +1,7 @@
 extends Node
 
 const CHARACTER_DIR := "res://data/characters"
-const CHARACTER_IDS := ["anna", "weller", "scolfield", "greenway"]
+const CHARACTER_IDS := ["anna", "weller", "scolfield", "greenway", "mendoza"]
 
 var _characters: Dictionary = {}
 
