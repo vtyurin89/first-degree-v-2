@@ -942,6 +942,7 @@ func _build_ui() -> void:
 		status_style.content_margin_top = 8
 		status_style.content_margin_bottom = 8
 		status_panel.add_theme_stylebox_override("panel", status_style)
+		status_panel.visible = false
 		add_child(status_panel)
 
 		_status_label = Label.new()
@@ -954,6 +955,7 @@ func _build_ui() -> void:
 		_chapter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		_chapter_label.theme_type_variation = UITheme.CHAPTER
 		_chapter_label.modulate = Color(0.85, 0.75, 0.5)
+		_chapter_label.visible = false
 		_set_rect(_chapter_label, 0.5, 0, 1, 0, 0, 64, -24, 92)
 		add_child(_chapter_label)
 
