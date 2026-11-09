@@ -34,6 +34,30 @@ EXTERNAL modify_attorney_risk(delta)
 
 === p1_coffee_yes ===
 Детектив Уэллер принесёт нам кофе. Вы какой любите? # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_FAVOURITE_COFFEE_QUESTION
+-> p1_scolfield_coffee_thanks
+
+=== p1_scolfield_coffee_thanks ===
+Большое спасибо. Мне чёрный, пожалуйста. Без сахара, без этих ваших сливок. Мы на службе пили такой. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_FAVOURITE_COFFEE_ANSWER
+-> p1_coffee_remark
+
+=== p1_coffee_remark ===
+Знаете, я сама без порции капучино не могу даже полдня прожить. # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_COFFEE_REMARK
+-> p1_coffee_order
+
+=== p1_coffee_order ===
+Детектив Уэллер, будьте добры, два кофе. Один чёрный, без сахара. # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_COFFEE_ORDER
+-> p1_coffee_mirror
+
+=== p1_coffee_mirror ===
+Он там, да? За зеркалом? Здравствуйте, детектив! # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_COFFEE_MIRROR
+-> p1_begin_questioning_1
+
+=== p1_begin_questioning_1 ===
+Скажу, как всё устроено. Наш разговор записывается. Вы здесь по собственной воле: вы не задержаны, обвинений вам не предъявлено, и вы можете встать и уйти в любой момент. Но я буду очень благодарна, если вы останетесь. # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_BEGIN_QUESTIONING_1
+-> p1_begin_questioning_2
+
+=== p1_begin_questioning_2 ===
+Вы лучше всех знали Грега и были в доме в тот день. Если кто-то и может помочь нам понять, что произошло, то это вы! # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_BEGIN_QUESTIONING_2
 -> p1_hub
 
 === p1_hub ===

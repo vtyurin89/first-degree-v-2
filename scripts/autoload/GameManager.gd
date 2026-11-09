@@ -202,6 +202,16 @@ func open_main_menu() -> void:
 	change_scene(SCENE_MAIN_MENU, 1.0)
 
 
+func start_interrogation_one() -> void:
+	get_tree().paused = false
+	reset_run()
+	has_case_file = true
+	ObjectiveManager.complete_objective("take_case")
+	add_flag("weller_briefing_done")
+	set_state(GameState.INTERROGATION)
+	change_scene(SCENE_INTERROGATION, 0.5)
+
+
 func add_energy(amount: int) -> int:
 	player_energy = clampi(player_energy + amount, 0, MAX_ENERGY)
 	energy_changed.emit(player_energy)

@@ -14,10 +14,16 @@ var _language_ru: Button
 var _language_en: Button
 var _skip_check: CheckBox
 var _skip_hint: Label
+var _dev_tools_check: CheckBox
+var _dev_tools_hint: Label
+var _save_button: Button
 var _close_button: Button
 var _control_actions: Array = []
 var _active_tab := "general"
 var _built := false
+var _draft_locale := ""
+var _draft_skip_prologue := false
+var _draft_dev_tools := true
 
 
 func _ready() -> void:
@@ -26,6 +32,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build()
 	_built = true
+	_snapshot_settings()
 	_apply_texts()
 	_set_tab("general")
 	_tab_general.grab_focus()
@@ -120,14 +127,14 @@ func _build() -> void:
 	_language_ru.custom_minimum_size = Vector2(150, 40)
 	_language_ru.theme_type_variation = UITheme.BUTTON
 	_language_ru.focus_mode = Control.FOCUS_ALL
-	_language_ru.pressed.connect(func() -> void: LocalizationManager.set_locale("ru"))
+	_language_ru.pressed.connect(_on_language_selected.bind("ru"))
 	language_row.add_child(_language_ru)
 
 	_language_en = Button.new()
 	_language_en.custom_minimum_size = Vector2(150, 40)
 	_language_en.theme_type_variation = UITheme.BUTTON
 	_language_en.focus_mode = Control.FOCUS_ALL
-	_language_en.pressed.connect(func() -> void: LocalizationManager.set_locale("en"))
+	_language_en.pressed.connect(_on_language_selected.bind("en"))
 	language_row.add_child(_language_en)
 
 	_skip_check = CheckBox.new()
@@ -146,6 +153,23 @@ func _build() -> void:
 	_skip_hint.add_theme_color_override("font_color", UIPalette.TEXT_DIM)
 	_skip_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_general_page.add_child(_skip_hint)
+
+	_dev_tools_check = CheckBox.new()
+	_dev_tools_check.theme_type_variation = UITheme.CHECK
+	_dev_tools_check.focus_mode = Control.FOCUS_ALL
+	_dev_tools_check.custom_minimum_size = Vector2(0, 36)
+	_dev_tools_check.add_theme_color_override("font_color", UIPalette.TEXT)
+	_dev_tools_check.add_theme_color_override("font_hover_color", UIPalette.WHITE)
+	_dev_tools_check.add_theme_color_override("font_pressed_color", UIPalette.WHITE)
+	_dev_tools_check.add_theme_color_override("font_focus_color", UIPalette.WHITE)
+	_dev_tools_check.toggled.connect(_on_dev_tools_toggled)
+	_general_page.add_child(_dev_tools_check)
+
+	_dev_tools_hint = Label.new()
+	_dev_tools_hint.theme_type_variation = UITheme.SMALL
+	_dev_tools_hint.add_theme_color_override("font_color", UIPalette.TEXT_DIM)
+	_dev_tools_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_general_page.add_child(_dev_tools_hint)
 
 	var general_spacer := Control.new()
 	general_spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -182,9 +206,17 @@ func _build() -> void:
 	_close_button.custom_minimum_size = Vector2(180, 44)
 	_close_button.theme_type_variation = UITheme.BUTTON
 	_close_button.focus_mode = Control.FOCUS_ALL
-	_style_primary(_close_button)
+	_style_secondary(_close_button)
 	_close_button.pressed.connect(func() -> void: closed.emit())
 	footer.add_child(_close_button)
+
+	_save_button = Button.new()
+	_save_button.custom_minimum_size = Vector2(180, 44)
+	_save_button.theme_type_variation = UITheme.BUTTON
+	_save_button.focus_mode = Control.FOCUS_ALL
+	_style_primary(_save_button)
+	_save_button.pressed.connect(_on_save_pressed)
+	footer.add_child(_save_button)
 
 
 func _make_tab_button() -> Button:
@@ -219,6 +251,12 @@ func _add_control_row(key: String, action_key: String) -> void:
 	_control_actions.append({"label": action_label, "key": action_key})
 
 
+func _snapshot_settings() -> void:
+	_draft_locale = LocalizationManager.current_locale
+	_draft_skip_prologue = GameSettings.skip_prologue
+	_draft_dev_tools = GameSettings.dev_tools_enabled
+
+
 func _apply_texts() -> void:
 	_title.text = tr("SETTINGS_TITLE")
 	_tab_general.text = tr("SETTINGS_TAB_GENERAL")
@@ -227,8 +265,12 @@ func _apply_texts() -> void:
 	_language_ru.text = tr("LANGUAGE_RU")
 	_language_en.text = tr("LANGUAGE_EN")
 	_skip_check.text = tr("SETTINGS_SKIP_PROLOGUE")
-	_skip_check.button_pressed = GameSettings.skip_prologue
+	_skip_check.button_pressed = _draft_skip_prologue
 	_skip_hint.text = tr("SETTINGS_SKIP_HINT")
+	_dev_tools_check.text = tr("SETTINGS_DEV_TOOLS")
+	_dev_tools_check.button_pressed = _draft_dev_tools
+	_dev_tools_hint.text = tr("SETTINGS_DEV_TOOLS_HINT")
+	_save_button.text = tr("COMMON_SAVE")
 	_close_button.text = tr("COMMON_CLOSE")
 	for entry in _control_actions:
 		var label: Label = entry["label"]
@@ -252,8 +294,25 @@ func _on_locale_changed(_locale: String) -> void:
 		_tab_general.grab_focus()
 
 
+func _on_language_selected(locale: String) -> void:
+	_draft_locale = locale
+	_style_language_buttons()
+
+
 func _on_skip_toggled(pressed: bool) -> void:
-	GameSettings.set_skip_prologue(pressed)
+	_draft_skip_prologue = pressed
+
+
+func _on_dev_tools_toggled(pressed: bool) -> void:
+	_draft_dev_tools = pressed
+
+
+func _on_save_pressed() -> void:
+	GameSettings.set_skip_prologue(_draft_skip_prologue)
+	GameSettings.set_dev_tools_enabled(_draft_dev_tools)
+	if LocalizationManager.current_locale != _draft_locale:
+		LocalizationManager.set_locale(_draft_locale)
+	closed.emit()
 
 
 func _style_tabs() -> void:
@@ -292,8 +351,8 @@ func _make_button_box(bg: Color, border_color: Color = Color(0, 0, 0, 0), border
 
 
 func _style_language_buttons() -> void:
-	_style_language_button(_language_ru, LocalizationManager.current_locale == "ru")
-	_style_language_button(_language_en, LocalizationManager.current_locale == "en")
+	_style_language_button(_language_ru, _draft_locale == "ru")
+	_style_language_button(_language_en, _draft_locale == "en")
 
 
 func _style_language_button(button: Button, active: bool) -> void:

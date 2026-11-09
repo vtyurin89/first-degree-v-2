@@ -3,13 +3,19 @@ extends Node
 const PAUSE_LAYER := 90
 const MODAL_LAYER := 100
 const SCREEN_LAYER := 95
+const DEV_LAYER := 96
 const INDICATOR_LAYER := 110
+const DEV_MENU_SCRIPT := preload("res://scripts/ui/DevMenu.gd")
 
 var _pause_layer: CanvasLayer
 var _pause_menu: MenuScreen
 var _modal_layer: CanvasLayer
 var _modal: ModalDialog
 var _settings_dialog: SettingsDialog
+var _dev_layer: CanvasLayer
+var _dev_menu: DevMenu
+var _dev_state_before: int = -1
+var _dev_mouse_mode: int = Input.MOUSE_MODE_VISIBLE
 var _inventory_layer: CanvasLayer
 var _inventory: InventoryUI
 var _inventory_state: int = -1
@@ -49,6 +55,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		close_inventory()
 		get_viewport().set_input_as_handled()
 		return
+	if _dev_menu != null:
+		close_dev_menu()
+		get_viewport().set_input_as_handled()
+		return
 	if _modal != null:
 		_dismiss_modal()
 		get_viewport().set_input_as_handled()
@@ -67,7 +77,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func pause_game() -> void:
-	if _pause_menu != null or not GameManager.is_gameplay_state():
+	if _pause_menu != null or _dev_menu != null or not GameManager.is_gameplay_state():
 		return
 	_state_before_pause = GameManager.current_state
 	_prev_mouse_mode = Input.mouse_mode
@@ -101,10 +111,52 @@ func resume_game() -> void:
 	Input.mouse_mode = _prev_mouse_mode
 
 
+func open_dev_menu() -> void:
+	if _dev_menu != null or not GameManager.is_gameplay_state():
+		return
+	if get_tree().paused or _pause_menu != null or _modal != null or _settings_dialog != null or _screen != null or _inventory != null:
+		return
+	_dev_state_before = GameManager.current_state
+	_dev_mouse_mode = Input.mouse_mode
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	GameManager.set_state(GameManager.GameState.PAUSED)
+
+	_dev_layer = CanvasLayer.new()
+	_dev_layer.layer = DEV_LAYER
+	_dev_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_dev_layer)
+
+	_dev_menu = DEV_MENU_SCRIPT.new()
+	_dev_menu.theme = ThemeManager.get_theme()
+	_dev_layer.add_child(_dev_menu)
+	_dev_menu.closed.connect(close_dev_menu)
+	_dev_menu.start_interrogation_requested.connect(_on_dev_start_interrogation)
+	get_tree().paused = true
+
+
+func close_dev_menu() -> void:
+	if _dev_menu == null:
+		return
+	get_tree().paused = false
+	_dev_menu.queue_free()
+	_dev_menu = null
+	_dev_layer.queue_free()
+	_dev_layer = null
+	if _dev_state_before >= 0:
+		GameManager.set_state(_dev_state_before)
+	_dev_state_before = -1
+	Input.mouse_mode = _dev_mouse_mode
+
+
+func _on_dev_start_interrogation() -> void:
+	close_dev_menu()
+	GameManager.start_interrogation_one()
+
+
 func _can_toggle_inventory() -> bool:
 	if _inventory != null:
 		return true
-	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null:
+	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null or _dev_menu != null:
 		return false
 	if get_tree().paused:
 		return false
@@ -121,7 +173,7 @@ func _toggle_inventory() -> void:
 func open_inventory() -> void:
 	if _inventory != null:
 		return
-	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null:
+	if _modal != null or _settings_dialog != null or _screen != null or _pause_menu != null or _dev_menu != null:
 		return
 	if get_tree().paused or not GameManager.is_gameplay_state():
 		return
@@ -204,7 +256,7 @@ func _close_screen_internal() -> void:
 
 
 func has_modal() -> bool:
-	return _modal != null or _settings_dialog != null or _inventory != null
+	return _modal != null or _settings_dialog != null or _inventory != null or _dev_menu != null
 
 
 func show_modal(title: String, message: String, options: Array, on_result: Callable = Callable(), sub_message: String = "", show_icon: bool = true) -> ModalDialog:
@@ -255,6 +307,7 @@ func show_input_modal(title: String, message: String, placeholder: String, on_co
 
 
 func _on_load_started() -> void:
+	close_dev_menu()
 	_dismiss_modal()
 	_close_settings()
 	_close_inventory_internal()

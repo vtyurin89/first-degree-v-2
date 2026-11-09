@@ -17,8 +17,8 @@ func _ready() -> void:
 	_stack.anchor_bottom = 0.0
 	_stack.offset_left = -430
 	_stack.offset_right = -24
-	_stack.offset_top = 24
-	_stack.offset_bottom = 300
+	_stack.offset_top = 68
+	_stack.offset_bottom = 340
 	_stack.add_theme_constant_override("separation", 10)
 	_stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_stack)
