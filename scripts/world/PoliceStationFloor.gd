@@ -5,6 +5,7 @@ const T_INT := 0.2
 const T_THICK := 0.4
 const DOOR_W := 1.0
 const DOOR_H := 2.2
+const CASE_VIEWER_SCENE := preload("res://scenes/CaseFileUI.tscn")
 
 @onready var player: PlayerController3D = $Player3D
 
@@ -17,6 +18,7 @@ var _prompt_tween: Tween
 var _overlay_rect: ColorRect
 var _vnbox: VNBox
 var _interactor: PlayerInteractor
+var _case_viewer: CaseDocumentViewer
 
 var _mat_floor: StandardMaterial3D
 var _mat_wall: StandardMaterial3D
@@ -67,7 +69,7 @@ func _handle_interact(_player: Node, id: String, prompt_key: String) -> void:
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
 			ObjectiveManager.activate_objective("study_911_transcript")
-			_start_dialogue(_document_sequence("case_file_4417"), Callable())
+			_open_case_document("case_4417_c")
 		"office_cabinet":
 			ObjectiveManager.complete_objective("study_evidence")
 			ObjectiveManager.complete_objective("study_911_transcript")
@@ -111,6 +113,24 @@ func _on_interact_lost() -> void:
 	_prompt_tween = create_tween()
 	_prompt_tween.tween_property(_prompt, "modulate:a", 0.0, 0.12)
 	_prompt_tween.tween_callback(func() -> void: _prompt.visible = false)
+
+
+func _open_case_document(id: String) -> void:
+	var document := CaseDocumentLibrary.load_document(id)
+	if document == null or _case_viewer == null:
+		_show_toast(tr("DOCUMENT_MISSING"))
+		return
+	GameManager.set_state(GameManager.GameState.INVENTORY)
+	player.release_mouse()
+	player.set_physics_process(false)
+	_prompt.visible = false
+	_case_viewer.open_document(document)
+
+
+func _on_case_viewer_closed() -> void:
+	GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
+	player.set_physics_process(true)
+	player.capture_mouse()
 
 
 func _on_weller_finished() -> void:
@@ -596,6 +616,11 @@ func _build_hud() -> void:
 	_toast.offset_top = 56
 	_toast.offset_bottom = 84
 	_ui_layer.add_child(_toast)
+
+	_case_viewer = CASE_VIEWER_SCENE.instantiate()
+	_case_viewer.visible = false
+	_case_viewer.document_closed.connect(_on_case_viewer_closed)
+	_ui_layer.add_child(_case_viewer)
 
 
 func _on_energy_changed(value: int) -> void:

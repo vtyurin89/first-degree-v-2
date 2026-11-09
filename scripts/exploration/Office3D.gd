@@ -3,6 +3,7 @@ extends Node3D
 const ROOM_W := 10.0
 const ROOM_D := 10.0
 const ROOM_H := 3.0
+const CASE_VIEWER_SCENE := preload("res://scenes/CaseFileUI.tscn")
 
 @onready var player: PlayerController3D = $Player3D
 
@@ -15,6 +16,7 @@ var _overlay_rect: ColorRect
 var _vnbox: VNBox
 var _dialogue_active := false
 var _current: Interactable = null
+var _case_viewer: CaseDocumentViewer
 
 var _mat_floor: StandardMaterial3D
 var _mat_wall: StandardMaterial3D
@@ -75,7 +77,7 @@ func _trigger(target: Interactable) -> void:
 				GameManager.play_cue(660.0, 0.14, -8.0)
 				_show_toast(tr("COFFEE_DRANK"))
 		"board":
-			_start_dialogue(_document_sequence("case_file_4417"), Callable())
+			_open_case_document("case_4417_c")
 		"cabinet":
 			_start_dialogue(_document_sequence("email_weller"), Callable())
 		"shelf":
@@ -90,6 +92,24 @@ func _trigger(target: Interactable) -> void:
 				_start_dialogue(lines, Callable())
 			else:
 				_show_toast(tr(target.prompt))
+
+
+func _open_case_document(id: String) -> void:
+	var document := CaseDocumentLibrary.load_document(id)
+	if document == null or _case_viewer == null:
+		_show_toast(tr("DOCUMENT_MISSING"))
+		return
+	GameManager.set_state(GameManager.GameState.INVENTORY)
+	player.release_mouse()
+	player.set_physics_process(false)
+	_prompt.visible = false
+	_case_viewer.open_document(document)
+
+
+func _on_case_viewer_closed() -> void:
+	GameManager.set_state(GameManager.GameState.EXPLORATION_3D)
+	player.set_physics_process(true)
+	player.capture_mouse()
 
 
 func _on_weller_finished() -> void:
@@ -622,6 +642,11 @@ func _build_hud() -> void:
 	_toast.offset_top = 56
 	_toast.offset_bottom = 84
 	_ui_layer.add_child(_toast)
+
+	_case_viewer = CASE_VIEWER_SCENE.instantiate()
+	_case_viewer.visible = false
+	_case_viewer.document_closed.connect(_on_case_viewer_closed)
+	_ui_layer.add_child(_case_viewer)
 
 
 func _on_energy_changed(value: int) -> void:

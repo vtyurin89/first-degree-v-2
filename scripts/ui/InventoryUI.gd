@@ -4,6 +4,7 @@ class_name InventoryUI
 const INK := Color(0.16, 0.12, 0.09)
 const PAPER := Color(0.86, 0.82, 0.72)
 const NOTES_PER_PAGE := 3
+const CASE_VIEWER_SCENE := preload("res://scenes/CaseFileUI.tscn")
 
 const ITEMS := [
 	{"id": "case_file", "name_key": "ITEM_CASE_FILE", "icon": "res://assets/icons/items/ic_case_file.png", "pos": Vector2(0.06, 0.12), "size": Vector2(240, 310), "color": Color(0.75, 0.62, 0.32)},
@@ -30,6 +31,7 @@ var _reading_overlay: Control
 var _reading_title: Label
 var _reading_body: RichTextLabel
 var _reading_hint: Label
+var _case_viewer: CaseDocumentViewer
 
 
 func _ready() -> void:
@@ -69,6 +71,7 @@ func _build() -> void:
 	_build_notebook()
 	_build_bag()
 	_build_reading_overlay()
+	_build_case_viewer()
 
 
 func _build_task_sticky() -> void:
@@ -278,8 +281,20 @@ func _build_reading_overlay() -> void:
 	vbox.add_child(close)
 
 
+func _build_case_viewer() -> void:
+	_case_viewer = CASE_VIEWER_SCENE.instantiate()
+	_case_viewer.visible = false
+	_case_viewer.document_closed.connect(_close_reading)
+	add_child(_case_viewer)
+
+
 func _open_reading() -> void:
 	if not GameManager.has_case_file:
+		return
+	var case_document := CaseDocumentLibrary.load_document("case_4417_c")
+	if case_document != null and _case_viewer != null:
+		_reading_overlay.visible = false
+		_case_viewer.open_document(case_document)
 		return
 	var document := DocumentLibrary.load_document("case_file_4417")
 	if document == null:
@@ -294,6 +309,8 @@ func _open_reading() -> void:
 
 func _close_reading() -> void:
 	_reading_overlay.visible = false
+	if _case_viewer != null and _case_viewer.visible:
+		_case_viewer.close()
 
 
 func _on_item_gui_input(event: InputEvent, entry: Dictionary) -> void:
@@ -307,6 +324,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _reading_overlay == null:
 		return
 	if not event.is_action_pressed("read"):
+		return
+	if _case_viewer != null and _case_viewer.visible:
+		_close_reading()
+		get_viewport().set_input_as_handled()
 		return
 	if _reading_overlay.visible:
 		_close_reading()
