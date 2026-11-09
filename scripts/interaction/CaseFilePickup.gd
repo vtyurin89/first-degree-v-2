@@ -57,7 +57,6 @@ func execute_interaction(_player) -> void:
 	set_highlight(false)
 	GameManager.has_case_file = true
 	ObjectiveManager.complete_objective("take_case")
-	GameManager.play_paper_sound()
 	if _visual != null:
 		_visual.visible = false
 	queue_free()

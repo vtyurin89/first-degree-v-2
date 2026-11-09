@@ -64,7 +64,7 @@ func _build_ui() -> void:
 	outer.add_theme_constant_override("margin_left", 32)
 	outer.add_theme_constant_override("margin_right", 32)
 	outer.add_theme_constant_override("margin_top", 24)
-	outer.add_theme_constant_override("margin_bottom", 24)
+	outer.add_theme_constant_override("margin_bottom", 72)
 	add_child(outer)
 
 	_folder = PanelContainer.new()
@@ -129,6 +129,14 @@ func _build_ui() -> void:
 	paper_vbox.add_theme_constant_override("separation", 6)
 	paper.add_child(paper_vbox)
 
+	var confidential := Label.new()
+	confidential.text = tr("CASE_CONFIDENTIAL")
+	confidential.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	confidential.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confidential.theme_type_variation = UITheme.SMALL
+	confidential.add_theme_color_override("font_color", MUTED_INK)
+	paper_vbox.add_child(confidential)
+
 	_page_title = Label.new()
 	_page_title.theme_type_variation = UITheme.MODAL_TITLE
 	_page_title.add_theme_color_override("font_color", INK)
@@ -147,10 +155,18 @@ func _build_ui() -> void:
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	paper_vbox.add_child(line)
 
+	var content_scroll := ScrollContainer.new()
+	content_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	content_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	content_scroll.custom_minimum_size = Vector2(0, 240)
+	paper_vbox.add_child(content_scroll)
+
 	_content_box = VBoxContainer.new()
+	_content_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_content_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content_box.add_theme_constant_override("separation", 10)
-	paper_vbox.add_child(_content_box)
+	content_scroll.add_child(_content_box)
 
 	_margin_layer = Control.new()
 	_margin_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -160,12 +176,10 @@ func _build_ui() -> void:
 	var footer := HBoxContainer.new()
 	footer.add_theme_constant_override("separation", 12)
 	paper_vbox.add_child(footer)
-	var confidential := Label.new()
-	confidential.text = tr("CASE_CONFIDENTIAL")
-	confidential.theme_type_variation = UITheme.SMALL
-	confidential.add_theme_color_override("font_color", MUTED_INK)
-	confidential.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	footer.add_child(confidential)
+	var footer_spacer := Control.new()
+	footer_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	footer.add_child(footer_spacer)
 	_page_indicator = Label.new()
 	_page_indicator.theme_type_variation = UITheme.SMALL
 	_page_indicator.add_theme_color_override("font_color", MUTED_INK)
@@ -173,7 +187,15 @@ func _build_ui() -> void:
 
 	var nav := HBoxContainer.new()
 	nav.add_theme_constant_override("separation", 12)
-	folder_vbox.add_child(nav)
+	nav.anchor_left = 0.0
+	nav.anchor_right = 1.0
+	nav.anchor_top = 1.0
+	nav.anchor_bottom = 1.0
+	nav.offset_left = 32
+	nav.offset_right = -32
+	nav.offset_top = -64
+	nav.offset_bottom = -20
+	add_child(nav)
 	_prev_button = _make_nav_button(tr("CASE_PREV"))
 	_prev_button.pressed.connect(_on_prev_pressed)
 	nav.add_child(_prev_button)
@@ -247,29 +269,40 @@ func _clear_page() -> void:
 func _build_page(page: Dictionary) -> void:
 	var body := String(page.get("body", ""))
 	var photo_path := String(page.get("photo_path", ""))
-	if photo_path != "":
+	var has_photo_column := bool(page.get("photo_column", false)) or photo_path != ""
+	if has_photo_column:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 18)
+		row.add_theme_constant_override("separation", 14)
 		_content_box.add_child(row)
 		var body_label := _make_body_label(body)
 		body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(body_label)
+		var right_column := VBoxContainer.new()
+		right_column.custom_minimum_size = Vector2(220, 0)
+		right_column.size_flags_horizontal = Control.SIZE_SHRINK_END
+		right_column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		right_column.add_theme_constant_override("separation", 10)
+		row.add_child(right_column)
 		var photo := PhotoSlot.new()
 		photo.custom_minimum_size = Vector2(144, 192)
-		row.add_child(photo)
+		photo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		photo.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		right_column.add_child(photo)
 		photo.set_placeholder(String(page.get("photo_label", "")))
-		photo.load_photo(photo_path, String(page.get("photo_label", "")))
+		if photo_path != "":
+			photo.load_photo(photo_path, String(page.get("photo_label", "")))
+		if page.has("margin_note"):
+			right_column.add_child(_make_margin_note(String(page["margin_note"]), String(page.get("margin_author", ""))))
 	else:
 		_content_box.add_child(_make_body_label(body))
-	if page.has("margin_note"):
-		_add_margin_note(String(page["margin_note"]), String(page.get("margin_author", "")))
 
 
 func _make_body_label(body: String) -> RichTextLabel:
 	var label := RichTextLabel.new()
 	label.bbcode_enabled = true
-	label.scroll_active = true
-	label.custom_minimum_size = Vector2(0, 300)
+	label.scroll_active = false
+	label.fit_content = true
+	label.custom_minimum_size = Vector2(0, 0)
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.add_theme_color_override("default_color", INK)
 	label.add_theme_font_size_override("normal_font_size", 17)
@@ -277,13 +310,10 @@ func _make_body_label(body: String) -> RichTextLabel:
 	return label
 
 
-func _add_margin_note(note: String, author: String) -> void:
+func _make_margin_note(note: String, author: String) -> Control:
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.anchor_left = 0.58
-	panel.anchor_right = 0.98
-	panel.anchor_top = 0.62
-	panel.anchor_bottom = 0.92
+	panel.custom_minimum_size = Vector2(200, 0)
 	panel.rotation = deg_to_rad(-2.0)
 	panel.resized.connect(func() -> void: panel.pivot_offset = panel.size * 0.5)
 	var style := StyleBoxFlat.new()
@@ -291,18 +321,17 @@ func _add_margin_note(note: String, author: String) -> void:
 	style.border_color = Color(0.72, 0.62, 0.3, 0.8)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)
-	style.set_content_margin_all(12)
+	style.set_content_margin_all(10)
 	style.shadow_color = Color(0.0, 0.0, 0.0, 0.35)
 	style.shadow_size = 8
 	panel.add_theme_stylebox_override("panel", style)
-	_margin_layer.add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)
 	var note_label := Label.new()
 	note_label.text = note
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note_label.add_theme_color_override("font_color", Color(0.12, 0.16, 0.48))
-	note_label.add_theme_font_size_override("font_size", 18)
+	note_label.add_theme_font_size_override("font_size", 17)
 	box.add_child(note_label)
 	if author != "":
 		var author_label := Label.new()
@@ -311,6 +340,7 @@ func _add_margin_note(note: String, author: String) -> void:
 		author_label.theme_type_variation = UITheme.SMALL
 		author_label.add_theme_color_override("font_color", MUTED_INK)
 		box.add_child(author_label)
+	return panel
 
 
 func _on_prev_pressed() -> void:
