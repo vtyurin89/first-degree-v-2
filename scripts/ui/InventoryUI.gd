@@ -6,7 +6,7 @@ const PAPER := Color(0.86, 0.82, 0.72)
 const NOTES_PER_PAGE := 3
 
 const ITEMS := [
-	{"id": "case_file", "name_key": "ITEM_CASE_FILE", "icon": "res://assets/icons/items/ic_case_file.svg", "pos": Vector2(0.06, 0.12), "size": Vector2(240, 310), "color": Color(0.75, 0.62, 0.32)},
+	{"id": "case_file", "name_key": "ITEM_CASE_FILE", "icon": "res://assets/icons/items/ic_case_file.png", "pos": Vector2(0.06, 0.12), "size": Vector2(240, 310), "color": Color(0.75, 0.62, 0.32)},
 	{"id": "cigarettes", "name_key": "ITEM_CIGARETTES", "icon": "res://assets/icons/items/ic_cigarettes.png", "icon_region": Rect2(318, 34, 421, 697), "pos": Vector2(0.62, 0.05), "size": Vector2(110, 150), "color": Color(0.82, 0.8, 0.74)},
 	{"id": "lighter", "name_key": "ITEM_LIGHTER", "icon": "res://assets/icons/items/ic_lighter.png", "pos": Vector2(0.84, 0.13), "size": Vector2(55, 130), "color": Color(0.15, 0.15, 0.16)},
 	{"id": "keys", "name_key": "ITEM_KEYS", "icon": "res://assets/icons/items/ic_keys.png", "pos": Vector2(0.53, 0.62), "size": Vector2(160, 120), "color": Color(0.7, 0.6, 0.3)},
@@ -343,6 +343,7 @@ func _make_item_slot(item: Dictionary) -> void:
 
 	var icon := TextureRect.new()
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	icon.offset_left = 6
 	icon.offset_top = 6
