@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/discoveries/DiscoveryEvent.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+event_id = "scolfield_misogyny_1"
+type = "TRAIT"
+suspect_id = "scolfield"
+energy_cost = 0
+ink_flag_to_set = "scolfield_gender_bias_noticed"
+trait_id = "GENDER_BIAS"
+trait_new_level = 1
+attorney_risk_delta = 0
+notification_header_key = "DISC_SCOLFIELD_GENDER_BIAS_HEADER"
+notification_title_key = "DISC_SCOLFIELD_GENDER_BIAS_NOTIFICATION_TITLE"
+generates_notebook_entry = true
+notebook_title_key = "DISC_SCOLFIELD_GENDER_BIAS_NOTE_TITLE"
+notebook_text_key = "DISC_SCOLFIELD_GENDER_BIAS_NOTE_TEXT"

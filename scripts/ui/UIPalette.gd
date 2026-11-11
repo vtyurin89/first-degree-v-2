@@ -20,6 +20,8 @@ const RED := Color(0.698, 0.133, 0.122)
 const RED_BRIGHT := Color(0.851, 0.224, 0.204)
 const RED_DIM := Color(0.420, 0.102, 0.094)
 
+const DISCOVERY_ACCENT := Color(0.878, 0.663, 0.267)
+
 
 static func html(color: Color) -> String:
 	return "#" + color.to_html(false)

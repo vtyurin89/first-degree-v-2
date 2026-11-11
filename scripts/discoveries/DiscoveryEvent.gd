@@ -5,12 +5,13 @@ enum EventType {
 	TRAIT,
 	DISCREPANCY,
 	CLUE,
-	JUNK
+	JUNK,
+	COMMENT
 }
 
-@export_group("Идентификация")
+@export_group("Метаданные")
 @export var event_id: String = ""
-@export var type: EventType = EventType.TRAIT
+@export_enum("TRAIT", "DISCREPANCY", "CLUE", "JUNK", "COMMENT") var type: String = "TRAIT"
 @export var suspect_id: String = "scolfield"
 @export var energy_cost: int = 0
 
@@ -23,9 +24,23 @@ enum EventType {
 @export_group("Нотификация")
 @export var notification_header_key: String = ""
 @export var notification_title_key: String = ""
-@export var notification_color: Color = Color("e0a944")
+@export var notification_color: Color = UIPalette.DISCOVERY_ACCENT
 
 @export_group("Запись в блокнот")
 @export var generates_notebook_entry: bool = true
 @export var notebook_title_key: String = ""
 @export var notebook_text_key: String = ""
+
+
+func get_event_type() -> EventType:
+	match type:
+		"DISCREPANCY":
+			return EventType.DISCREPANCY
+		"CLUE":
+			return EventType.CLUE
+		"JUNK":
+			return EventType.JUNK
+		"COMMENT":
+			return EventType.COMMENT
+		_:
+			return EventType.TRAIT

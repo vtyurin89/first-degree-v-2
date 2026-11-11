@@ -69,13 +69,19 @@ func trigger_event(event_id: String) -> bool:
 
 func _load_all_events() -> void:
 	registry.clear()
-	var dir := DirAccess.open(DISCOVERIES_DIR)
+	_load_events_in_dir(DISCOVERIES_DIR)
+
+
+func _load_events_in_dir(path: String) -> void:
+	var dir := DirAccess.open(path)
 	if dir == null:
 		return
 	for file_name in dir.get_files():
 		if not file_name.ends_with(".tres"):
 			continue
-		var path := "%s/%s" % [DISCOVERIES_DIR, file_name]
-		var resource = ResourceLoader.load(path)
+		var resource_path := "%s/%s" % [path, file_name]
+		var resource = ResourceLoader.load(resource_path)
 		if resource is DiscoveryEvent and resource.event_id != "":
 			registry[resource.event_id] = resource
+	for subdirectory in dir.get_directories():
+		_load_events_in_dir("%s/%s" % [path, subdirectory])

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 event_id = "scolfield_narcissism_probe"
-type = 0
+type = "TRAIT"
 suspect_id = "scolfield"
 energy_cost = 0
 ink_flag_to_set = "found_medals_display"
@@ -14,7 +14,6 @@ trait_new_level = 1
 attorney_risk_delta = 0
 notification_header_key = "DISC_SCOLFIELD_NARCISSISM_HEADER"
 notification_title_key = "DISC_SCOLFIELD_NARCISSISM_NOTIFICATION_TITLE"
-notification_color = Color(0.878, 0.663, 0.267, 1)
 generates_notebook_entry = true
 notebook_title_key = "DISC_SCOLFIELD_NARCISSISM_NOTE_TITLE"
 notebook_text_key = "DISC_SCOLFIELD_NARCISSISM_NOTE_TEXT"

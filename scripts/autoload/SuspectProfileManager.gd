@@ -53,6 +53,12 @@ func restore(data: Dictionary) -> void:
 func _init_suspect(suspect_id: String) -> void:
 	if not _profiles.has(suspect_id):
 		_profiles[suspect_id] = {}
+	for trait_id in TraitStatus.ALL_TRAITS:
+		if not _profiles[suspect_id].has(trait_id):
+			_profiles[suspect_id][trait_id] = {
+				"level": TraitStatus.Level.UNKNOWN,
+				"sources": []
+			}
 
 
 func register_flag(flag: String) -> void:

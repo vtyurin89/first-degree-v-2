@@ -22,9 +22,66 @@ EXTERNAL modify_attorney_risk(delta)
 === p1_anna_greeting_2 ===
 Я детектив Анна Кроуфорд. Понимаю, что вам сейчас непросто, поэтому давайте разберёмся со всем побыстрее. Не хочу держать вас здесь без необходимости.
  # speaker: anna # id: CH1_DLG_ANNA_P1_GREETING_2
--> p1_hub_1
+-> p1_anna_greeting_3
 
-=== p1_hub_1 ===
+=== p1_anna_greeting_3 ===
+[url=event:scolfield_misogyny_1]Женщина-детектив, надо же...[/url] [url=event:scolfield_selfishness_1]Так я не арестован?[/url]
+ # speaker: scolfield # id: CH1_DLG_ANNA_P1_GREETING_3
+-> p1_scolfield_arrest_hub_1
+
+
+// Arrest question hub 1
+=== p1_scolfield_arrest_hub_1 ===
+* [Нет, вы здесь по собственной воле и можете уйти когда захотите. Но мне следует зачитать вам права... (зачитать права Миранды) # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_MIRANDA]
+    -> p1_miranda
+* [Нет, мистер Сколфилд, конечно же вы не арестованы. Но вам нужно будет ответить на несколько вопросов. # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_NOT_ARRESTED]
+    -> p1_scoldield_arrest_answer_good
+* [Вы свидетель, а не подозреваемый, никто вас не арестует. # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_NOT_SUSPECT]
+    -> p1_scoldield_arrest_answer_good
+* [Пока что нет. # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_NOT_YET]
+    -> p1_scoldield_arrest_answer_suspicious
+
+=== p1_miranda ===
+Это просто формальность. По новым правилам у нас требуют зачитывать это всем подряд, даже тем, кто просто помогает. Вы имеете право хранить молчание. Всё, что вы скажете, может и будет использовано против вас в суде. Вы имеете право на адвоката. Если вы не можете его себе позволить, он будет предоставлен вам бесплатно. Вам понятны ваши права? # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_MIRANDA
+    -> p1_miranda_answer_uncomfortable_1
+    
+=== p1_miranda_answer_uncomfortable_1 ===
+Да... наверное. Но как-то вы внезапно говорите про права... Хах, уж извините, стало как-то не по себе. Мне позвонить адвокату? # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_MIRANDA_UNCOMFORTABLE_1
+    -> p1_miranda_uncomfortable_hub
+
+=== p1_miranda_uncomfortable_hub ===
+* [Это ваше право, мистер Сколфилд. Если хотите позвонить, я остановлю запись прямо сейчас. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_HONEST]
+    -> p1_miranda_clarify_1
+* [Вы считаете, что вам нужен адвокат? Я могу остановить допрос, чтобы вы могли позвонить, это ваше право. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY]
+    -> p1_miranda_clarify_1
+* [Адвокат вам не понадобится, мистер Сколфилд. Вы же не подозреваемый, мы только время потеряем. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_LIE]
+    -> p1_miranda_lie_1
+
+=== p1_miranda_clarify_1 ===
+Э-э-э, полагаю, адвокат мне не то чтобы нужен... (кашляет) Я просто на всякий случай спрашиваю. Я ведь не юрист, сами понимаете. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY_1
+-> p1_miranda_clarify_2
+
+=== p1_miranda_lie_1 ===
+Если вы так считаете, спорить не буду. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_LIE_1
+-> p1_miranda_clarify_2
+
+=== p1_miranda_clarify_2 ===
+Я здесь только для того, чтобы вы разобрались, что случилось с этим парнем. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY_2
+-> p1_hub_coffee_1
+
+===  p1_scoldield_arrest_answer_good  ===
+Конечно, я всё понимаю. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_ARREST_ANSWER_GOOD
+-> p1_hub_coffee_1
+
+===  p1_scoldield_arrest_answer_suspicious  ===
+Конечно, я всё понимаю. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_ARREST_ANSWER_SUSPICIOUS
+-> p1_hub_coffee_1
+
+
+
+
+// Coffee question (main hub 1)
+=== p1_hub_coffee_1 ===
 * [Будете кофе, мистер Сколфилд? # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_YES]
     -> p1_army_1
 * [(Обойдётся) # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_NO]
@@ -58,7 +115,19 @@ EXTERNAL modify_attorney_risk(delta)
 
 === p1_begin_questioning_2 ===
 Вы лучше всех знали Грега и были в доме в тот день. Если кто-то и может помочь нам понять, что произошло, то это вы! # speaker: anna # id: CH1_DLG_SCOLFIELD_P1_BEGIN_QUESTIONING_2
--> p1_hub
+-> p1_begin_questioning_3
+
+=== p1_begin_questioning_3 ===
+Конечно. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_BEGIN_QUESTIONING_3
+-> p1_hub_2
+
+=== p1_hub_2 ===
+* [Если это поможет, расскажите немного о себе. Чем вы занимались до всего этого? # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_YES]
+    -> p1_army_1
+* [Как держится Тамара? # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_NO]
+    -> p1_feel_1
+* ->
+    -> p2_intro
 
 === p1_hub ===
 * [Спросить о службе в армии # id: CH1_DLG_SCOLFIELD_CHOICE_P1_HUB_PROBE_ARMY]

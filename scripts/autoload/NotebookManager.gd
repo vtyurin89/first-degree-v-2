@@ -78,7 +78,7 @@ func _resolve_type(event: DiscoveryEvent) -> int:
 			return NoteType.FACT
 		if SuspectProfileManager.has_trait_at_least(event.suspect_id, event.trait_id, TraitStatus.Level.SUSPECTED):
 			return NoteType.HYPOTHESIS
-	match event.type:
+	match event.get_event_type():
 		DiscoveryEvent.EventType.DISCREPANCY:
 			return NoteType.DISCREPANCY
 		DiscoveryEvent.EventType.CLUE:
