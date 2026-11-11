@@ -29,6 +29,8 @@ var _last_meta_frame := -1
 var _active_dialogue_path := ""
 var _line_source_text := ""
 var _line_plain_text := ""
+var _line_id := ""
+var _line_meta_locked := false
 var _line_parts: Array = []
 var _updating_text := false
 var _hovered_meta := ""
@@ -189,6 +191,8 @@ func _display_line(line: DialogueLine) -> void:
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if line.internal_thought else Color(0.92, 0.9, 0.86))
 	_line_source_text = ""
 	_line_plain_text = ""
+	_line_id = ""
+	_line_meta_locked = false
 	_line_parts.clear()
 	if _clue_underlay != null:
 		_clue_underlay.clear()
@@ -217,6 +221,8 @@ func _on_manager_line(speaker: String, text: String, metadata: Dictionary) -> vo
 	_update_portrait(speaker, internal, emotion)
 	_text_label.add_theme_color_override("default_color", Color(0.72, 0.82, 1.0) if internal else Color(0.92, 0.9, 0.86))
 	_line_source_text = text
+	_line_id = String(metadata.get("id", ""))
+	_line_meta_locked = GameManager.is_meta_line_locked(_line_id)
 	_clear_meta_feedback()
 	_text_label.text = _format_interactive_text(text)
 	_text_label.visible_characters = 0
@@ -233,6 +239,8 @@ func _on_manager_line(speaker: String, text: String, metadata: Dictionary) -> vo
 func _on_manager_choices(available_choices: Array) -> void:
 	_clear_meta_feedback()
 	_line_source_text = ""
+	_line_id = ""
+	_line_meta_locked = false
 	_mode = "choice"
 	_typing = false
 	_waiting_choice = true
@@ -376,6 +384,8 @@ func _clear_meta_feedback() -> void:
 
 
 func _meta_is_used(meta_id: String) -> bool:
+	if _line_meta_locked:
+		return true
 	if _manager == null:
 		return false
 	return _manager.is_meta_used(meta_id)
@@ -648,6 +658,8 @@ func _finish_hold() -> void:
 	if _manager == null or _manager.click_meta(meta_id) == false:
 		_refresh_status()
 		return
+	_line_meta_locked = true
+	GameManager.lock_meta_line(_line_id)
 	_last_meta_frame = Engine.get_process_frames()
 	_hovered_meta = ""
 	_refresh_interactive_text()
@@ -719,7 +731,7 @@ func _advance() -> void:
 				return
 		_manager.advance()
 		return
-	if _current != null and _current.required_url != "" and not GameManager.clicked_urls.has(_current.required_url):
+	if _current != null and _current.required_url != "" and not _line_meta_locked and not GameManager.clicked_urls.has(_current.required_url):
 		_update_hint()
 		return
 	_next()
@@ -732,7 +744,7 @@ func _update_hint() -> void:
 	if _typing or _current == null:
 		_hint.text = ""
 		return
-	if _current.required_url != "" and not GameManager.clicked_urls.has(_current.required_url):
+	if _current.required_url != "" and not _line_meta_locked and not GameManager.clicked_urls.has(_current.required_url):
 		_hint.text = tr("PIN_HINT")
 	else:
 		_hint.text = tr("ADVANCE_HINT")

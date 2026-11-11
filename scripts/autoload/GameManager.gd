@@ -49,6 +49,7 @@ var unlocked_tactics: Array[String] = []
 var registered_clues: Array[String] = []
 var completed_milestones: Array[int] = []
 var clicked_urls: Dictionary = {}
+var locked_meta_lines: Dictionary = {}
 var flags: Dictionary = {}
 
 var _fade: ColorRect
@@ -79,6 +80,7 @@ func reset_run() -> void:
 	registered_clues.clear()
 	completed_milestones.clear()
 	clicked_urls.clear()
+	locked_meta_lines.clear()
 	flags.clear()
 	SuspectProfileManager.reset_all()
 	NotebookManager.reset_all()
@@ -107,6 +109,7 @@ func capture_state() -> Dictionary:
 		"registered_clues": registered_clues.duplicate(),
 		"completed_milestones": completed_milestones.duplicate(),
 		"clicked_urls": clicked_urls.duplicate(true),
+		"locked_meta_lines": locked_meta_lines.duplicate(true),
 		"flags": flags.duplicate(true),
 		"suspect_profiles": SuspectProfileManager.snapshot(),
 		"notebook_entries": NotebookManager.snapshot(),
@@ -141,6 +144,11 @@ func restore_state(data: Dictionary) -> void:
 		clicked_urls = clicked.duplicate(true)
 	else:
 		clicked_urls = {}
+	var locked_lines = data.get("locked_meta_lines", {})
+	if locked_lines is Dictionary:
+		locked_meta_lines = locked_lines.duplicate(true)
+	else:
+		locked_meta_lines = {}
 	var flags_data = data.get("flags", {})
 	if flags_data is Dictionary:
 		flags = flags_data.duplicate(true)
@@ -271,6 +279,16 @@ func register_clicked_meta(meta_id: String) -> bool:
 		return false
 	clicked_urls[meta_id] = true
 	return true
+
+
+func lock_meta_line(line_id: String) -> void:
+	if line_id == "":
+		return
+	locked_meta_lines[line_id] = true
+
+
+func is_meta_line_locked(line_id: String) -> bool:
+	return line_id != "" and locked_meta_lines.has(line_id)
 
 
 func add_flag(flag: String) -> void:

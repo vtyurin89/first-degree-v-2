@@ -29,11 +29,8 @@ EXTERNAL modify_attorney_risk(delta)
  # speaker: scolfield # id: CH1_DLG_ANNA_P1_GREETING_3
 -> p1_scolfield_arrest_hub_1
 
-
 // Arrest question hub 1
 === p1_scolfield_arrest_hub_1 ===
-* [Нет, вы здесь по собственной воле и можете уйти когда захотите. Но мне следует зачитать вам права... (зачитать права Миранды) # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_MIRANDA]
-    -> p1_miranda
 * [Нет, мистер Сколфилд, конечно же вы не арестованы. Но вам нужно будет ответить на несколько вопросов. # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_NOT_ARRESTED]
     -> p1_scoldield_arrest_answer_good
 * [Вы свидетель, а не подозреваемый, никто вас не арестует. # id: CH1_DLG_SCOLFIELD_ANSWER_IMMEDIATE_NOT_SUSPECT]
@@ -50,16 +47,30 @@ EXTERNAL modify_attorney_risk(delta)
     -> p1_miranda_uncomfortable_hub
 
 === p1_miranda_uncomfortable_hub ===
-* [Это ваше право, мистер Сколфилд. Если хотите позвонить, я остановлю запись прямо сейчас. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_HONEST]
+* [Это ваше право, мистер Сколфилд. Если хотите позвонить, я остановлю запись прямо сейчас. (Положить руку на камеру) # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_HONEST]
     -> p1_miranda_clarify_1
-* [Вы считаете, что вам нужен адвокат? Я могу остановить допрос, чтобы вы могли позвонить, это ваше право. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY]
-    -> p1_miranda_clarify_1
-* [Адвокат вам не понадобится, мистер Сколфилд. Вы же не подозреваемый, мы только время потеряем. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_LIE]
+* [Так вы считаете, что вам нужен адвокат? Почему? # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY]
+    -> p1_miranda_clarify_question_back
+* [Адвокат вам не нужен, мистер Сколфилд. Вы же не подозреваемый. # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_LIE]
     -> p1_miranda_lie_1
 
 === p1_miranda_clarify_1 ===
-Э-э-э, полагаю, адвокат мне не то чтобы нужен... (кашляет) Я просто на всякий случай спрашиваю. Я ведь не юрист, сами понимаете. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY_1
+Э-э-э, полагаю, адвокат мне не то чтобы нужен... Мне нечего скрывать. (кашляет) Я просто на всякий случай спрашиваю. Я ведь не юрист, сами понимаете. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_CLARIFY_1
 -> p1_miranda_clarify_2
+
+=== p1_miranda_clarify_question_back ===
+Нет, зачем... Может, вы считаете, мне нужен адвокат, детектив? # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_MIRANDA_CLARIFY_QUESTION_BACK
+-> p1_miranda_clarify_hub
+
+=== p1_miranda_clarify_hub ===
+* [Решать только вам, мистер Сколфилд. # id: CH1_DLG_SCOLFIELD_PART_1_MIRANDA_CLARIFY_OPT_1]
+    -> p1_miranda_part_1_final
+* [Если вам нечего скрывать, то нет. # id: CH1_DLG_SCOLFIELD_PART_1_MIRANDA_CLARIFY_OPT_2]
+    -> p1_miranda_part_1_final
+    
+=== p1_miranda_part_1_final ===
+Как скажете # speaker: scolfield # id: CH1_DLG_SCOLFIELD_P1_MIRANDA_FINAL
+-> p1_hub_coffee_1
 
 === p1_miranda_lie_1 ===
 Если вы так считаете, спорить не буду. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_CHOICE_P1_MIRANDA_LIE_1
@@ -74,10 +85,8 @@ EXTERNAL modify_attorney_risk(delta)
 -> p1_hub_coffee_1
 
 ===  p1_scoldield_arrest_answer_suspicious  ===
-Конечно, я всё понимаю. # speaker: scolfield # id: CH1_DLG_SCOLFIELD_ARREST_ANSWER_SUSPICIOUS
+"Пока что нет?" Ха-ха-ха, милочка, если бы вы так не улыбались, я бы решил, что адвокат мне нужен еще как! # speaker: scolfield # id: CH1_DLG_SCOLFIELD_ARREST_ANSWER_SUSPICIOUS
 -> p1_hub_coffee_1
-
-
 
 
 // Coffee question (main hub 1)
@@ -124,10 +133,19 @@ EXTERNAL modify_attorney_risk(delta)
 === p1_hub_2 ===
 * [Если это поможет, расскажите немного о себе. Чем вы занимались до всего этого? # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_YES]
     -> p1_army_1
-* [Как держится Тамара? # id: CH1_DLG_SCOLFIELD_CHOICE_1_P1_COFFEE_NO]
+* [Как держится Тамара? # id: CH1_DLG_SCOLFIELD_TAMARA_QUESTION]
     -> p1_feel_1
-* ->
-    -> p2_intro
+* [Прежде чем мы продолжим, я по протоколу обязана зачитать вам ваши права... (зачитать права Миранды) # id: CH1_DLG_SCOLFIELD_MIRANDA_2]
+    ~ add_flag("mirandized_scolfield")
+    -> p1_feel_1
+{ has_trait("GENDER_BIAS"):
+    * [Простите, я здесь всего третью неделю. У меня не так много опыта в работе с подозреваемыми, как у детектива Уэллера. # id: CH1_DLG_SCOLFIELD_NOT_MUCH_EXPERIENCE]
+        -> p1_feel_1
+}
+
+
+
+
 
 === p1_hub ===
 * [Спросить о службе в армии # id: CH1_DLG_SCOLFIELD_CHOICE_P1_HUB_PROBE_ARMY]
